@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <title>Shopping list example</title>
+    <style>
+      li {
+        margin-bottom: 10px;
+      }
+
+      li button {
+        font-size: 12px;
+        margin-left: 20px;
+        color: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+      function ShoppingList() {
+        const [items, setItems] = React.useState([]);
+        const [inputValue, setInputValue] = React.useState("");
+        const inputRef = React.useRef(null);
+
+        const addItem = () => {
+          if (inputValue.trim() !== "") {
+            setItems([...items, inputValue]);
+            setInputValue("");
+            inputRef.current.focus();
+          }
+        };
+
+        const deleteItem = (index) => {
+          const newItems = items.filter((_, i) => i !== index);
+          setItems(newItems);
+        };
+
+        return (
+          <div>
+            <h1>My shopping list</h1>
+
+            <div>
+              <label htmlFor="item">Enter a new item:</label>
+              <input
+                type="text"
+                name="item"
+                id="item"
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                ref={inputRef}
+              />
+              <button onClick={addItem}>Add item</button>
+            </div>
+
+            <ul>
+              {items.map((item, index) => (
+                <li key={index}>
+                  <span>{item}</span>
+                  <button onClick={() => deleteItem(index)}>Delete</button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        );
+      }
+
+      ReactDOM.render(<ShoppingList />, document.getElementById("root"));
+    </script>
+  </body>
+</html>
