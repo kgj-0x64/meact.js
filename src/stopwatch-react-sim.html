@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Clock example</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: sans-serif;
+        margin: 20px;
+        padding: 0;
+      }
+
+      h1 {
+        margin-top: 0;
+        font-size: 22px;
+      }
+
+      h2 {
+        margin-top: 0;
+        font-size: 20px;
+      }
+
+      h3 {
+        margin-top: 0;
+        font-size: 18px;
+      }
+
+      h4 {
+        margin-top: 0;
+        font-size: 16px;
+      }
+
+      h5 {
+        margin-top: 0;
+        font-size: 14px;
+      }
+
+      h6 {
+        margin-top: 0;
+        font-size: 12px;
+      }
+
+      code {
+        font-size: 1.2em;
+      }
+
+      ul {
+        padding-inline-start: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/javascript">
+      let appState = {
+        nextId: 0,
+        components: {},
+        getNewComponentId(componentName) {
+          const id = this.nextId++;
+          const instanceId = `${componentName}-${id}`;
+          this.components[instanceId] = {
+            type: componentName,
+            state: {},
+          };
+          return instanceId;
+        },
+        initState(instanceId, state) {
+          const componentObject = this.components[instanceId];
+          if (Object.keys(componentObject.state).length === 0) {
+            componentObject.state = state;
+          }
+        },
+        getState(instanceId) {
+          const componentObject = this.components[instanceId];
+          return componentObject.state;
+        },
+        setState(instanceId, newState) {
+          const componentObject = this.components[instanceId];
+          componentObject.state = { ...this.state, ...newState };
+          rerenderComponent(instanceId);
+        },
+        reset() {
+          this.nextId = 0;
+          this.components = {};
+        },
+      };
+
+      // when color value is changed in its state
+      // it should update children components as well
+      function setColor_StopwatchTower(instanceId, value) {
+        appState.setState(instanceId, {
+          color: value,
+        });
+      }
+
+      function Stopwatch(instanceId, props) {
+        const renderObjectId = `render-${instanceId}`;
+        appState.initState(instanceId, {});
+
+        console.log("Stopwatch props", props);
+        const { color, time } = props;
+
+        return `
+          <h1 id='${renderObjectId}' style="color:${color}">
+            {time}
+          </h1>
+        `;
+      }
+
+      function StopwatchTower(instanceId) {
+        console.log("StopwatchTower CALLED", instanceId);
+        const renderObjectId = `render-${instanceId}`;
+        appState.initState(instanceId, {
+          color: "lightcoral",
+        });
+
+        const thisComponentState = appState.getState(instanceId);
+        const { color } = thisComponentState;
+
+        const _Stopwatches = () => {
+          let elements = [];
+          var length = 5;
+          for (var i = 0; i < length; i++) {
+            const stopwatchElement = Stopwatch(
+              appState.getNewComponentId("Stopwatch"),
+              {
+                color,
+              }
+            );
+            elements.push(stopwatchElement);
+          }
+          return elements.join("");
+        };
+
+        return `
+          <div id='${renderObjectId}'>
+            <p>
+              Pick a color:${" "}
+              <select value='${color}' onChange="setColor_StopwatchTower('${instanceId}', this.value)">
+                <option value="lightcoral">lightcoral</option>
+                <option value="midnightblue">midnightblue</option>
+                <option value="rebeccapurple">rebeccapurple</option>
+              </select>
+            </p>
+            <div class="game-info">
+                <ol>${_Stopwatches()}</ol>
+            </div>
+          </div>
+        `;
+      }
+
+      function rerenderComponent(instanceId) {
+        const componentObject = appState.components[instanceId];
+        if (!componentObject) return;
+
+        let componentElement;
+        componentElement = document.getElementById(`render-${instanceId}`);
+
+        if (componentElement) {
+          console.log("Rerender component element", componentElement);
+          const temp = document.createElement("div");
+          temp.innerHTML = eval(`${componentObject.type}('${instanceId}')`);
+          componentElement.parentNode.replaceChild(
+            temp.firstElementChild,
+            componentElement
+          );
+        }
+      }
+
+      let pageStructure = [
+        {
+          type: "StopwatchTower",
+          id: appState.getNewComponentId("StopwatchTower"),
+        },
+      ];
+
+      function MyPage() {
+        return pageStructure
+          .map((component) => {
+            if (component.type === "StopwatchTower") {
+              return StopwatchTower(component.id);
+            }
+          })
+          .join("");
+      }
+
+      function render() {
+        document.getElementById("root").innerHTML = MyPage();
+      }
+
+      // Initial render
+      render();
+    </script>
+  </body>
+</html>

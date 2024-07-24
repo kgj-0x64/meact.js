@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tic Tac Toe Game</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: sans-serif;
+        margin: 20px;
+        padding: 0;
+      }
+
+      h1 {
+        margin-top: 0;
+        font-size: 22px;
+      }
+
+      h2 {
+        margin-top: 0;
+        font-size: 20px;
+      }
+
+      h3 {
+        margin-top: 0;
+        font-size: 18px;
+      }
+
+      h4 {
+        margin-top: 0;
+        font-size: 16px;
+      }
+
+      h5 {
+        margin-top: 0;
+        font-size: 14px;
+      }
+
+      h6 {
+        margin-top: 0;
+        font-size: 12px;
+      }
+
+      code {
+        font-size: 1.2em;
+      }
+
+      ul {
+        padding-inline-start: 20px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: sans-serif;
+        margin: 20px;
+        padding: 0;
+      }
+
+      .square {
+        background: #fff;
+        border: 1px solid #999;
+        float: left;
+        font-size: 24px;
+        font-weight: bold;
+        line-height: 34px;
+        height: 34px;
+        margin-right: -1px;
+        margin-top: -1px;
+        padding: 0;
+        text-align: center;
+        width: 34px;
+      }
+
+      .board-row:after {
+        clear: both;
+        content: "";
+        display: table;
+      }
+
+      .status {
+        margin-bottom: 10px;
+      }
+      .game {
+        display: flex;
+        flex-direction: row;
+      }
+
+      .game-info {
+        margin-left: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/javascript">
+      let appState = {
+        nextId: 0,
+        components: {},
+        getNewComponentId(componentName) {
+          const id = this.nextId++;
+          const instanceId = `${componentName}-${id}`;
+          this.components[instanceId] = {
+            type: componentName,
+            state: {},
+            // TODO: IDs of children components need to persisted across rerenders of a component like its state
+            children: [],
+            get() {
+              return this.state;
+            },
+            set(newState) {
+              this.state = { ...this.state, ...newState };
+              rerenderComponent(instanceId);
+            },
+          };
+          return instanceId;
+        },
+        initState(instanceId, newState) {
+          const componentObject = this.components[instanceId];
+          if (Object.keys(componentObject.state).length === 0) {
+            componentObject.set(newState);
+          }
+        },
+        reset() {
+          this.nextId = 0;
+          this.components = {};
+        },
+      };
+
+      function calculateWinner(squares) {
+        const lines = [
+          [0, 1, 2],
+          [3, 4, 5],
+          [6, 7, 8],
+          [0, 3, 6],
+          [1, 4, 7],
+          [2, 5, 8],
+          [0, 4, 8],
+          [2, 4, 6],
+        ];
+        for (let i = 0; i < lines.length; i++) {
+          const [a, b, c] = lines[i];
+          if (
+            squares[a] &&
+            squares[a] === squares[b] &&
+            squares[a] === squares[c]
+          ) {
+            return squares[a];
+          }
+        }
+        return null;
+      }
+
+      // Global function to handle clicks
+      // `Uncaught ReferenceError: onSquareClick is not defined at HTMLButtonElement.onclick`
+      // defining in global scope because it's being called from button's onClick
+      //   function onClick_Square(instanceId, encodedSquares) {
+      //     const squares = JSON.parse(atob(encodedSquares));
+      //     console.log("onClick_Square", instanceId, squares);
+      //   }
+      // Global function to handle clicks
+      function onClick_Square(instanceId, encodedProps) {
+        // Decode and parse the props
+        const props = JSON.parse(atob(encodedProps));
+
+        // Destructure the props
+        const { index, squares, xIsNext, onPlayFunction } = props;
+
+        console.log(
+          "onClick_Square",
+          instanceId,
+          index,
+          squares,
+          xIsNext,
+          onPlayFunction
+        );
+      }
+
+      function onSquareClick(squares) {
+        console.log("onSquareClick called", squares);
+        // console.log(calculateWinner(squares));
+        // // do nothing if the game is already over or a square is already marked
+        // if (calculateWinner(squares) || squares[index]) {
+        //   return;
+        // }
+
+        // const nextSquares = squares.slice();
+        // if (xIsNext) {
+        //   nextSquares[index] = "X";
+        // } else {
+        //   nextSquares[index] = "O";
+        // }
+        // onPlay(nextSquares);
+      }
+
+      function handlePlay_Game(instanceId, nextSquares) {
+        console.log("called handlePlay", instanceId, nextSquares);
+        const { history, currentMove } = appState.components[instanceId].get();
+        const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
+        appState.components[instanceId].set({
+          history: nextHistory,
+          currentMove: nextHistory.length - 1,
+        });
+      }
+
+      function jumpTo_Game(instanceId, nextMove) {
+        console.log("jumpTo_Game", instanceId, nextMove);
+        appState.components[instanceId].set({ currentMove: nextMove });
+      }
+
+      /**
+       * LESSON:  passing complex data structures through HTML attributes
+       * like Sqaure's onclick can be prone to errors and security issues
+       */
+      function Square(instanceId, props) {
+        const { index, squares, xIsNext, onPlay } = props;
+        const value = squares[index];
+
+        /**
+         * SOLVING NaN
+         * If instanceId is, for example, "Square-1", the resulting HTML will look like this
+         * `<button class="square" onclick="onClick_Square(Square-1)">...</button>`
+         * When this `onclick` handler is executed in the browser, JavaScript tries to evaluate Square-1 as an expression.
+         * It's not in quotes, so it's not treated as a string.
+         * JavaScript interprets this as a mathematical expression: Square (undefined variable) minus 1.
+         * The result of undefined minus 1 is NaN (Not a Number).
+         *
+         * To fix this, you need to ensure that the instanceId is passed as a string in the `onclick` attribute.
+         * You can do this by adding quotes around the interpolated value:
+         */
+
+        /**
+         * SOLVING Uncaught "SyntaxError: Unexpected token ','"
+         * The line causing the problem is:
+         * `<button class="square" onclick="onClick_Square('${instanceId}', ${squares})">`
+         * When this HTML is rendered, if squares is an array like [null, null, null, null, null, null, null, null, null],
+         * it will be directly inserted into the HTML, resulting in something like:
+         * `<button class="square" onclick="onClick_Square('Square-2', null,null,null,null,null,null,null,null,null)">`
+         * This is invalid JavaScript. The browser interprets this as trying to call onClick_Square with 10 separate arguments
+         * (the instanceId string and 9 null values), rather than with 2 arguments (a string and an array).
+         * To fix this, you need to properly stringify the squares array.
+         *
+         * SOLVING
+         * Uncaught SyntaxError: Unexpected token ',', ",,,,,,,," is not valid JSON
+         * at JSON.parse (<anonymous>)
+         * at onClick_Square
+         * at HTMLButtonElement.onclick
+         * The problem now is that if squares contains null values, JSON.stringify() is converting them to null,
+         * but when this is inserted into the HTML string,
+         * it's being interpreted as an empty value, resulting in adjacent commas.
+         * We first JSON.stringify(squares) to convert the array to a JSON string.
+         * We then use btoa() to encode this string to base64.
+         * This ensures that all characters, including nulls and commas, are properly encoded and can be safely passed as a string.
+         */
+
+        // Serialize the props, excluding the function
+        const serializedProps = JSON.stringify({
+          index,
+          squares,
+          xIsNext,
+          onPlay,
+        });
+
+        // Encode the serialized props to base64
+        const encodedProps = btoa(serializedProps);
+        console.log("encodedProps", encodedProps);
+
+        return `
+          <button class="square" onclick="onClick_Square('${instanceId}', '${encodedProps}')">
+            ${value ? value : ""}
+          </button>
+      `;
+      }
+
+      function Board(instanceId, props) {
+        const { xIsNext, squares, onPlay } = props;
+        appState.initState(instanceId, {
+          history: [Array(9).fill(null)],
+          currentMove: 0,
+        });
+
+        const winner = calculateWinner(squares);
+        let status;
+        if (winner) {
+          status = "Winner: " + winner;
+        } else {
+          status = "Next player: " + (xIsNext ? "X" : "O");
+        }
+
+        console.log("onPlay", onPlay(squares));
+
+        return `
+              <div>
+                <div class="status">${status}</div>
+                <div class="board-row">
+                    <button class="square" onclick="onPlay('${squares}')">
+                        ""
+                    </button>
+                </div>
+              </div>
+            `;
+      }
+
+      function Game(instanceId) {
+        // maintain moves history for undo and redo functionality
+        appState.initState(instanceId, {
+          history: [Array(9).fill(null)],
+          currentMove: 0,
+        });
+
+        const { history, currentMove } = appState.components[instanceId].get();
+        const xIsNext = currentMove % 2 === 0;
+        const currentSquares = history[currentMove];
+
+        const _GameMoves = () => {
+          return history
+            .map((squares, move) => {
+              let description;
+              if (move > 0) {
+                description = "Go to move #" + move;
+              } else {
+                description = "Go to game start";
+              }
+              return `
+                  <li key=${move}>
+                    <button onclick="jumpTo_Game(${instanceId}, ${move})">${description}</button>
+                  </li>
+                `;
+            })
+            .join("");
+        };
+
+        return `
+            <div class="game">
+            <div class="game-board">
+                ${Board(appState.getNewComponentId("Board"), {
+                  xIsNext: xIsNext,
+                  squares: currentSquares,
+                  onPlay: (nextSquares) =>
+                    handlePlay_Game(instanceId, nextSquares),
+                })}
+            </div>
+            <div class="game-info">
+                <ol>${_GameMoves()}</ol>
+            </div>
+            </div>
+        `;
+      }
+
+      function rerenderComponent(id) {
+        const component = appState.components[id];
+        if (!component) return;
+
+        let componentElement;
+        if (component.type === "Game") {
+          componentElement = document.getElementById(`game-${id}`);
+        } else if (component.type === "Board") {
+          componentElement = document.getElementById(`board-${id}`);
+        } else if (component.type === "Square") {
+          componentElement = document.getElementById(`square-${id}`);
+        }
+
+        if (componentElement) {
+          const temp = document.createElement("div");
+          temp.innerHTML = eval(`${component.type}(${id})`);
+          componentElement.parentNode.replaceChild(
+            temp.firstElementChild,
+            componentElement
+          );
+        }
+      }
+
+      let pageStructure = [
+        { type: "Game", id: appState.getNewComponentId("Game") },
+        { type: "Game", id: appState.getNewComponentId("Game") },
+      ];
+
+      function MyPage() {
+        return pageStructure
+          .map((component) => {
+            if (component.type === "Game") {
+              return Game(component.id);
+            }
+          })
+          .join("");
+      }
+
+      function render() {
+        document.getElementById("root").innerHTML = MyPage();
+      }
+
+      // Initial render
+      render();
+    </script>
+  </body>
+</html>
