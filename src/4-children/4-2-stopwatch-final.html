@@ -13,17 +13,26 @@
         margin: 20px;
         padding: 0;
       }
+      .stopwatch-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 32px;
+      }
       .timer-row {
         display: flex;
         flex-direction: row;
         align-items: center;
-        margin-bottom: 32px;
+        margin-bottom: 16px;
       }
       .timer-text {
         display: flex;
         flex-direction: row;
         align-items: center;
         margin-right: 16px;
+        margin-left: 16px;
+      }
+      .stopwatch-buttons {
         margin-left: 16px;
       }
     </style>
@@ -45,10 +54,11 @@
             state: {},
             props: {},
             children: {},
+            refs: {},
           };
           return instanceId;
         },
-        initState(instanceId, state, props, children) {
+        initState(instanceId, state, props, children, refs) {
           const componentObject = this.components[instanceId];
 
           if (Object.keys(componentObject.state).length === 0) {
@@ -74,6 +84,9 @@
               componentObject.children[renderPositionKey] = childrenIdsArray;
             }
           }
+
+          // refs
+          componentObject.refs = refs;
         },
         getState(instanceId) {
           const componentObject = this.components[instanceId];
@@ -91,6 +104,24 @@
         getChildren(instanceId, renderPositionKey) {
           const componentObject = this.components[instanceId];
           return componentObject.children[renderPositionKey];
+        },
+        getRefs(instanceId) {
+          const componentObject = this.components[instanceId];
+          return componentObject.refs;
+        },
+        getRef(instanceId, key) {
+          const componentObject = this.components[instanceId];
+          const refs = componentObject.refs;
+          const refIndex = refs.findIndex((ref) => ref.key === key);
+          return refIndex > -1 ? refs[refIndex] : null;
+        },
+        setRef(instanceId, { key, value }) {
+          const componentObject = this.components[instanceId];
+          const refs = componentObject.refs;
+          const updatedRefs = refs.map((ref) =>
+            ref.key === key ? { key, value } : ref
+          );
+          componentObject.refs = updatedRefs;
         },
         reset() {
           this.nextId = 0;
@@ -115,46 +146,139 @@
         });
       }
 
+      // start if it has not run already or reset it
+      function start_Stopwatch(instanceId) {
+        const thisComponentState = appState.getState(instanceId);
+        const { isPaused, intervals, currIntervalRef } = thisComponentState;
+
+        if (intervals.length === 0) {
+          console.log("START Stopwatch");
+          const startTime = Date.now();
+          const endTime = Date.now();
+
+          appState.setState(instanceId, {
+            isPaused: false,
+            intervals: [{ startTime, endTime }],
+          });
+
+          play_Stopwatch(instanceId);
+        }
+        // reset
+        else {
+          console.log("RESET Stopwatch");
+          // reset
+          appState.setState(instanceId, {
+            isPaused: true,
+            intervals: [],
+          });
+          resetInterval(instanceId);
+        }
+      }
+
+      function play_Stopwatch(instanceId) {
+        const { intervals } = appState.getState(instanceId);
+
+        intervalRef = setInterval(() => {
+          const intervalsState = [...intervals];
+          if (intervalsState.length > 0) {
+            intervalsState[intervalsState.length - 1].endTime = Date.now();
+          }
+          console.log("intervalsState", intervalsState);
+          appState.setState(instanceId, {
+            isPaused: false,
+            intervals: intervalsState,
+          });
+        }, 10000);
+
+        console.log("play_Stopwatch intervalRef", intervalRef);
+
+        appState.setRef(instanceId, {
+          key: "currIntervalRef",
+          value: intervalRef,
+        });
+      }
+
+      function resetInterval(instanceId) {
+        const intervalRef = appState.getRef(instanceId, "currIntervalRef");
+        console.log("resetInterval intervalRef", intervalRef);
+        clearInterval(intervalRef);
+        appState.setRef(instanceId, {
+          key: "currIntervalRef",
+          value: null,
+        });
+      }
+
       // COMPONENTS //
 
       function Stopwatch(instanceId, props) {
         console.log("Render Stopwatch Component", instanceId);
         const renderObjectId = `render-${instanceId}`;
 
-        // reuse props in case of rerendering
+        let refs = [{ key: "currIntervalRef", value: null }];
+        // reuse props and refs in case of rerendering
         if (
           typeof props === undefined ||
           !props ||
           Object.keys(props).length === 0
         ) {
           props = appState.getProps(instanceId);
+          refs = appState.getRefs(instanceId);
         }
         const { position, color } = props;
 
         appState.initState(
           instanceId,
+          // state
           {
             isPaused: true,
-            timerInMs: 0,
+            intervals: [],
           },
+          // props
           props,
-          []
+          // children
+          [],
+          // refs
+          refs
         );
 
         const thisComponentState = appState.getState(instanceId);
-        const { isPaused, timerInMs } = thisComponentState;
+        const { isPaused, intervals } = thisComponentState;
 
-        const buttonText = isPaused ? "Play" : "Pause";
+        const startButtonText = intervals.length === 0 ? "Start" : "Reset";
+        const playButtonText = isPaused ? "Play" : "Pause";
+
+        const _IntervalsContent = () => {
+          let content = ``;
+          for (i = 0; i < intervals.length; i++) {
+            interval = intervals[i];
+            const { startTime, endTime } = interval;
+            let secondsPassed = 0;
+            if (startTime != null && endTime != null) {
+              secondsPassed = (endTime - startTime) / 1000;
+            }
+            content += `<li key=${i}><span class="timer-text" style="color:${color}">Duration: ${secondsPassed.toFixed(
+              1
+            )}</span></li>`;
+          }
+          return content;
+        };
 
         return `
-          <div id='${renderObjectId}' class="timer-row">
-            <h3 style="color:${color}">
-              Stopwatch #${position + 1}
-            </h3>
-            <h3 class="timer-text" style="color:${color}">
-              ${timerInMs} ms
-            </h3>
-            <button onclick="togglePlay_Stopwatch('${instanceId}')">${buttonText}</button>
+          <div id='${renderObjectId}' class="stopwatch-container">
+            <div class="timer-row">
+              <h3 style="color:${color}">
+                Stopwatch #${position + 1}
+              </h3>
+              <button class="stopwatch-buttons" onclick="start_Stopwatch('${instanceId}')">${startButtonText}</button>
+              ${
+                intervals.length > 0
+                  ? `<button class="stopwatch-buttons" onclick="togglePlay_Stopwatch('${instanceId}')">${playButtonText}</button>`
+                  : ""
+              }
+            </div>
+            <div>
+              <ol>${_IntervalsContent()}</ol>
+            </div>
           </div>
         `;
       }
@@ -168,9 +292,11 @@
 
         appState.initState(
           instanceId,
+          // state
           {
             color: "lightcoral",
           },
+          // props
           {},
           // children
           [
@@ -180,7 +306,9 @@
               childrenIdGeneratorFn: () =>
                 appState.getNewComponentId("Stopwatch"),
             },
-          ]
+          ],
+          // refs
+          []
         );
 
         const thisComponentState = appState.getState(instanceId);
@@ -190,10 +318,6 @@
           const _stopwatchesRenderPositionChildren = appState.getChildren(
             instanceId,
             _stopwatchesRenderPosition
-          );
-          console.log(
-            "_stopwatchesRenderPositionChildren",
-            _stopwatchesRenderPositionChildren
           );
 
           let elements = [];
@@ -234,7 +358,6 @@
         componentElement = document.getElementById(`render-${instanceId}`);
 
         if (componentElement) {
-          console.log("Rerender component element", componentElement);
           const temp = document.createElement("div");
           temp.innerHTML = eval(`${componentObject.type}('${instanceId}')`);
           componentElement.parentNode.replaceChild(
