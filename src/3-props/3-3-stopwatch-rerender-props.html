@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Clock example</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        font-family: sans-serif;
+        margin: 20px;
+        padding: 0;
+      }
+      .timer-row {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        margin-bottom: 32px;
+      }
+      .timer-text {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        margin-right: 16px;
+        margin-left: 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/javascript">
+      // GLOBAL STATE //
+
+      let appState = {
+        nextId: 0,
+        components: {},
+        getNewComponentId(componentName) {
+          const id = this.nextId++;
+          const instanceId = `${componentName}-${id}`;
+          this.components[instanceId] = {
+            type: componentName,
+            state: {},
+            props: {},
+          };
+          return instanceId;
+        },
+        initState(instanceId, state, props) {
+          const componentObject = this.components[instanceId];
+          if (Object.keys(componentObject.state).length === 0) {
+            componentObject.state = state;
+          }
+          componentObject.props = { ...componentObject.props, ...props };
+        },
+        getState(instanceId) {
+          const componentObject = this.components[instanceId];
+          return componentObject.state;
+        },
+        setState(instanceId, newState) {
+          const componentObject = this.components[instanceId];
+          componentObject.state = { ...componentObject.state, ...newState };
+          rerenderComponent(instanceId);
+        },
+        getProps(instanceId) {
+          const componentObject = this.components[instanceId];
+          return componentObject.props;
+        },
+        reset() {
+          this.nextId = 0;
+          this.components = {};
+        },
+      };
+
+      // GLOBAL FUNCTIONS //
+
+      // when color value is changed in its state
+      // it should update children components as well
+      function setColor_StopwatchTower(instanceId, value) {
+        appState.setState(instanceId, {
+          color: value,
+        });
+      }
+
+      function togglePlay_Stopwatch(instanceId) {
+        const { isPaused } = appState.getState(instanceId);
+        appState.setState(instanceId, {
+          isPaused: !isPaused,
+        });
+      }
+
+      // COMPONENTS //
+
+      function Stopwatch(instanceId, props) {
+        console.log("Render Stopwatch Component", instanceId);
+        const renderObjectId = `render-${instanceId}`;
+
+        if (
+          typeof props === undefined ||
+          !props ||
+          Object.keys(props).length === 0
+        ) {
+          props = appState.getProps(instanceId);
+        }
+        const { position, color } = props;
+
+        appState.initState(
+          instanceId,
+          {
+            isPaused: true,
+            timerInMs: 0,
+          },
+          props
+        );
+
+        const thisComponentState = appState.getState(instanceId);
+        const { isPaused, timerInMs } = thisComponentState;
+
+        const buttonText = isPaused ? "Play" : "Pause";
+
+        return `
+          <div id='${renderObjectId}' class="timer-row">
+            <h3 style="color:${color}">
+              Stopwatch #${position + 1}
+            </h3>
+            <h3 class="timer-text" style="color:${color}">
+              ${timerInMs} ms
+            </h3>
+            <button onclick="togglePlay_Stopwatch('${instanceId}')">${buttonText}</button>
+          </div>
+        `;
+      }
+
+      function StopwatchTower(instanceId) {
+        console.log("Render StopwatchTower Component", instanceId);
+        const renderObjectId = `render-${instanceId}`;
+        appState.initState(
+          instanceId,
+          {
+            color: "lightcoral",
+          },
+          {}
+        );
+
+        const thisComponentState = appState.getState(instanceId);
+        const { color } = thisComponentState;
+
+        /**
+         * ISSUE:
+         * It can be seen from console logs that StopwatchTower component
+         * is creating 5 whole new Stopwatch components on every re-render due to color change
+         * due to which we are losing play/pause states of previously rendered Stopwatch components
+         */
+        const _Stopwatches = () => {
+          let elements = [];
+          var length = 5;
+          for (var i = 0; i < length; i++) {
+            const stopwatchElement = Stopwatch(
+              appState.getNewComponentId("Stopwatch"),
+              {
+                position: i,
+                color,
+              }
+            );
+            elements.push(stopwatchElement);
+          }
+          return elements.join("");
+        };
+
+        return `
+          <div id='${renderObjectId}'>
+            <p>
+              Pick a color:${" "}
+              <select value='${color}' onChange="setColor_StopwatchTower('${instanceId}', this.value)">
+                <option value="lightcoral">lightcoral</option>
+                <option value="midnightblue">midnightblue</option>
+                <option value="rebeccapurple">rebeccapurple</option>
+              </select>
+            </p>
+            <div>
+                <ol>${_Stopwatches()}</ol>
+            </div>
+          </div>
+        `;
+      }
+
+      function rerenderComponent(instanceId) {
+        const componentObject = appState.components[instanceId];
+        if (!componentObject) return;
+
+        let componentElement;
+        componentElement = document.getElementById(`render-${instanceId}`);
+
+        if (componentElement) {
+          console.log("Rerender component element", componentElement);
+          const temp = document.createElement("div");
+          temp.innerHTML = eval(`${componentObject.type}('${instanceId}')`);
+          componentElement.parentNode.replaceChild(
+            temp.firstElementChild,
+            componentElement
+          );
+        }
+      }
+
+      let pageStructure = [
+        {
+          type: "StopwatchTower",
+          id: appState.getNewComponentId("StopwatchTower"),
+        },
+      ];
+
+      function MyPage() {
+        return pageStructure
+          .map((component) => {
+            if (component.type === "StopwatchTower") {
+              return StopwatchTower(component.id);
+            }
+          })
+          .join("");
+      }
+
+      function render() {
+        document.getElementById("root").innerHTML = MyPage();
+      }
+
+      // Initial render
+      render();
+    </script>
+  </body>
+</html>
