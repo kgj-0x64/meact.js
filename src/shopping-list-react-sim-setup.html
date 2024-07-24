@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Shopping list example with custom</title>
+    <style>
+      li {
+        margin-bottom: 10px;
+      }
+
+      li button {
+        font-size: 12px;
+        margin-left: 20px;
+        color: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/javascript">
+      // TODO: implement `appState` map
+      // `appState` is the global runtime state of this app
+      // every function instance (i.e. component) maintains its state mapped to its name and instance ID
+      // via get() (which is like a object constructor passing state variables) and set() methods
+      // and any call to `set()` of any component should call `render()` for rerendering using new updated state
+      let appState = {};
+
+      function ShoppingList() {
+        // TODO: implement `getInstanceId()` function
+        // instance ID of this function invocation on the stack to differentiate
+        // state read and write for different invocations of the same function
+        const functionInstanceId = this.getInstanceId();
+        const thisInstanceInAppState = `shoppingList_${functionInstanceId}`;
+        const { items, inputValue } = appState[thisInstanceInAppState].get();
+        const inputRef = null;
+
+        const setInputValue = (text) => {
+          appState[thisInstanceInAppState].set({
+            inputValue: text,
+          });
+        };
+
+        const addItem = () => {
+          if (inputValue.trim() !== "") {
+            appState[thisInstanceInAppState].set({
+              items: [...items, inputValue],
+              inputValue: "",
+            });
+            inputRef?.focus();
+          }
+        };
+
+        const deleteItem = (index) => {
+          const newItems = items.filter((_, i) => i !== index);
+          appState[thisInstanceInAppState].set({
+            items: newItems,
+          });
+        };
+
+        const _ShoppingListContent = () => {
+          let content = ``;
+          for (i = 0; i < items.length; i++) {
+            item = items[i];
+            content += `<li key=${i}><span>${item}</span><button onClick={() => deleteItem(${i})}>Delete</button></li>`;
+          }
+          return content;
+        };
+
+        return `
+          <div>
+            <h1>My shopping list</h1>
+
+            <div>
+              <label htmlFor="item">Enter a new item:</label>
+              <input
+                type="text"
+                name="item"
+                id="item"
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                ref={inputRef}
+              />
+              <button onClick={addItem}>Add item</button>
+            </div>
+
+            <ul>
+              ${_ShoppingListContent()}
+            </ul>
+          </div>
+        `;
+      }
+
+      // implement this render function to run the function and attach its returned HTML to the `root` element
+      render(ShoppingList(), document.getElementById("root"));
+    </script>
+  </body>
+</html>

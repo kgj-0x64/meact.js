@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Shopping list example with persistent instances</title>
+    <style>
+      li {
+        margin-bottom: 10px;
+      }
+
+      li button {
+        font-size: 12px;
+        margin-left: 20px;
+        color: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/javascript">
+      let appState = {
+        nextId: 0,
+        components: {},
+        createShoppingListState() {
+          const id = this.nextId++;
+          this.components[id] = {
+            state: {
+              items: [],
+              inputValue: "",
+            },
+            get() {
+              return this.state;
+            },
+            set(newState) {
+              this.state = { ...this.state, ...newState };
+              renderComponent(id);
+            },
+          };
+          return id;
+        },
+      };
+
+      // Global functions
+      function setInputValue_ShoppingList(instanceId, text) {
+        appState.components[instanceId].set({
+          inputValue: text,
+        });
+      }
+
+      function addItem_ShoppingList(instanceId) {
+        const state = appState.components[instanceId];
+        const { items, inputValue } = state.get();
+        if (inputValue.trim() !== "") {
+          state.set({
+            items: [...items, inputValue],
+            inputValue: "",
+          });
+          document.getElementById(`item_${instanceId}`).focus();
+        }
+      }
+
+      function deleteItem_ShoppingList(instanceId, index) {
+        const state = appState.components[instanceId];
+        const { items } = state.get();
+        const newItems = items.filter((_, i) => i !== index);
+        state.set({
+          items: newItems,
+        });
+      }
+
+      function ShoppingList(instanceId) {
+        const { items, inputValue } = appState.components[instanceId].get();
+
+        const _ShoppingListContent = () => {
+          let content = ``;
+          for (let i = 0; i < items.length; i++) {
+            let item = items[i];
+            content += `<li key=${i}><span>${item}</span><button onclick="deleteItem_ShoppingList(${instanceId}, ${i})">Delete</button></li>`;
+          }
+          return content;
+        };
+
+        return `
+          <div id="shopping-list-${instanceId}">
+            <h2>Shopping List ${instanceId + 1}</h2>
+
+            <div>
+              <label for="item_${instanceId}">Enter a new item:</label>
+              <input
+                type="text"
+                name="item_${instanceId}"
+                id="item_${instanceId}"
+                value="${inputValue}"
+                oninput="setInputValue_ShoppingList(${instanceId}, this.value)"
+              />
+              <button onclick="addItem_ShoppingList(${instanceId})">Add item</button>
+            </div>
+
+            <ul>
+              ${_ShoppingListContent()}
+            </ul>
+          </div>
+        `;
+      }
+
+      function renderComponent(id) {
+        const componentElement = document.getElementById(`shopping-list-${id}`);
+        if (componentElement) {
+          componentElement.outerHTML = ShoppingList(id);
+        }
+      }
+
+      const pageStructure = [
+        { type: "ShoppingList", id: appState.createShoppingListState() },
+        { type: "ShoppingList", id: appState.createShoppingListState() },
+      ];
+
+      function MyPage() {
+        return pageStructure
+          .map((component) => {
+            if (component.type === "ShoppingList") {
+              return ShoppingList(component.id);
+            }
+          })
+          .join("");
+      }
+
+      function render() {
+        document.getElementById("root").innerHTML = MyPage();
+      }
+
+      // Initial render
+      render();
+    </script>
+  </body>
+</html>

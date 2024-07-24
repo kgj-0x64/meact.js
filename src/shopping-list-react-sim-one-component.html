@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Shopping list example with custom</title>
+    <style>
+      li {
+        margin-bottom: 10px;
+      }
+
+      li button {
+        font-size: 12px;
+        margin-left: 20px;
+        color: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/javascript">
+      // Implement `appState` map
+      let appState = {
+        getInstanceId: (function () {
+          let id = 0;
+          return function () {
+            return id++;
+          };
+        })(),
+        shoppingList_0: {
+          state: {
+            items: [],
+            inputValue: "",
+          },
+          get() {
+            return this.state;
+          },
+          set(newState) {
+            this.state = { ...this.state, ...newState };
+            render();
+          },
+        },
+      };
+
+      /**
+       * When you define event handlers as string attributes in HTML (like onclick="addItem()"),
+       * the browser evaluates these strings in the global scope.
+       * This is because the HTML doesn't have direct access to the JavaScript function scope
+       * where these functions were originally defined.
+       * By moving the functions to the global scope,
+       * we ensure they're accessible when the browser tries to execute the onclick handlers.
+       */
+      // Global functions
+      function setInputValue(text) {
+        appState.shoppingList_0.set({
+          inputValue: text,
+        });
+      }
+
+      function addItem() {
+        const { items, inputValue } = appState.shoppingList_0.get();
+        if (inputValue.trim() !== "") {
+          appState.shoppingList_0.set({
+            items: [...items, inputValue],
+            inputValue: "",
+          });
+          document.getElementById("item").focus();
+        }
+      }
+
+      function deleteItem(index) {
+        const { items } = appState.shoppingList_0.get();
+        const newItems = items.filter((_, i) => i !== index);
+        appState.shoppingList_0.set({
+          items: newItems,
+        });
+      }
+
+      function ShoppingList() {
+        const { items, inputValue } = appState.shoppingList_0.get();
+
+        const _ShoppingListContent = () => {
+          let content = ``;
+          for (let i = 0; i < items.length; i++) {
+            let item = items[i];
+            content += `<li key=${i}><span>${item}</span><button onclick="deleteItem(${i})">Delete</button></li>`;
+          }
+          return content;
+        };
+
+        return `
+          <div>
+            <h1>My shopping list</h1>
+
+            <div>
+              <label for="item">Enter a new item:</label>
+              <input
+                type="text"
+                name="item"
+                id="item"
+                value="${inputValue}"
+                oninput="setInputValue(this.value)"
+              />
+              <button onclick="addItem()">Add item</button>
+            </div>
+
+            <ul>
+              ${_ShoppingListContent()}
+            </ul>
+          </div>
+        `;
+      }
+
+      // Implement render function
+      function render() {
+        document.getElementById("root").innerHTML = ShoppingList();
+      }
+
+      // Initial render
+      render();
+    </script>
+  </body>
+</html>

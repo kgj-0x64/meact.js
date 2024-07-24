@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Enhanced Shopping List Application</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      h1,
+      h2 {
+        color: #333;
+      }
+      input,
+      button {
+        margin: 5px;
+        padding: 5px;
+      }
+      ul {
+        list-style-type: none;
+        padding-left: 0;
+      }
+      li {
+        margin-bottom: 10px;
+      }
+      li button {
+        font-size: 12px;
+        margin-left: 10px;
+        color: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/javascript">
+      let appState = {
+        nextId: 0,
+        userName: "",
+        dashboardId: null,
+        components: {},
+        createComponentState(type) {
+          const id = this.nextId++;
+          this.components[id] = {
+            type,
+            state: type === "ShoppingList" ? { items: [], inputValue: "" } : {},
+            get() {
+              return this.state;
+            },
+            set(newState) {
+              this.state = { ...this.state, ...newState };
+              renderComponent(id);
+              if (type === "ShoppingList") {
+                renderComponent(appState.dashboardId);
+              }
+            },
+          };
+          return id;
+        },
+        getAllUniqueItems() {
+          const allItems = Object.values(this.components)
+            .filter((comp) => comp.type === "ShoppingList")
+            .flatMap((comp) => comp.state.items);
+          return [...new Set(allItems)];
+        },
+        reset() {
+          this.nextId = 0;
+          this.components = {};
+          this.userName = "";
+          this.dashboardId = null;
+        },
+      };
+
+      function login() {
+        const nameInput = document.getElementById("username-input");
+        if (nameInput && nameInput.value.trim() !== "") {
+          appState.userName = nameInput.value.trim();
+          appState.dashboardId = appState.createComponentState("UserDashboard");
+          pageStructure = [
+            { type: "UserDashboard", id: appState.dashboardId },
+            {
+              type: "ShoppingList",
+              id: appState.createComponentState("ShoppingList"),
+            },
+          ];
+          render();
+        } else {
+          alert("Please enter a valid name.");
+        }
+      }
+
+      function logout() {
+        appState.reset();
+        pageStructure = [
+          { type: "UserAuth", id: appState.createComponentState("UserAuth") },
+        ];
+        render();
+      }
+
+      function addShoppingList() {
+        pageStructure.push({
+          type: "ShoppingList",
+          id: appState.createComponentState("ShoppingList"),
+        });
+        render();
+      }
+
+      function removeShoppingList(id) {
+        pageStructure = pageStructure.filter((comp) => comp.id !== id);
+        delete appState.components[id];
+        render();
+        renderComponent(appState.dashboardId);
+      }
+
+      function setInputValue_ShoppingList(instanceId, text) {
+        appState.components[instanceId].set({ inputValue: text });
+      }
+
+      function addItem_ShoppingList(instanceId) {
+        const state = appState.components[instanceId];
+        const { items, inputValue } = state.get();
+        if (inputValue.trim() !== "") {
+          state.set({
+            items: [...items, inputValue],
+            inputValue: "",
+          });
+        }
+      }
+
+      function deleteItem_ShoppingList(instanceId, index) {
+        const state = appState.components[instanceId];
+        const { items } = state.get();
+        state.set({ items: items.filter((_, i) => i !== index) });
+      }
+
+      function ShoppingList(instanceId) {
+        const { items, inputValue } = appState.components[instanceId].get();
+        const listIndex =
+          pageStructure.findIndex((comp) => comp.id === instanceId) - 1; // Subtract 1 to account for UserDashboard
+
+        const _ShoppingListContent = () => {
+          return items
+            .map(
+              (item, i) => `
+            <li key=${i}>
+              <span>${item}</span>
+              <button onclick="deleteItem_ShoppingList(${instanceId}, ${i})">Delete</button>
+            </li>
+          `
+            )
+            .join("");
+        };
+
+        return `
+          <div id="shopping-list-${instanceId}">
+            <h2>Shopping List ${listIndex + 1}</h2>
+            <div>
+              <input
+                type="text"
+                id="item_${instanceId}"
+                value="${inputValue}"
+                oninput="setInputValue_ShoppingList(${instanceId}, this.value)"
+              />
+              <button onclick="addItem_ShoppingList(${instanceId})">Add item</button>
+            </div>
+            <ul>${_ShoppingListContent()}</ul>
+            <button onclick="removeShoppingList(${instanceId})">Remove this list</button>
+          </div>
+        `;
+      }
+
+      function UserAuth(instanceId) {
+        return `
+          <div id="user-auth-${instanceId}">
+            <h2>Welcome to Shopping Lists</h2>
+            <input type="text" id="username-input" placeholder="Enter your name" />
+            <button onclick="login()">Login</button>
+          </div>
+        `;
+      }
+
+      function UserDashboard(instanceId) {
+        const uniqueItems = appState.getAllUniqueItems();
+        return `
+          <div id="user-dashboard-${instanceId}">
+            <h1>Welcome, ${appState.userName}!</h1>
+            <h2>All Unique Items:</h2>
+            <ul>${uniqueItems.map((item) => `<li>${item}</li>`).join("")}</ul>
+            <button onclick="logout()">Logout</button>
+            <button onclick="addShoppingList()">Add New Shopping List</button>
+          </div>
+        `;
+      }
+
+      function renderComponent(id) {
+        const component = appState.components[id];
+        if (!component) return;
+
+        let componentElement;
+        if (component.type === "ShoppingList") {
+          componentElement = document.getElementById(`shopping-list-${id}`);
+        } else if (component.type === "UserAuth") {
+          componentElement = document.getElementById(`user-auth-${id}`);
+        } else if (component.type === "UserDashboard") {
+          componentElement = document.getElementById(`user-dashboard-${id}`);
+        }
+
+        if (componentElement) {
+          const temp = document.createElement("div");
+          temp.innerHTML = eval(`${component.type}(${id})`);
+          componentElement.parentNode.replaceChild(
+            temp.firstElementChild,
+            componentElement
+          );
+        }
+      }
+
+      let pageStructure = [
+        { type: "UserAuth", id: appState.createComponentState("UserAuth") },
+      ];
+
+      function MyPage() {
+        return pageStructure
+          .map((component) => {
+            if (component.type === "ShoppingList") {
+              return ShoppingList(component.id);
+            } else if (component.type === "UserAuth") {
+              return UserAuth(component.id);
+            } else if (component.type === "UserDashboard") {
+              return UserDashboard(component.id);
+            }
+          })
+          .join("");
+      }
+
+      function render() {
+        document.getElementById("root").innerHTML = MyPage();
+      }
+
+      // Initial render
+      render();
+    </script>
+  </body>
+</html>
