@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Counter example</title>
+    <style>
+      body {
+        text-align: center;
+        font-size: 120%;
+      }
+      span {
+        margin: 5px;
+        font-size: 200%;
+      }
+      span:hover {
+        font-size: 250%;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/javascript">
+      // GLOBAL STATE VALUES //
+
+      // initilize a count variable at 0
+      let count = 0;
+
+      // GLOBAL FUNCTIONS //
+
+      // will be used to re-set the "count" value
+      function setCount(value) {
+        console.log("set count to value", value);
+        count = value;
+        render(); // Re-render the Counter component
+      }
+
+      // COMPONENTS //
+
+      /**
+       * To properly update the displayed count, you need a mechanism to re-render the component whenever count changes.
+       * So, manually call render() again after updating count.
+       */
+      function Counter() {
+        console.log("Render Counter component");
+
+        return `
+          <div>
+            <h2>${count} likes</h2>
+            <span onClick="setCount(${count + 1})">👍🏽</span>
+            <span onClick="setCount(${count - 1})">👎🏽</span>
+            <h3>Like or dislike to increase/decrease</h3>
+          </div>
+        `;
+      }
+
+      function render() {
+        document.getElementById("root").innerHTML = Counter();
+      }
+
+      // Initial render
+      render();
+    </script>
+  </body>
+</html>

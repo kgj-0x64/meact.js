@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Counter example</title>
+    <style>
+      body {
+        text-align: center;
+        font-size: 120%;
+      }
+      span {
+        margin: 5px;
+        font-size: 200%;
+      }
+      span:hover {
+        font-size: 250%;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/javascript">
+      // GLOBAL FUNCTIONS //
+
+      /**
+       * When you define event handlers as string attributes in HTML (like onclick="addItem()"),
+       * the browser evaluates these strings in the global scope.
+       * This is because the HTML doesn't have direct access to the JavaScript function scope
+       * where these functions were originally defined.
+       * By moving the functions to the global scope,
+       * we ensure they're accessible when the browser tries to execute the onclick handlers.
+       */
+      // will be used to re-set the "count" value
+      function setCount(value) {
+        console.log("set count to value", value);
+        count = value;
+      }
+
+      // COMPONENTS //
+
+      function Counter() {
+        console.log("Render Counter component");
+        // initilize a count variable at 0
+        let count = 0;
+
+        return `
+          <div>
+            <h2>${count} likes</h2>
+            <span onClick="setCount(${count + 1})">👍🏽</span>
+            <span onClick="setCount(${count - 1})">👎🏽</span>
+            <h3>Like or dislike to increase/decrease</h3>
+          </div>
+        `;
+      }
+
+      function render() {
+        document.getElementById("root").innerHTML = Counter();
+      }
+
+      // Initial render
+      render();
+    </script>
+  </body>
+</html>

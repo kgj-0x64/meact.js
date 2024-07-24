@@ -20,6 +20,8 @@
     <div id="root"></div>
 
     <script type="text/javascript">
+      // GLOBAL STATE //
+
       let appState = {
         nextId: 0,
         components: {},
@@ -42,7 +44,8 @@
         },
       };
 
-      // Global functions
+      // GLOBAL FUNCTIONS //
+
       function setInputValue_ShoppingList(instanceId, text) {
         appState.components[instanceId].set({
           inputValue: text,
@@ -69,6 +72,8 @@
           items: newItems,
         });
       }
+
+      // COMPONENTS //
 
       function ShoppingList(instanceId) {
         const { items, inputValue } = appState.components[instanceId].get();

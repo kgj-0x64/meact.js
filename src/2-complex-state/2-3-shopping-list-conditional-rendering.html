@@ -38,6 +38,8 @@
     <div id="root"></div>
 
     <script type="text/javascript">
+      // GLOBAL STATE //
+
       let appState = {
         nextId: 0,
         userName: "",
@@ -74,6 +76,8 @@
           this.dashboardId = null;
         },
       };
+
+      // GLOBAL FUNCTIONS //
 
       function login() {
         const nameInput = document.getElementById("username-input");
@@ -136,6 +140,8 @@
         const { items } = state.get();
         state.set({ items: items.filter((_, i) => i !== index) });
       }
+
+      // COMPONENTS //
 
       function ShoppingList(instanceId) {
         const { items, inputValue } = appState.components[instanceId].get();

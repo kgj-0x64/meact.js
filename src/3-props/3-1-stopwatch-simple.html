@@ -58,6 +58,8 @@
     <div id="root"></div>
 
     <script type="text/javascript">
+      // GLOBAL STATE //
+
       let appState = {
         nextId: 0,
         components: {},
@@ -91,6 +93,8 @@
         },
       };
 
+      // GLOBAL FUNCTIONS //
+
       // when color value is changed in its state
       // it should update children components as well
       function setColor_StopwatchTower(instanceId, value) {
@@ -99,22 +103,25 @@
         });
       }
 
+      // COMPONENTS //
+
       function Stopwatch(instanceId, props) {
+        console.log("Render Stopwatch Component", instanceId);
         const renderObjectId = `render-${instanceId}`;
         appState.initState(instanceId, {});
 
         console.log("Stopwatch props", props);
-        const { color, time } = props;
+        const { position, color } = props;
 
         return `
           <h1 id='${renderObjectId}' style="color:${color}">
-            {time}
+            Stopwatch #${position + 1}
           </h1>
         `;
       }
 
       function StopwatchTower(instanceId) {
-        console.log("StopwatchTower CALLED", instanceId);
+        console.log("Render StopwatchTower Component", instanceId);
         const renderObjectId = `render-${instanceId}`;
         appState.initState(instanceId, {
           color: "lightcoral",
@@ -130,6 +137,7 @@
             const stopwatchElement = Stopwatch(
               appState.getNewComponentId("Stopwatch"),
               {
+                position: i,
                 color,
               }
             );

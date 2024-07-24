@@ -20,14 +20,10 @@
     <div id="root"></div>
 
     <script type="text/javascript">
+      // GLOBAL STATE //
+
       // Implement `appState` map
       let appState = {
-        getInstanceId: (function () {
-          let id = 0;
-          return function () {
-            return id++;
-          };
-        })(),
         shoppingList_0: {
           state: {
             items: [],
@@ -38,20 +34,13 @@
           },
           set(newState) {
             this.state = { ...this.state, ...newState };
-            render();
+            render(); // Re-render the component
           },
         },
       };
 
-      /**
-       * When you define event handlers as string attributes in HTML (like onclick="addItem()"),
-       * the browser evaluates these strings in the global scope.
-       * This is because the HTML doesn't have direct access to the JavaScript function scope
-       * where these functions were originally defined.
-       * By moving the functions to the global scope,
-       * we ensure they're accessible when the browser tries to execute the onclick handlers.
-       */
-      // Global functions
+      // GLOBAL FUNCTIONS //
+
       function setInputValue(text) {
         appState.shoppingList_0.set({
           inputValue: text,
@@ -77,7 +66,11 @@
         });
       }
 
+      // COMPONENTS //
+
       function ShoppingList() {
+        console.log("Render ShoppingList component");
+
         const { items, inputValue } = appState.shoppingList_0.get();
 
         const _ShoppingListContent = () => {
