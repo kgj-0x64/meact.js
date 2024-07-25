@@ -109,11 +109,11 @@
           const componentObject = this.components[instanceId];
           return componentObject.refs;
         },
-        getRef(instanceId, key) {
+        getRefValue(instanceId, key) {
           const componentObject = this.components[instanceId];
           const refs = componentObject.refs;
           const refIndex = refs.findIndex((ref) => ref.key === key);
-          return refIndex > -1 ? refs[refIndex] : null;
+          return refIndex > -1 ? refs[refIndex].value : null;
         },
         setRef(instanceId, { key, value }) {
           const componentObject = this.components[instanceId];
@@ -149,10 +149,10 @@
       // start if it has not run already or reset it
       function start_Stopwatch(instanceId) {
         const thisComponentState = appState.getState(instanceId);
-        const { isPaused, intervals, currIntervalRef } = thisComponentState;
+        const { isPaused, intervals } = thisComponentState;
 
         if (intervals.length === 0) {
-          console.log("START Stopwatch");
+          console.log("START Stopwatch", instanceId);
           const startTime = Date.now();
           const endTime = Date.now();
 
@@ -163,32 +163,38 @@
 
           play_Stopwatch(instanceId);
         }
+        /**
+         * Issue:
+         * Resetting timer is working well and fine now for interval >=1000ms
+         * And at an interval of 500ms, clicking "Reset" button (i.e. calling resetInterval function)
+         * works but it does not work on the first click sometimes
+         *
+         * But at interval <= 250ms, clicking "Reset" button works only when rage clicking it
+         * and in that rage clicking process, resetInterval function is called once and the timer stops
+         *
+         * What is happening here?
+         */
         // reset
         else {
-          console.log("RESET Stopwatch");
-          // reset
-          appState.setState(instanceId, {
-            isPaused: true,
-            intervals: [],
-          });
-          resetInterval(instanceId);
+          console.log("RESET Stopwatch", instanceId);
+          reset_Stopwatch(instanceId);
         }
       }
 
       function play_Stopwatch(instanceId) {
-        const { intervals } = appState.getState(instanceId);
+        console.log("PLAY Stopwatch", instanceId);
 
-        intervalRef = setInterval(() => {
+        const intervalRef = setInterval(() => {
+          const { isPaused, intervals } = appState.getState(instanceId);
           const intervalsState = [...intervals];
-          if (intervalsState.length > 0) {
+          console.log("INTERVAL Stopwatch", intervalsState);
+          if (!isPaused && intervalsState.length > 0) {
             intervalsState[intervalsState.length - 1].endTime = Date.now();
+            appState.setState(instanceId, {
+              intervals: intervalsState,
+            });
           }
-          console.log("intervalsState", intervalsState);
-          appState.setState(instanceId, {
-            isPaused: false,
-            intervals: intervalsState,
-          });
-        }, 10000);
+        }, 150);
 
         console.log("play_Stopwatch intervalRef", intervalRef);
 
@@ -198,9 +204,21 @@
         });
       }
 
-      function resetInterval(instanceId) {
-        const intervalRef = appState.getRef(instanceId, "currIntervalRef");
-        console.log("resetInterval intervalRef", intervalRef);
+      function reset_Stopwatch(instanceId) {
+        console.log("RESET Stopwatch Interval", instanceId);
+
+        // Immediately set the state to paused and clear intervals
+        appState.setState(instanceId, {
+          isPaused: true,
+          intervals: [],
+        });
+
+        /**
+         * This wasted good amount of time for me:
+         * The clearInterval function expects a numeric interval ID,
+         * but I was passing it the key-value object.
+         */
+        const intervalRef = appState.getRefValue(instanceId, "currIntervalRef");
         clearInterval(intervalRef);
         appState.setRef(instanceId, {
           key: "currIntervalRef",
@@ -243,6 +261,7 @@
 
         const thisComponentState = appState.getState(instanceId);
         const { isPaused, intervals } = thisComponentState;
+        console.log("RENDER isPaused, intervals", isPaused, intervals);
 
         const startButtonText = intervals.length === 0 ? "Start" : "Reset";
         const playButtonText = isPaused ? "Play" : "Pause";
@@ -257,7 +276,7 @@
               secondsPassed = (endTime - startTime) / 1000;
             }
             content += `<li key=${i}><span class="timer-text" style="color:${color}">Duration: ${secondsPassed.toFixed(
-              1
+              2
             )}</span></li>`;
           }
           return content;
