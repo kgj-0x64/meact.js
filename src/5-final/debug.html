@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Debug issue</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        font-family: sans-serif;
+        margin: 20px;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/javascript">
+      function handler_A(instanceId, param1) {
+        console.log("called handler_A", param1);
+      }
+
+      // COMPONENTS //
+
+      function B(instanceId, props) {
+        console.log("Render Board Component", instanceId);
+        const renderObjectId = `render-${instanceId}`;
+
+        // reuse props and refs in case of rerendering
+        // ... correct logic here
+
+        const { value, onButtonClickOfB } = props;
+        console.log("Board PROPS value", value);
+        console.log("Board PROPS onButtonClickOfB", onButtonClickOfB);
+        console.log("Calling handler_A(value) directly from B");
+        handler_A(instanceId, value);
+
+        // ... correct logic here
+        appState.initState({
+          // ...
+        });
+
+        // ReferenceError: onButtonClickOfB is not defined at HTMLButtonElement.onclick
+        /**
+         * Explanation:
+         * The problem occurs because the onButtonClickOfB function is defined within the scope of your JavaScript code,
+         * but it's not accessible in the global scope where the inline onclick attribute is executed.
+         * That is, when the button is clicked, the browser looks for onButtonClickOfB in the global scope (window object),
+         * but it doesn't exist there.
+         */
+        return `
+            <div id='${renderObjectId}'>
+                <button onclick="onButtonClickOfB('${value}')">TEST PROP FUNCTION CALL FROM ONCLICK</button>
+                <div>${value}</div>
+            </div>
+        `;
+      }
+
+      function A(instanceId) {
+        console.log("Render Game Component", instanceId);
+        const renderObjectId = `render-${instanceId}`;
+
+        // assume correctness in logic for this
+        appState
+          .initState
+          // set state, props, children, refs here
+          // ...
+          ();
+
+        return `
+            <div id='${renderObjectId}'>
+                ${B(bChildId, {
+                  value: "sending value via props works",
+                  onButtonClickOfB: (param1) => handler_A(instanceId, param1),
+                })}
+            </div>
+        `;
+      }
+
+      function render() {
+        document.getElementById("root").innerHTML = A(
+          appState.getNewComponentId("A")
+        );
+      }
+
+      // Initial render
+      render();
+    </script>
+  </body>
+</html>

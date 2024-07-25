@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tik Tac Toe Game</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        font-family: sans-serif;
+        margin: 20px;
+        padding: 0;
+      }
+      .square {
+        background: #fff;
+        border: 1px solid #999;
+        float: left;
+        margin-right: -1px;
+        margin-top: -1px;
+        padding: 0;
+        text-align: center;
+        width: 48px;
+        height: 48px;
+        font-size: 24px;
+        font-weight: bold;
+      }
+      .board-row:after {
+        clear: both;
+        content: "";
+        display: table;
+      }
+      .status {
+        margin-bottom: 10px;
+      }
+      .game {
+        display: flex;
+        flex-direction: row;
+      }
+      .game-info {
+        margin-left: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/javascript">
+      // GLOBAL STATE //
+
+      let appState = {
+        nextId: 0,
+        components: {},
+        getNewComponentId(componentName) {
+          const id = this.nextId++;
+          const instanceId = `${componentName}-${id}`;
+          this.components[instanceId] = {
+            type: componentName,
+            state: {},
+            props: {},
+            children: {},
+            refs: {},
+          };
+          return instanceId;
+        },
+        initState(instanceId, state, props, children, refs) {
+          const componentObject = this.components[instanceId];
+
+          if (Object.keys(componentObject.state).length === 0) {
+            componentObject.state = state;
+          }
+
+          componentObject.props = { ...componentObject.props, ...props };
+
+          // adding IDs of children components at appropriate render positions
+          for (let i = 0; i < children.length; i++) {
+            const { renderPositionKey, numOfChildren, childrenIdGeneratorFn } =
+              children[i];
+            if (
+              Object.keys(componentObject.children).length === 0 ||
+              Object.keys(componentObject.children[renderPositionKey])
+                .length === 0
+            ) {
+              let childrenIdsArray = [];
+              for (let j = 0; j < numOfChildren; j++) {
+                const childId = childrenIdGeneratorFn();
+                childrenIdsArray.push(childId);
+              }
+              componentObject.children[renderPositionKey] = childrenIdsArray;
+            }
+          }
+
+          // refs
+          componentObject.refs = refs;
+        },
+        getState(instanceId) {
+          const componentObject = this.components[instanceId];
+          return componentObject.state;
+        },
+        setState(instanceId, newState) {
+          const componentObject = this.components[instanceId];
+          componentObject.state = { ...componentObject.state, ...newState };
+          rerenderComponent(instanceId);
+        },
+        getProps(instanceId) {
+          const componentObject = this.components[instanceId];
+          return componentObject.props;
+        },
+        getChildren(instanceId, renderPositionKey) {
+          const componentObject = this.components[instanceId];
+          return componentObject.children[renderPositionKey];
+        },
+        getRefs(instanceId) {
+          const componentObject = this.components[instanceId];
+          return componentObject.refs;
+        },
+        getRefValue(instanceId, key) {
+          const componentObject = this.components[instanceId];
+          const refs = componentObject.refs;
+          const refIndex = refs.findIndex((ref) => ref.key === key);
+          return refIndex > -1 ? refs[refIndex].value : null;
+        },
+        setRef(instanceId, { key, value }) {
+          const componentObject = this.components[instanceId];
+          const refs = componentObject.refs;
+          const updatedRefs = refs.map((ref) =>
+            ref.key === key ? { key, value } : ref
+          );
+          componentObject.refs = updatedRefs;
+        },
+        reset() {
+          this.nextId = 0;
+          this.components = {};
+        },
+      };
+
+      // Global object to store event handlers
+      window.eventHandlers = {
+        functions: {},
+        setNewFunctionId(instanceId, functionName, functionObject) {
+          const functionId = `${instanceId}-${functionName}`;
+          this.functions[functionId] = functionObject;
+          return functionId;
+        },
+      };
+
+      function getEventHandlerFunction(functionId) {
+        return window.eventHandlers.functions[functionId];
+      }
+
+      // GLOBAL FUNCTIONS //
+
+      function calculateWinner(squares) {
+        const lines = [
+          [0, 1, 2],
+          [3, 4, 5],
+          [6, 7, 8],
+          [0, 3, 6],
+          [1, 4, 7],
+          [2, 5, 8],
+          [0, 4, 8],
+          [2, 4, 6],
+        ];
+        for (let i = 0; i < lines.length; i++) {
+          const [a, b, c] = lines[i];
+          if (
+            squares[a] &&
+            squares[a] === squares[b] &&
+            squares[a] === squares[c]
+          ) {
+            return squares[a];
+          }
+        }
+        return null;
+      }
+
+      // COMPONENTS //
+
+      function Square(instanceId, props) {
+        console.log("Render Square Component", instanceId);
+        const renderObjectId = `render-${instanceId}`;
+
+        let refs = [];
+        // reuse props and refs in case of rerendering
+        if (
+          typeof props === undefined ||
+          !props ||
+          Object.keys(props).length === 0
+        ) {
+          props = appState.getProps(instanceId);
+          refs = appState.getRefs(instanceId);
+        }
+        const { value, onSquareClick } = props;
+
+        appState.initState(
+          instanceId,
+          // state
+          {},
+          // props
+          props,
+          // children
+          [],
+          // refs
+          refs
+        );
+
+        // store the event handler in the global object
+        const onSquareClickHandlerId = window.eventHandlers.setNewFunctionId(
+          instanceId,
+          "onSquareClick",
+          onSquareClick
+        );
+
+        return `
+            <button class="square" onclick="getEventHandlerFunction('${onSquareClickHandlerId}')()">
+                ${value ? value : ""}
+            </button>
+        `;
+      }
+
+      function Board(instanceId, props) {
+        console.log("Render Board Component", instanceId);
+        const renderObjectId = `render-${instanceId}`;
+
+        // Children
+        const _squareRenderPosition = "div/div";
+
+        let refs = [];
+        // reuse props and refs in case of rerendering
+        if (
+          typeof props === undefined ||
+          !props ||
+          Object.keys(props).length === 0
+        ) {
+          props = appState.getProps(instanceId);
+          refs = appState.getRefs(instanceId);
+        }
+        const { xIsNext, squares, onPlay } = props;
+
+        appState.initState(
+          instanceId,
+          // state
+          {},
+          // props
+          props,
+          // children
+          [
+            {
+              renderPositionKey: _squareRenderPosition,
+              numOfChildren: 9,
+              childrenIdGeneratorFn: () => appState.getNewComponentId("Square"),
+            },
+          ],
+          // refs
+          refs
+        );
+
+        function handleClick(i) {
+          console.log("called handleClick", i, xIsNext);
+          if (calculateWinner(squares) || squares[i]) {
+            return;
+          }
+          const nextSquares = squares.slice();
+          if (xIsNext) {
+            nextSquares[i] = "X";
+          } else {
+            nextSquares[i] = "O";
+          }
+          console.log("nextSquares", nextSquares);
+          onPlay(nextSquares);
+        }
+
+        const winner = calculateWinner(squares);
+        let status;
+        if (winner) {
+          status = "Winner: " + winner;
+        } else {
+          status = "Next player: " + (xIsNext ? "X" : "O");
+        }
+
+        // using same childred IDs to persist them across rerendering
+        const _squareRenderPositionChildren = appState.getChildren(
+          instanceId,
+          _squareRenderPosition
+        );
+
+        return `
+            <div id='${renderObjectId}'>
+                <div class="status">${status}</div>
+                <div class="board-row">
+                    ${Square(_squareRenderPositionChildren[0], {
+                      value: squares[0],
+                      onSquareClick: () => handleClick(0),
+                    })}
+                    ${Square(_squareRenderPositionChildren[1], {
+                      value: squares[1],
+                      onSquareClick: () => handleClick(1),
+                    })}
+                    ${Square(_squareRenderPositionChildren[2], {
+                      value: squares[2],
+                      onSquareClick: () => handleClick(2),
+                    })}
+                </div>
+                <div class="board-row">
+                    ${Square(_squareRenderPositionChildren[3], {
+                      value: squares[3],
+                      onSquareClick: () => handleClick(3),
+                    })}
+                    ${Square(_squareRenderPositionChildren[4], {
+                      value: squares[4],
+                      onSquareClick: () => handleClick(4),
+                    })}
+                    ${Square(_squareRenderPositionChildren[5], {
+                      value: squares[5],
+                      onSquareClick: () => handleClick(5),
+                    })}
+                </div>
+                <div class="board-row">
+                    ${Square(_squareRenderPositionChildren[6], {
+                      value: squares[6],
+                      onSquareClick: () => handleClick(6),
+                    })}
+                    ${Square(_squareRenderPositionChildren[7], {
+                      value: squares[7],
+                      onSquareClick: () => handleClick(7),
+                    })}
+                    ${Square(_squareRenderPositionChildren[8], {
+                      value: squares[8],
+                      onSquareClick: () => handleClick(8),
+                    })}
+                </div>
+            </div>
+        `;
+      }
+
+      function Game(instanceId) {
+        console.log("Render Game Component", instanceId);
+        const renderObjectId = `render-${instanceId}`;
+
+        // Children
+        const _boardRenderPosition = "div/div";
+
+        appState.initState(
+          instanceId,
+          // state
+          // maintain moves history for undo and redo functionality
+          {
+            history: [Array(9).fill(null)],
+            currentMove: 0,
+          },
+          // props
+          {},
+          // children
+          [
+            {
+              renderPositionKey: _boardRenderPosition,
+              numOfChildren: 1,
+              childrenIdGeneratorFn: () => appState.getNewComponentId("Board"),
+            },
+          ],
+          // refs
+          []
+        );
+
+        const thisComponentState = appState.getState(instanceId);
+        const { history, currentMove } = thisComponentState;
+
+        const xIsNext = currentMove % 2 === 0;
+        const currentSquares = history[currentMove];
+
+        function handlePlay(nextSquares) {
+          console.log("called handlePlay", nextSquares);
+          const nextHistory = [
+            ...history.slice(0, currentMove + 1),
+            nextSquares,
+          ];
+          appState.setState(instanceId, {
+            history: nextHistory,
+            currentMove: nextHistory.length - 1,
+          });
+        }
+
+        function jumpToMove(nextMove) {
+          console.log("jumpToMove", nextMove);
+          appState.setState(instanceId, {
+            currentMove: nextMove,
+          });
+        }
+
+        // store the event handler in the global object
+        const jumpToMoveHandlerId = window.eventHandlers.setNewFunctionId(
+          instanceId,
+          "jumpToMove",
+          jumpToMove
+        );
+
+        const _GameMoves = () => {
+          return history
+            .map((squares, move) => {
+              let description;
+              if (move > 0) {
+                description = "Go to move #" + move;
+              } else {
+                description = "Go to game start";
+              }
+              return `
+                  <li key='${move}'>
+                    <button onclick="getEventHandlerFunction('${jumpToMoveHandlerId}')(${move})">${description}</button>
+                  </li>
+                `;
+            })
+            .join("");
+        };
+
+        // using same child ID to persist it across rerendering
+        const _boardRenderPositionChildren = appState.getChildren(
+          instanceId,
+          _boardRenderPosition
+        );
+        const boardChildId = _boardRenderPositionChildren[0];
+
+        return `
+            <div id='${renderObjectId}' class="game">
+                <div class="game-board">
+                    ${Board(boardChildId, {
+                      xIsNext: xIsNext,
+                      squares: currentSquares,
+                      onPlay: (nextSquares) => handlePlay(nextSquares),
+                    })}
+                </div>
+                <div class="game-info">
+                    <ol>${_GameMoves()}</ol>
+                </div>
+            </div>
+        `;
+      }
+
+      function rerenderComponent(instanceId) {
+        const componentObject = appState.components[instanceId];
+        if (!componentObject) return;
+
+        let componentElement;
+        componentElement = document.getElementById(`render-${instanceId}`);
+
+        if (componentElement) {
+          const temp = document.createElement("div");
+          temp.innerHTML = eval(`${componentObject.type}('${instanceId}')`);
+          componentElement.parentNode.replaceChild(
+            temp.firstElementChild,
+            componentElement
+          );
+        }
+      }
+
+      let pageStructure = [
+        {
+          type: "Game",
+          id: appState.getNewComponentId("Game"),
+        },
+      ];
+
+      function MyPage() {
+        return pageStructure
+          .map((component) => {
+            if (component.type === "Game") {
+              return Game(component.id);
+            }
+          })
+          .join("");
+      }
+
+      function render() {
+        document.getElementById("root").innerHTML = MyPage();
+      }
+
+      // Initial render
+      render();
+    </script>
+  </body>
+</html>

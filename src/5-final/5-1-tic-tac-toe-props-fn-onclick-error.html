@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Clock example</title>
+    <title>Tik Tac Toe Game</title>
     <style>
       * {
         box-sizing: border-box;
@@ -214,7 +214,7 @@
         /**
          * Issue: I am not able to call functions received via props from within onclick event handlers
          *
-         * ReferenceError: onPlay is not defined at HTMLButtonElement.onclick
+         * ReferenceError: onSquareClick is not defined at HTMLButtonElement.onclick
          */
         return `
             <button class="square" onclick="onSquareClick()">
@@ -296,6 +296,13 @@
          * Issue: I am not able to call functions received via props from within onclick event handlers
          *
          * ReferenceError: onPlay is not defined at HTMLButtonElement.onclick
+         */
+        /**
+         * Explanation:
+         * The problem occurs because the onPlay function is defined within the scope of your JavaScript code,
+         * but it's not accessible in the global scope where the inline onclick attribute is executed.
+         * That is, when the button is clicked, the browser looks for onPlay in the global scope (window object),
+         * but it doesn't exist there.
          */
         return `
             <div id='${renderObjectId}'>
