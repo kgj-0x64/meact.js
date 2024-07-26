@@ -3,26 +3,39 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- type="module" leads to CORS error -->
-    <script src="./react-dom.js"></script>
-    <script src="./react.js"></script>
-    <script src="./index.js"></script>
     <title>Basic example</title>
+    <!-- type="module" leads to CORS error -->
+    <script src="./react.js" defer></script>
+    <script src="./react-dom.js" defer></script>
+    <script src="./components.js" defer></script>
+    <script src="./index.js" defer></script>
     <style>
       body {
-        text-align: center;
         font-size: 120%;
       }
       span {
         margin: 16px;
       }
-      span:hover {
-        font-size: 250%;
-        cursor: pointer;
+      /* https://stackoverflow.com/a/61619447/3083243 */
+      .react-element-tree-node {
+        /* new line for each react tree element */
+        display: block;
+        position: relative;
+        padding: 0px 0px;
+        background-color: #eeeeee;
+      }
+      .react-element-tree-node:after {
+        content: "";
+        position: absolute;
+        left: 0px;
+        top: 0%;
+        height: 100%;
+        border-left: 1px solid #000;
       }
     </style>
   </head>
   <body>
     <div id="root"></div>
+    <div id="react-element-tree"></div>
   </body>
 </html>
