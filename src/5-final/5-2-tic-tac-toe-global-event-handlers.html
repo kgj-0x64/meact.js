@@ -453,21 +453,9 @@
         }
       }
 
-      let pageStructure = [
-        {
-          type: "Game",
-          id: appState.getNewComponentId("Game"),
-        },
-      ];
-
       function MyPage() {
-        return pageStructure
-          .map((component) => {
-            if (component.type === "Game") {
-              return Game(component.id);
-            }
-          })
-          .join("");
+        const rootComponentId = appState.getNewComponentId("Game");
+        return Game(component.id);
       }
 
       function render() {
