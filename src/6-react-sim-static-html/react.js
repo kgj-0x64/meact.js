@@ -15,28 +15,14 @@ class ReactElement {
     // name of this element
     this.name = name;
     // set of props set on this element
-    this.props = props; // map-like object
+    this.props = props ? props : {}; // map-like object
     // ordered collection of children elements of this element
     this.children = children; // array
   }
 
+  // plot render tree beginning from this node for visual debugging
   plotRenderTree() {
     new ReactElementTreeDebugger(this).renderTreeInHtmlDocument();
-  }
-
-  run() {
-    // MDN: Creates a new Text node. This method can be used to escape HTML characters.
-    // return document.createTextNode(virtualDomElement);
-    for (const child in this.children) {
-      if (Object.hasOwnProperty.call(object, key)) {
-        const element = object[key];
-      }
-      if (typeof child === "string") {
-        // MDN: Creates a new Text node.
-        // This method can be used to escape HTML characters.
-        return document.createTextNode(child);
-      }
-    }
   }
 }
 
