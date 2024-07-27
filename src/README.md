@@ -4,10 +4,10 @@ WHAT's MISSING:: Beyond many for-scale things, these necessary ones:
 - Local development server and hot reload
 - Declarative syntax
 - Modern JavaScript/Typescript syntax
+- Scoped CSS; CSS-in-JS
 - Cross-browser tested API
 - Ecosystem of client or async state management, UI components, caching, etc
 - Ecosystem of build, bundler and tree-shaking tools
-- Different ways to write CSS
 - Concurrent rendering
 - Server side rendering
 - Performance optimization:
