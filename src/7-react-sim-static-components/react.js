@@ -41,6 +41,13 @@ class ReactElement {
 // recursively creates ReactElement objects
 // since every child is another call to createElement or a text string
 function createElement(type, props, ...children) {
+  // this is a React component
+  if (typeof type === "function") {
+    // call the function with the arguments to invoke a call to createElement again unless we reach atomic html elements
+    const component = type.apply(null, props);
+    return component;
+  }
+
   let childrenElements = [];
   if (children !== undefined && children && children.length > 0) {
     for (let i = 0; i < children.length; i++) {
