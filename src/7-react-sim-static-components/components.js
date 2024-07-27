@@ -1,15 +1,19 @@
-function ChildComponent() {
-  console.log("ChildComponent called");
+function ChildComponent(props) {
+  console.log("ChildComponent called with props", props);
 
-  const count = 100;
+  const { count, updateCountBy } = props;
+  const compounder = Math.abs(count);
+
   const childComponent = createElement(
     "div",
     null,
+    createElement("h3", null, "Hello from the Child Component &#10083; ❤️"),
+    createElement("h2", null, `${count} likes`),
+    createElement("button", { onClick: () => updateCountBy(compounder) }, "👍🏽"),
     createElement(
-      "span",
-      null,
-      "Hello from the Child Component 👍🏽",
-      createElement("h2", null, `${count} likes`)
+      "button",
+      { onClick: () => updateCountBy(-1 * compounder) },
+      "👎🏽"
     )
   );
   console.log("childComponent", childComponent);
@@ -29,13 +33,18 @@ function ParentComponent() {
   console.log("uselessNode", uselessNode);
 
   // should be rendered
+  let count = 100;
+  function updateCountBy(value) {
+    console.log("updateCountBy", value);
+    count += value;
+  }
+
   const parentComponent = createElement(
     "div",
     null,
-    createElement("span", null, "👍🏽"),
-    createElement("span", null, "👎🏽"),
-    createElement(ChildComponent),
-    createElement("h3", null, "Like or dislike to increase/decrease")
+    createElement("h1", null, "Compounding Counter"),
+    createElement(ChildComponent, { count, updateCountBy }),
+    createElement("p", null, "Like or dislike to increase/decrease")
   );
   console.log("parentComponent", parentComponent);
 

@@ -14,6 +14,7 @@ class BrowserDomWriter {
   render(reactElement) {
     this.rootNodeInBrowserDom.innerHTML = ""; // Clear any existing content
     const browserDom = createBrowserDomForReactElement(reactElement);
+    console.log("browserDom", browserDom);
     this.rootNodeInBrowserDom.appendChild(browserDom);
   }
 
@@ -21,23 +22,43 @@ class BrowserDomWriter {
 }
 
 function createBrowserDomForReactElement(reactElement) {
-  if (reactElement.name === "text") {
-    const textContent = reactElement.props.content;
-    return document.createTextNode(textContent);
-  }
+  /**
+   * this approach renders text including Unicode character ❤️ correctly
+   * but it doesn't interpret HTML entities correctly like &#10083; as a heart emoji
+   */
+  // if (reactElement.name === "text") {
+  //   const textContent = reactElement.props.content;
+  //   const textNode = document.createTextNode(textContent);
+  //   console.log("textNode", textNode);
+  //   return textNode;
+  // }
 
   const htmlElement = document.createElement(reactElement.name);
   htmlElement.setAttribute("id", reactElement.id);
 
-  if (reactElement.props !== undefined && !reactElement.props) {
+  if (reactElement.props !== undefined && reactElement.props) {
     for (const [key, value] of Object.entries(reactElement.props)) {
-      htmlElement.setAttribute(key, value);
+      const attrKey = key.toLowerCase();
+      let attrValue = value;
+      if (attrKey === "onclick") {
+        // htmlElement.setAttribute("onclick", "alert('blah');");
+        htmlElement.onclick = attrValue;
+      } else {
+        htmlElement.setAttribute(attrKey, attrValue);
+      }
     }
   }
 
   // If the node has children, create and append child nodes
   if (reactElement.children && reactElement.children.length > 0) {
     reactElement.children.forEach((child) => {
+      if (child.name === "text") {
+        const textContent = child.props.content;
+        // unlike creating a Text Node using `document.createTextNode`,
+        // setting innerHTML handles both Unicode characters and HTML entities
+        htmlElement.innerHTML = textContent;
+      }
+
       htmlElement.appendChild(createBrowserDomForReactElement(child));
     });
   }
