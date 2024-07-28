@@ -19,11 +19,13 @@ class ReactElement {
     this.children = children; // array
     // state manager useful for an element of type "ReactComponent"
     this.stateManager = {
-      // position of next state value in component's statements
-      nextPosition: 0,
+      // should be reset to 0 on every render
+      useStateCallCount: 0,
       // ordered collection of state values of this component
-      state: [],
+      values: [],
     };
+    // function object used in creating this component
+    this.functionRef = null;
   }
 
   // plot render tree beginning from this node for visual debugging
@@ -71,6 +73,7 @@ function createElement(element, props, ...children) {
     // all the function logic including `useState`, `setState` etc will be executed when this function is called
     // before its return block is executed which creates nested children elements for it
     // so, if a call to `useState` (directly as GET or as SET via calling `setState`) then it must be corresponding to this component only
+    reactComponent.functionRef = element;
     currReactComponentObject = reactComponent;
 
     // call the component function with the received arguments
@@ -108,21 +111,60 @@ function createElement(element, props, ...children) {
 
 /**
  * stuff to manage component behaviour across rerenders
+ *
+ * FAIL
+ *
+ * This approach is as faulty as it felt in my head!
+ * It works only for one single stateful component.
+ * By the time `updateState` is called via `setState`,
+ * `currReactComponentObject` would be set to the last React Component dealt with in `createElement`
  */
 
 let currReactComponentObject = null;
-function updateState(reactComponentObject, stateName, stateValue) {
-  reactComponentObject.state[stateName] = stateValue;
+function updateState(reactComponentObject, valueIndex, newValue) {
+  console.log("updateState", reactComponentObject, valueIndex, newValue);
+  reactComponentObject.stateManager.values[valueIndex] = newValue;
+  console.log("reactComponentObject", reactComponentObject);
   // TODO: rerender
+  currReactComponentObject.plotRenderTree();
+  // update the call counter since useState will be called again due to function call
+  currReactComponentObject.stateManager.useStateCallCount = 0;
+  reactComponentObject.functionRef(reactComponentObject.props);
 }
 
 function useState(initialValue) {
+  console.log("useState", initialValue);
   // this is initial value on first render
   let stateValue = initialValue;
 
-  function setStateValue(newValue) {
-    console.log("newValue", newValue);
+  // how many useState calls have been made for this component in this render
+  const { useStateCallCount } = currReactComponentObject.stateManager;
+  const numOfStoredStateValues =
+    currReactComponentObject.stateManager.values.length;
+  console.log(
+    "useStateCallCount",
+    useStateCallCount,
+    "numOfStoredStateValues",
+    numOfStoredStateValues
+  );
+
+  // do we have a state value at (useStateCallCount+1) position already
+  if (numOfStoredStateValues >= useStateCallCount + 1) {
+    // GET value from last render
+    stateValue =
+      currReactComponentObject.stateManager.values[useStateCallCount];
+  } else {
+    // SET initial value
+    currReactComponentObject.stateManager.values[useStateCallCount] =
+      initialValue;
   }
+
+  function setStateValue(newValue) {
+    updateState(currReactComponentObject, useStateCallCount, newValue);
+  }
+
+  // update the call counter
+  currReactComponentObject.stateManager.useStateCallCount += 1;
 
   return [stateValue, setStateValue];
 }
@@ -163,6 +205,17 @@ class ReactElementTreeDebugger {
     nodeIdSpan.innerText = `${nestedLeftMargin}_id: ${node.id}`;
     this.treeContainer.appendChild(nodeIdSpan);
 
+    // node's state
+    if (node.stateManager && node.stateManager.values.length > 0) {
+      node.stateManager.values.forEach((value, index) => {
+        const nodeStateSpan = document.createElement("span");
+        nodeStateSpan.className = "react-element-tree-node";
+        nodeStateSpan.innerText = `${nestedLeftMargin}_${index}: "${value}"`;
+        this.treeContainer.appendChild(nodeStateSpan);
+      });
+    }
+
+    // node's props
     if (node.props !== undefined && node.props) {
       for (const [key, value] of Object.entries(node.props)) {
         const nodeAttributeSpan = document.createElement("span");
@@ -172,7 +225,7 @@ class ReactElementTreeDebugger {
       }
     }
 
-    // If the node has children, create and append child nodes
+    // node's children
     if (node.children && node.children.length > 0) {
       node.children.forEach((child) => {
         this.createHtmlForTreeNode(child, level + 1);
