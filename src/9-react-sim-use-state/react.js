@@ -6,9 +6,11 @@ function getnewElementId(elementName) {
 }
 
 class ReactElement {
-  constructor(name, props = {}, children = []) {
+  constructor(type, name, props = {}, children = []) {
     // ID of this element to uniquely identify an instance of it
     this.id = getnewElementId(name);
+    // type of this element
+    this.type = type; // null | "ReactComponent" | "HtmlElement"
     // name of this element
     this.name = name;
     // set of props set on this element
@@ -35,31 +37,88 @@ class ReactElement {
  * in the function call chain initiated by ReactDOM.render()
  */
 
+// takes an entry point as root element and
 // recursively creates ReactElement objects
 // since every child is another call to createElement or a text string
-function createElement(name, props, ...children) {
-  // this is a React component
-  if (typeof name === "function") {
-    // call the function with the arguments to invoke a call to createElement again unless we reach atomic html elements
-    const component = name(props);
-    return component;
+// so as to eventually reach atomic html elements
+function createElement(element, props, ...children) {
+  // default type, props and children
+  let type = null;
+  let name = element;
+  const propsObject = props === undefined || !props ? {} : props;
+  let childrenElements = [];
+
+  // if it's a null element
+  if (!element) {
+    return new ReactElement(null, "null", {}, []);
   }
 
-  let childrenElements = [];
-  if (children !== undefined && children && children.length > 0) {
-    for (let i = 0; i < children.length; i++) {
-      const child = children[i];
-      let childElement = child;
-      if (typeof child === "string") {
-        childElement = createElement("text", { content: child });
+  // if this is a React component
+  if (typeof element === "function") {
+    type = "ReactComponent";
+    name = element.name;
+
+    // call the component function with the received arguments to invoke calls to createElement in its return block again
+    // all the function logic including `useState`, `setState` etc of this component will be called here
+    // to finally return a `createElement` call from its return block
+    // which could have however deeply nested `createElement` calls in its children
+    const returnedElement = element(propsObject);
+    childrenElements.push(returnedElement);
+  } else {
+    type = "HtmlElement";
+    if (children !== undefined && children && children.length > 0) {
+      for (let i = 0; i < children.length; i++) {
+        const child = children[i];
+        let childElement = child;
+        if (typeof child === "string") {
+          childElement = createElement("text", { content: child });
+        }
+        childrenElements.push(childElement);
       }
-      childrenElements.push(childElement);
     }
   }
 
-  const element = new ReactElement(name, props, childrenElements);
+  const reactElement = new ReactElement(
+    type,
+    name,
+    propsObject,
+    childrenElements
+  );
 
-  return element;
+  return reactElement;
+}
+
+/**
+ * stuff to manage component behaviour across rerenders
+ */
+
+let currentComponentFunctionBeingRun = null;
+let dataPersistedAcrossRerenders = {
+  state: {},
+  updateState(stateReferenceId, newValue) {
+    this.state[stateReferenceId] = newValue;
+  },
+};
+
+function useState(initialValue) {
+  // ???
+  const stateReferenceId = "";
+
+  // this is initial value on first render, and persisted value on rerenders
+  let stateValue = initialValue;
+
+  // upsert this initial value into our store for the render tree
+  if (dataPersistedAcrossRerenders.state.hasOwnProperty(stateReferenceId)) {
+    stateValue = dataPersistedAcrossRerenders.state[stateReferenceId];
+  } else {
+    dataPersistedAcrossRerenders.updateState(stateReferenceId, initialValue);
+  }
+
+  function setStateValue(newValue) {
+    dataPersistedAcrossRerenders.updateState(stateReferenceId, newValue);
+  }
+
+  return [stateValue, setStateValue];
 }
 
 class ReactElementTreeDebugger {
@@ -85,6 +144,12 @@ class ReactElementTreeDebugger {
     nodeNameSpan.className = "react-element-tree-node";
     nodeNameSpan.innerText = `${leftMargin}_node: ${node.name}`;
     this.treeContainer.appendChild(nodeNameSpan);
+
+    // node's type
+    const nodeTypeSpan = document.createElement("span");
+    nodeTypeSpan.className = "react-element-tree-node";
+    nodeTypeSpan.innerText = `${nestedLeftMargin}_type: ${node.type}`;
+    this.treeContainer.appendChild(nodeTypeSpan);
 
     // node's ID
     const nodeIdSpan = document.createElement("span");

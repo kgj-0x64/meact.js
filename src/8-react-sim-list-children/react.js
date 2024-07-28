@@ -1,6 +1,3 @@
-// THE RENDER TREE
-const renderTree = new Map();
-
 let nextId = 0;
 function getnewElementId(elementName) {
   const id = nextId++;
