@@ -1,7 +1,7 @@
 let nextId = 0;
 function getnewElementId(elementName) {
   const id = nextId++;
-  const instanceId = `${elementName}-${id}`;
+  const instanceId = `${elementName.toLowerCase()}-${id}`;
   return instanceId;
 }
 
@@ -17,6 +17,13 @@ class ReactElement {
     this.props = props ? props : {}; // map-like object
     // ordered collection of children elements of this element
     this.children = children; // array
+    // state manager useful for an element of type "ReactComponent"
+    this.stateManager = {
+      // position of next state value in component's statements
+      nextPosition: 0,
+      // ordered collection of state values of this component
+      state: [],
+    };
   }
 
   // plot render tree beginning from this node for visual debugging
@@ -58,64 +65,63 @@ function createElement(element, props, ...children) {
     type = "ReactComponent";
     name = element.name;
 
-    // call the component function with the received arguments to invoke calls to createElement in its return block again
-    // all the function logic including `useState`, `setState` etc of this component will be called here
-    // to finally return a `createElement` call from its return block
+    // creating it without children here only to get its ID and handle state etc
+    const reactComponent = new ReactElement(type, name, propsObject, []);
+
+    // all the function logic including `useState`, `setState` etc will be executed when this function is called
+    // before its return block is executed which creates nested children elements for it
+    // so, if a call to `useState` (directly as GET or as SET via calling `setState`) then it must be corresponding to this component only
+    currReactComponentObject = reactComponent;
+
+    // call the component function with the received arguments
+    // to finally run a `createElement` call and return its output ReactElement through its return block
     // which could have however deeply nested `createElement` calls in its children
     const returnedElement = element(propsObject);
     childrenElements.push(returnedElement);
-  } else {
-    type = "HtmlElement";
-    if (children !== undefined && children && children.length > 0) {
-      for (let i = 0; i < children.length; i++) {
-        const child = children[i];
-        let childElement = child;
-        if (typeof child === "string") {
-          childElement = createElement("text", { content: child });
-        }
-        childrenElements.push(childElement);
+
+    reactComponent.children = [returnedElement];
+    return reactComponent;
+  }
+
+  /// else
+  type = "HtmlElement";
+  if (children !== undefined && children && children.length > 0) {
+    for (let i = 0; i < children.length; i++) {
+      const child = children[i];
+      let childElement = child;
+
+      if (typeof child === "string") {
+        childElement = createElement("text", { content: child });
       }
+      childrenElements.push(childElement);
     }
   }
 
-  const reactElement = new ReactElement(
+  const htmlElement = new ReactElement(
     type,
     name,
     propsObject,
     childrenElements
   );
-
-  return reactElement;
+  return htmlElement;
 }
 
 /**
  * stuff to manage component behaviour across rerenders
  */
 
-let currentComponentFunctionBeingRun = null;
-let dataPersistedAcrossRerenders = {
-  state: {},
-  updateState(stateReferenceId, newValue) {
-    this.state[stateReferenceId] = newValue;
-  },
-};
+let currReactComponentObject = null;
+function updateState(reactComponentObject, stateName, stateValue) {
+  reactComponentObject.state[stateName] = stateValue;
+  // TODO: rerender
+}
 
 function useState(initialValue) {
-  // ???
-  const stateReferenceId = "";
-
-  // this is initial value on first render, and persisted value on rerenders
+  // this is initial value on first render
   let stateValue = initialValue;
 
-  // upsert this initial value into our store for the render tree
-  if (dataPersistedAcrossRerenders.state.hasOwnProperty(stateReferenceId)) {
-    stateValue = dataPersistedAcrossRerenders.state[stateReferenceId];
-  } else {
-    dataPersistedAcrossRerenders.updateState(stateReferenceId, initialValue);
-  }
-
   function setStateValue(newValue) {
-    dataPersistedAcrossRerenders.updateState(stateReferenceId, newValue);
+    console.log("newValue", newValue);
   }
 
   return [stateValue, setStateValue];

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <style>
+      body {
+        background: transparent; /* Make it white if you need */
+        padding: 0 24px;
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+      }
+      .App {
+        color: #72a24d;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+      // Scenario 2: Same component, no key
+      function ParentComponentNoKey() {
+        const [toggle, setToggle] = React.useState(true);
+
+        return (
+          <div>
+            <button onClick={() => setToggle(!toggle)}>Toggle</button>
+            {toggle ? <ChildComponent /> : <ChildComponent />}
+          </div>
+        );
+      }
+
+      // Scenario 3: Same component type, different prop
+      function ParentComponentWithKey() {
+        const [count, setCount] = React.useState(0);
+
+        return (
+          <div>
+            <button onClick={() => setCount(count + 1)}>Increment</button>
+            {count % 2 === 0 ? (
+              <ChildComponent key="even" label="Even" />
+            ) : (
+              <ChildComponent key="odd" label="Odd" />
+            )}
+          </div>
+        );
+      }
+
+      function ChildComponent({ label }) {
+        const [internalState, setInternalState] = React.useState(0);
+
+        React.useEffect(() => {
+          console.log(`ChildComponent ${label} mounted`);
+          return () => console.log(`ChildComponent ${label} unmounted`);
+        }, []);
+
+        return (
+          <div>
+            <p>
+              {label} Child (Internal state: {internalState})
+            </p>
+            <button onClick={() => setInternalState(internalState + 1)}>
+              Increment Internal State
+            </button>
+          </div>
+        );
+      }
+
+      // Scenario 1: Different component types
+      function ParentComponentDifferentTypes() {
+        const [showA, setShowA] = React.useState(true);
+
+        return (
+          <div>
+            <button onClick={() => setShowA(!showA)}>Toggle Component</button>
+            {showA ? <ComponentA /> : <ComponentB />}
+          </div>
+        );
+      }
+
+      function ComponentA() {
+        const [count, setCount] = React.useState(0);
+
+        React.useEffect(() => {
+          console.log("ComponentA mounted");
+          return () => console.log("ComponentA unmounted");
+        }, []);
+
+        return (
+          <div>
+            <p>Component A (Count: {count})</p>
+            <button onClick={() => setCount(count + 1)}>Increment</button>
+          </div>
+        );
+      }
+
+      function ComponentB() {
+        const [count, setCount] = React.useState(0);
+
+        React.useEffect(() => {
+          console.log("ComponentB mounted");
+          return () => console.log("ComponentB unmounted");
+        }, []);
+
+        return (
+          <div>
+            <p>Component B (Count: {count})</p>
+            <button onClick={() => setCount(count + 1)}>Increment</button>
+          </div>
+        );
+      }
+
+      ReactDOM.render(
+        <ParentComponentWithKey />,
+        document.getElementById("root")
+      );
+    </script>
+  </body>
+</html>

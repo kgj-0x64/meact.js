@@ -3,16 +3,13 @@ function StopwatchComponent(props) {
 
   const { color, position } = props;
 
-  const stopwatchComponent = createElement(
+  return createElement(
     "h3",
     {
       style: `color:${color}`,
     },
     `Stopwatch #${position + 1}`
   );
-  console.log("stopwatchComponent", stopwatchComponent);
-
-  return stopwatchComponent;
 }
 
 function StopwatchTowerComponent() {
@@ -21,7 +18,7 @@ function StopwatchTowerComponent() {
   const [color, setColor] = useState("lightcoral");
 
   function updateColor(event) {
-    console.log("updateColor", event);
+    console.log("SET COLOR", event);
     setColor(event.target.value);
   }
 
@@ -38,7 +35,7 @@ function StopwatchTowerComponent() {
     return elements;
   }
 
-  const stopwatchTowerComponent = createElement(
+  return createElement(
     "div",
     null,
     // conditional render
@@ -70,7 +67,4 @@ function StopwatchTowerComponent() {
       createElement("ol", null, ...getStopwatchesElementsArray())
     )
   );
-  console.log("stopwatchTowerComponent", stopwatchTowerComponent);
-
-  return stopwatchTowerComponent;
 }

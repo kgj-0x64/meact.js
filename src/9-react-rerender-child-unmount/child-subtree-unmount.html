@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <style>
+      body {
+        background: transparent; /* Make it white if you need */
+        padding: 0 24px;
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+      }
+      .App {
+        color: #72a24d;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+      function ParentComponent() {
+        const [showComponentA, setShowComponentA] = React.useState(true);
+
+        return (
+          <div>
+            <button onClick={() => setShowComponentA(!showComponentA)}>
+              Toggle Component
+            </button>
+            {showComponentA ? <ComponentA /> : <ComponentB />}
+          </div>
+        );
+      }
+
+      function ComponentA() {
+        React.useEffect(() => {
+          console.log("ComponentA mounted");
+          return () => console.log("ComponentA unmounted");
+        }, []);
+
+        return (
+          <div>
+            <h2>Parent's Child: Component A</h2>
+            <NestedComponentA1 />
+            <NestedComponentA2 />
+          </div>
+        );
+      }
+
+      function NestedComponentA1() {
+        React.useEffect(() => {
+          console.log("NestedComponentA1 mounted");
+          return () => console.log("NestedComponentA1 unmounted");
+        }, []);
+
+        return <div>A's Child: Nested Component A1</div>;
+      }
+
+      function NestedComponentA2() {
+        React.useEffect(() => {
+          console.log("NestedComponentA2 mounted");
+          return () => console.log("NestedComponentA2 unmounted");
+        }, []);
+
+        return (
+          <div>
+            <p>A's Child: Nested Component A2</p>
+            <DeepNestedComponentA2 />
+          </div>
+        );
+      }
+
+      function DeepNestedComponentA2() {
+        React.useEffect(() => {
+          console.log("DeepNestedComponentA2 mounted");
+          return () => console.log("DeepNestedComponentA2 unmounted");
+        }, []);
+
+        return <div>A2's Child: Deep Nested Component A2</div>;
+      }
+
+      function ComponentB() {
+        React.useEffect(() => {
+          console.log("ComponentB mounted");
+          return () => console.log("ComponentB unmounted");
+        }, []);
+
+        return <div>Parent's Child: Component B</div>;
+      }
+
+      ReactDOM.render(<ParentComponent />, document.getElementById("root"));
+    </script>
+  </body>
+</html>
