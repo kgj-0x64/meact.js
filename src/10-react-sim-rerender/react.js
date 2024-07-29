@@ -5,6 +5,27 @@ function getnewElementId(elementName) {
   return instanceId;
 }
 
+// render tree which refreshes on every render and re-render
+// and is used to construct the browser DOM in react-dom.js
+const renderTree = {
+  // root node of the render tree
+  rootNode: null,
+  // how many times this app has been rendered (or rerendered) in browser
+  domRefreshCounter: 0,
+  // update root node thus the whole render tree
+  setRootNode(reactElement) {
+    this.rootNode = reactElement;
+    // reset the render counter
+    this.domRefreshCounter = 0;
+  },
+  postRenderHandler() {
+    if (!this.rootNode) return;
+    this.domRefreshCounter += 1;
+    // reset the hooks counter for all react elements in the render tree
+    resetHooksCallCounters(this.rootNode);
+  },
+};
+
 class ReactElement {
   constructor(type, name, props = {}, children = []) {
     // ID of this element to uniquely identify an instance of it
@@ -17,18 +38,33 @@ class ReactElement {
     this.props = props ? props : {}; // map-like object
     // ordered collection of children elements of this element
     this.children = children; // array
+    // in this render, number of hook calls seen by this React Component
+    this.hooksCallCounter =
+      type === "ReactComponent"
+        ? {
+            values: {},
+            increment(hookName) {
+              this.values[hookName] =
+                hookName in this.values ? this.values[hookName] + 1 : 1;
+            },
+            // should be reset to 0 on every render
+            reset() {
+              this.values = {};
+            },
+          }
+        : null;
     // state manager useful for an element of type "ReactComponent"
-    this.stateManager = {
-      // should be reset to 0 on every render
-      useStateCallCount: 0,
-      // ordered collection of state values of this component
-      values: [],
-      updateValue: (index, newValue) => {
-        this.stateManager.values[index] = newValue;
-        // TODO: updateSubtreeForElement(this);
-        this.plotRenderTree();
-      },
-    };
+    this.stateManager =
+      type === "ReactComponent"
+        ? {
+            // ordered collection of state values of this component
+            values: [],
+            updateValue(index, newValue) {
+              this.values[index] = newValue;
+              // TODO: updateSubtreeForElement(this);
+            },
+          }
+        : null;
   }
 
   // plot render tree beginning from this node for visual debugging
@@ -161,12 +197,21 @@ function useState(initialValue) {
   // Or, 2.
   // const reactComponentForThisHook = reactComponentStack[reactComponentStack.length - 1];
 
-  if (!reactComponentForThisHook) {
+  if (
+    !reactComponentForThisHook ||
+    !reactComponentForThisHook.hooksCallCounter
+  ) {
     throw new Error("useState must be used within a function component");
   }
 
   // how many useState calls have been made for this component in this render
-  const { useStateCallCount, values } = reactComponentForThisHook.stateManager;
+  let useStateCallCount = 0;
+  if ("useState" in reactComponentForThisHook.hooksCallCounter.values) {
+    useStateCallCount =
+      reactComponentForThisHook.hooksCallCounter.values["useState"];
+  }
+
+  const { values } = reactComponentForThisHook.stateManager;
   let stateValue;
 
   // do we have a state value at (useStateCallCount+1) position already
@@ -187,14 +232,26 @@ function useState(initialValue) {
    * so, it will always refer to the same `ReactElement` object within a specific `useState` call's context
    */
   function setStateValue(newValue) {
-    console.log("Updating state in:", reactComponentForThisHook.name);
+    console.log("Updating state in:", reactComponentForThisHook.id);
     reactComponentForThisHook.stateManager.updateValue(stateIndex, newValue);
   }
 
   // update the call counter
-  reactComponentForThisHook.stateManager.useStateCallCount++;
+  reactComponentForThisHook.hooksCallCounter.increment("useState");
 
   return [stateValue, setStateValue];
+}
+
+function resetHooksCallCounters(reactElement) {
+  if (reactElement.type !== "ReactComponent") return;
+
+  // reset number of hook calls seen by this React Component
+  reactElement.hooksCallCounter.reset();
+
+  for (let i = 0; i < reactElement.children.length; i++) {
+    const child = reactElement.children[i];
+    resetHooksCallCounters(child);
+  }
 }
 
 class ReactElementTreeDebugger {
@@ -233,13 +290,15 @@ class ReactElementTreeDebugger {
     nodeIdSpan.innerText = `${nestedLeftMargin}_id: ${node.id}`;
     this.treeContainer.appendChild(nodeIdSpan);
 
-    // node's state
-    const nodeStateSpan = document.createElement("span");
-    nodeStateSpan.className = "react-element-tree-node";
-    nodeStateSpan.innerText = `${nestedLeftMargin}_STATE: "${JSON.stringify(
-      node.stateManager.values
-    )}"`;
-    this.treeContainer.appendChild(nodeStateSpan);
+    if (node.type === "ReactComponent") {
+      // node's state
+      const nodeStateSpan = document.createElement("span");
+      nodeStateSpan.className = "react-element-tree-node";
+      nodeStateSpan.innerText = `${nestedLeftMargin}_STATE: "${JSON.stringify(
+        node.stateManager.values
+      )}"`;
+      this.treeContainer.appendChild(nodeStateSpan);
+    }
 
     // node's props
     if (node.props !== undefined && node.props) {

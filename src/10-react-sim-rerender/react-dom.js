@@ -16,37 +16,24 @@ const browserDomWriter = {
   // call it to display the given "React elements tree" into this root node of browser DOM
   // and take over managing the DOM inside it
   render(reactElement) {
-    // reset the render counter
-    domRefreshCounter.reset();
+    // set this as the root node of the render tree
+    renderTree.setRootNode(reactElement);
 
-    this.targetNodeInBrowserDom.innerHTML = ""; // Clear any existing content
+    this.targetNodeInBrowserDom.innerHTML = ""; // clear any existing content
     const browserDom = createBrowserDomForReactElement(reactElement);
     // view the all properties and methods of a document object
     console.dir(browserDom);
     this.targetNodeInBrowserDom.appendChild(browserDom);
 
-    domRefreshCounter.increment();
+    // post render housekeeping
+    renderTree.postRenderHandler();
   },
   // update existing DOM's copy based on render tree's diff
   rerenderTheDiff(reactSubtree) {
+    // TODO: don't clear existing DOM content
     console.log("reactSubtree", reactSubtree);
-    domRefreshCounter.increment();
-  },
-};
-
-// how many times this app has been rendered (or rerendered)
-const domRefreshCounter = {
-  count: 0,
-  reset() {
-    this.setCount(0);
-  },
-  increment() {
-    this.setCount(this.count + 1);
-  },
-  setCount(newCount) {
-    // update the call counter since useState will be called again due to function call
-    // ! TODO: reset the hooks counter for all react elements in the render tree
-    this.count = newCount;
+    // post re-render housekeeping
+    renderTree.postRenderHandler();
   },
 };
 
