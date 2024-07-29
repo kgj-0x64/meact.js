@@ -126,7 +126,7 @@ function updateState(reactComponentObject, valueIndex, newValue) {
   reactComponentObject.stateManager.values[valueIndex] = newValue;
   console.log("reactComponentObject", reactComponentObject);
   // TODO: rerender
-  currReactComponentObject.plotRenderTree();
+  reactComponentObject.plotRenderTree();
   // update the call counter since useState will be called again due to function call
   currReactComponentObject.stateManager.useStateCallCount = 0;
   reactComponentObject.functionRef(reactComponentObject.props);
@@ -134,6 +134,7 @@ function updateState(reactComponentObject, valueIndex, newValue) {
 
 function useState(initialValue) {
   console.log("useState", initialValue);
+  console.log("currReactComponentObject", currReactComponentObject);
   // this is initial value on first render
   let stateValue = initialValue;
 
