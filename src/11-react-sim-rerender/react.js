@@ -122,7 +122,13 @@ function createElement(element, props, ...children) {
     // call the component function with the received arguments
     // to finally run a `createElement` call and return its output ReactElement through its return block
     // which could have however deeply nested `createElement` calls in its children
-    const returnedElement = element(propsObject);
+
+    // add children, if any, into props
+    const propsWithChildren = {
+      ...propsObject,
+      children,
+    };
+    const returnedElement = element(propsWithChildren);
     childrenElements.push(returnedElement);
 
     reactComponent.children = [returnedElement];
@@ -305,7 +311,9 @@ class ReactElementTreeDebugger {
       for (const [key, value] of Object.entries(node.props)) {
         const nodeAttributeSpan = document.createElement("span");
         nodeAttributeSpan.className = "react-element-tree-node";
-        nodeAttributeSpan.innerText = `${nestedLeftMargin}_${key}: "${value}"`;
+        nodeAttributeSpan.innerText = `${nestedLeftMargin}_${key}: ${JSON.stringify(
+          value
+        )}`;
         this.treeContainer.appendChild(nodeAttributeSpan);
       }
     }

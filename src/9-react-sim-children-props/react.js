@@ -47,7 +47,6 @@ function createElement(name, props, ...children) {
       ...propsWithChildren,
       children,
     };
-    // console.log("its propsWithChildren", propsWithChildren);
 
     // call the function with the arguments to invoke a call to createElement again unless we reach atomic html elements
     const component = name(propsWithChildren);
@@ -103,6 +102,7 @@ class ReactElementTreeDebugger {
     nodeIdSpan.innerText = `${nestedLeftMargin}_id: ${node.id}`;
     this.treeContainer.appendChild(nodeIdSpan);
 
+    // node's props
     if (node.props !== undefined && node.props) {
       for (const [key, value] of Object.entries(node.props)) {
         const nodeAttributeSpan = document.createElement("span");
