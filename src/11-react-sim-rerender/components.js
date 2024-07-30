@@ -26,25 +26,23 @@ function StopwatchTowerComponent() {
     // conditional render
     color === "lightcoral"
       ? createElement(
-          "span",
+          "p",
           { style: `color:${color}` },
           "light coral is the right choice!!!"
         )
       : createElement(null),
+    createElement("label", { for: "select-color" }, "Pick a color: "),
     createElement(
-      "p",
-      null,
-      `Pick a color: `,
-      createElement(
-        "select",
-        {
-          value: color,
-          onChange: (event) => updateColor(event),
-        },
-        createElement("option", { value: "lightcoral" }, "lightcoral"),
-        createElement("option", { value: "midnightblue" }, "midnightblue"),
-        createElement("option", { value: "rebeccapurple" }, "rebeccapurple")
-      )
+      "select",
+      {
+        id: "select-color",
+        name: "colors",
+        value: color,
+        onChange: (event) => updateColor(event),
+      },
+      createElement("option", { value: "lightcoral" }, "Light Coral"),
+      createElement("option", { value: "darkgreen" }, "Dark Green"),
+      createElement("option", { value: "rebeccapurple" }, "Rebecca Purple")
     ),
     createElement("h3", null, `Current selected color option is ${color}`),
     createElement(
@@ -94,4 +92,70 @@ function StopwatchComponent(props) {
       )
     )
   );
+}
+
+// EXAMPLE FROM: https://react.dev/learn/passing-props-to-a-component#passing-jsx-as-children
+
+function Profile() {
+  const [size, setSize] = useState(100);
+  console.log("Profile size is", size);
+
+  return createElement(
+    Card,
+    null,
+    // whatever this returns becomes a child element of Card component
+    createElement(Avatar, {
+      size,
+      person: {
+        name: "Katsuko Saruhashi",
+        imageId: "YfeOqp2",
+      },
+    }),
+    createElement("h3", null, `Size: ${size}`),
+    createElement(
+      "button",
+      { onClick: () => setSize(Math.min(size * 2, 400)) },
+      "Magnify"
+    ),
+    createElement(
+      "button",
+      { onClick: () => setSize(Math.max(size * 0.5, 25)) },
+      "Minify"
+    )
+  );
+}
+
+function Card({ children }) {
+  return createElement(
+    "div",
+    {
+      class: "card",
+    },
+    ...children
+  );
+}
+
+function Avatar({ person, size }) {
+  console.log("Avatar size is", size);
+
+  // conditional rendering based on props
+  if (size < 50) {
+    return createElement(
+      "h2",
+      { style: "color:red" },
+      `Do you even want to see ${person.name}? I think not! Zoom on...`
+    );
+  }
+
+  return createElement("img", {
+    class: "avatar",
+    src: getImageUrl(person),
+    alt: person.name,
+    width: size,
+    height: size,
+  });
+}
+
+function getImageUrl(person, size = "s") {
+  return "https://i.imgur.com/" + person.imageId + size + ".jpg";
 }

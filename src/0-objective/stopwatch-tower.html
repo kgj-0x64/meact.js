@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <title>Submit form example</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        font-family: sans-serif;
+        margin: 20px;
+        padding: 0;
+      }
+      .stopwatch-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 32px;
+      }
+      .timer-row {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        margin-bottom: 16px;
+      }
+      .timer-text {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        margin-right: 16px;
+        margin-left: 16px;
+      }
+      .stopwatch-buttons {
+        margin-left: 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+      function StopwatchTowerComponent() {
+        console.log("StopwatchTowerComponent called");
+
+        const [color, setColor] = React.useState("lightcoral");
+
+        function updateColor(event) {
+          setColor(event.target.value);
+        }
+
+        function getStopwatchesElementsArray() {
+          let elements = [];
+          for (let i = 0; i < 5; i++) {
+            const stopwatchElement = (
+              <StopwatchComponent key={i} position={i} color />
+            );
+            elements.push(stopwatchElement);
+          }
+          console.log("elements", elements);
+          return elements;
+        }
+
+        return (
+          <div>
+            {color === "lightcoral" ? (
+              <span style={{ color }}>
+                "light coral is the right choice!!!"
+              </span>
+            ) : null}
+            <p>
+              Pick a color:
+              <select value={color} onChange={(event) => updateColor(event)}>
+                <option value="lightcoral">lightcoral</option>
+                <option value="darkgreen">darkgreen</option>
+                <option value="rebeccapurple">rebeccapurple</option>
+              </select>
+            </p>
+
+            <h3>Current selected color option is {color}</h3>
+            <div>
+              <ol>{getStopwatchesElementsArray()}</ol>
+            </div>
+          </div>
+        );
+      }
+
+      function StopwatchComponent(props) {
+        console.log("StopwatchComponent called");
+
+        const { color, position } = props;
+
+        const [countValue, setCountValue] = React.useState(1);
+        const [compoundValue, setCompoundValue] = React.useState(1);
+
+        return (
+          <div>
+            <h3 style={{ color }}>Stopwatch #{position + 1}</h3>
+            <div>
+              <p>Count value: {countValue}</p>
+              <button onClick={() => setCountValue(countValue + 2)}>
+                Incrementer
+              </button>
+            </div>
+            <div>
+              <p>Compound value: {compoundValue}</p>
+              <button onClick={() => setCompoundValue(compoundValue * 2)}>
+                Compounder
+              </button>
+            </div>
+          </div>
+        );
+      }
+
+      ReactDOM.render(
+        <StopwatchTowerComponent />,
+        document.getElementById("root")
+      );
+    </script>
+  </body>
+</html>

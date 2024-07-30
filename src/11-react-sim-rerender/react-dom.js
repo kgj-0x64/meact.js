@@ -9,57 +9,77 @@ function createRoot(rootNodeInBrowserDom) {
 // appends it to the target DOM node
 const browserDomWriter = {
   targetNodeInBrowserDom: null,
+
   // constructor
   setbrowserDomWriterAtNode(nodeInBrowserDom) {
     this.targetNodeInBrowserDom = nodeInBrowserDom;
   },
+
   // call it to display the given "React elements tree" into this root node of browser DOM
   // and take over managing the DOM inside it
   render(reactElement) {
     // set this as the root node of the render tree
     renderTree.setRootNode(reactElement);
 
+    // for visual debugging, plot the render tree at the bottom of browser DOM
+    reactElement.plotRenderTree();
+
     this.targetNodeInBrowserDom.innerHTML = ""; // clear any existing content
     const browserDom = createBrowserDomForReactElement(reactElement);
     // view the all properties and methods of a document object
     console.dir(browserDom);
+    console.log(browserDom);
     this.targetNodeInBrowserDom.appendChild(browserDom);
 
     // post render housekeeping
     renderTree.postRenderHandler();
   },
+
   // update existing DOM's copy based on render tree's diff
-  rerenderTheDiff(reactSubtree) {
-    // TODO: don't clear existing DOM content
-    console.log("reactSubtree", reactSubtree);
+  rerenderTheDiff(rootReactElement, reactSubtree) {
+    console.log("rerenderTheDiff reactSubtree", reactSubtree);
+
+    // for visual debugging, plot the render tree at the bottom of browser DOM
+    rootReactElement.plotRenderTree();
+
+    // TODO: modify browser DOM from renderTree's diff only
+    this.targetNodeInBrowserDom.innerHTML = ""; // clear any existing content
+    const browserDom = createBrowserDomForReactElement(rootReactElement);
+    // view the all properties and methods of a document object
+    console.dir(browserDom);
+    console.log(browserDom);
+    this.targetNodeInBrowserDom.appendChild(browserDom);
+
     // post re-render housekeeping
     renderTree.postRenderHandler();
   },
 };
 
 function createBrowserDomForReactElement(reactElement) {
+  /// render tree nodes which is not meant for browser DOM
+
+  if (reactElement.type === "null") {
+    // browser DOM shouldn't know it since it's meant to hold position in the render tree
+    // we use `display:none` on this element,
+    // so it neither renders in the document nor affects its layout
+    const nullElement = document.createElement("div");
+    nullElement.setAttribute("class", "null-element");
+    return nullElement;
+  }
+
+  if (reactElement.type === "ReactComponent") {
+    // browser DOM cares for DOM element from its return block only
+    return createBrowserDomForReactElement(reactElement.children[0]);
+  }
+
+  // show these in the browser DOM
   const htmlElement = document.createElement(reactElement.name);
   htmlElement.setAttribute("id", reactElement.id);
 
-  if (reactElement.props !== undefined && reactElement.props) {
-    for (const [key, value] of Object.entries(reactElement.props)) {
-      const attrKey = key.toLowerCase();
-      let attrValue = value;
-      if (attrKey.startsWith("on")) {
-        // `htmlElement.setAttribute(attrKey, attrValue);` does not work for "onclick" or "onchange"
-        // because DOM sees:
-        //     onclick --> `<button id="button-9" onclick="() => updateCountBy(compounder)">👍🏽</button>`
-        //     onchange --> `<select id="select-6" value="lightcoral" onchange="(event) => updateColor(event)">...</select>`
-        // so, given the style of our funciton passing, we should update corresponding property on this DOM element's object
-        // then DOM sees (can be seen using `console.dir`):
-        //     `<button id="button-9">👍🏽</button>` and `<select id="select-6" value="lightcoral">...</select>`
-        htmlElement[attrKey] = attrValue;
-      } else {
-        htmlElement.setAttribute(attrKey, attrValue);
-      }
-    }
-  }
-
+  /**
+   * select element's value must exactly match one of the option values,
+   * so it must only be set after all its children option elements are seen by the DOM
+   */
   // If the node has children, create and append child nodes
   if (reactElement.children && reactElement.children.length > 0) {
     reactElement.children.forEach((child) => {
@@ -73,6 +93,29 @@ function createBrowserDomForReactElement(reactElement) {
         htmlElement.appendChild(createBrowserDomForReactElement(child));
       }
     });
+  }
+
+  if (reactElement.props !== undefined && reactElement.props) {
+    for (const [key, value] of Object.entries(reactElement.props)) {
+      const attrKey = key.toLowerCase();
+      let attrValue = value;
+
+      // SET DOM element's Property
+      if (attrKey.startsWith("on") || attrKey === "value") {
+        // `htmlElement.setAttribute(attrKey, attrValue);` does not work for "onclick" or "onchange"
+        // because DOM sees:
+        //     onclick --> `<button id="button-9" onclick="() => updateCountBy(compounder)">👍🏽</button>`
+        //     onchange --> `<select id="select-6" value="lightcoral" onchange="(event) => updateColor(event)">...</select>`
+        // so, given the style of our funciton passing, we should update corresponding property on this DOM element's object
+        // then DOM sees (can be seen using `console.dir`):
+        //     `<button id="button-9">👍🏽</button>` and `<select id="select-6" value="lightcoral">...</select>`
+        htmlElement[attrKey] = attrValue;
+      }
+      // SET DOM element's Attribute
+      else {
+        htmlElement.setAttribute(attrKey, attrValue);
+      }
+    }
   }
 
   return htmlElement;

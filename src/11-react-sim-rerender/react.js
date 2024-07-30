@@ -1,7 +1,9 @@
 let nextId = 0;
 function getnewElementId(elementName) {
   const id = nextId++;
-  const instanceId = `${elementName.toLowerCase()}-${id}`;
+  const instanceId = `${
+    elementName ? elementName.toLowerCase() : "null"
+  }-${id}`;
   return instanceId;
 }
 
@@ -23,6 +25,12 @@ const renderTree = {
     this.domRefreshCounter += 1;
     // reset the hooks counter for all react elements in the render tree
     resetHooksCallCounters(this.rootNode);
+
+    console.log("Post Render Cleanup Done!");
+  },
+  reRender(reactSubtree) {
+    console.log("Re-render from subtree", reactSubtree.id);
+    browserDomWriter.rerenderTheDiff(this.rootNode, reactSubtree);
   },
 };
 
@@ -31,7 +39,7 @@ class ReactElement {
     // ID of this element to uniquely identify an instance of it
     this.id = getnewElementId(name);
     // type of this element
-    this.type = type; // null | "ReactComponent" | "HtmlElement"
+    this.type = type; // "null" | "ReactComponent" | "HtmlElement"
     // name of this element
     this.name = name;
     // set of props set on this element
@@ -46,25 +54,31 @@ class ReactElement {
             increment(hookName) {
               this.values[hookName] =
                 hookName in this.values ? this.values[hookName] + 1 : 1;
+              console.log(
+                `incremented hook [${hookName}]`,
+                this.values[hookName]
+              );
             },
             // should be reset to 0 on every render
             reset() {
               this.values = {};
             },
           }
-        : null;
+        : undefined;
     // state manager useful for an element of type "ReactComponent"
     this.stateManager =
       type === "ReactComponent"
         ? {
             // ordered collection of state values of this component
             values: [],
-            updateValue(index, newValue) {
-              this.values[index] = newValue;
-              // TODO: updateSubtreeForElement(this);
+            updateValue: (index, newValue) => {
+              this.stateManager.values[index] = newValue;
+              console.log("this.stateManager.values", this.stateManager.values);
+              updateSubtreeForElement(this, null);
+              renderTree.reRender(this);
             },
           }
-        : null;
+        : undefined;
   }
 
   // plot render tree beginning from this node for visual debugging
@@ -91,14 +105,14 @@ class ReactElement {
 // so as to eventually reach atomic html elements
 function createElement(element, props, ...children) {
   // default type, props and children
-  let type = null;
+  let type = "null";
   let name = element;
   const propsObject = props === undefined || !props ? {} : props;
   let childrenElements = [];
 
   // if it's a null element
   if (!element) {
-    return new ReactElement(null, "null", {}, []);
+    return new ReactElement(type, null, {}, []);
   }
 
   // if this is a React component
@@ -106,13 +120,22 @@ function createElement(element, props, ...children) {
     type = "ReactComponent";
     name = element.name;
 
-    // creating it without children here only to get its ID and handle state etc
-    const reactComponent = new ReactElement(type, name, propsObject, []);
+    // add children, if any, into props
+    // this is the argument sent to component's function definition
+    const propsWithChildren = {
+      ...propsObject,
+      children,
+    };
+
+    // creating it beforehand to get its ID for handling hooks in its context
+    // preserve whole of its argument to reuse in case of its re-rendering
+    const reactComponent = new ReactElement(type, name, propsWithChildren, []);
 
     // hooks are initialized when a ReactComponent's function logic
     // and thus its hooks are executed
     // so, if a hook is called right now then it must be corresponding to this component only
 
+    // set this component as the context for handling hooks
     // 1.
     reactComponentForHooks = reactComponent;
     // or, 2.
@@ -123,11 +146,6 @@ function createElement(element, props, ...children) {
     // to finally run a `createElement` call and return its output ReactElement through its return block
     // which could have however deeply nested `createElement` calls in its children
 
-    // add children, if any, into props
-    const propsWithChildren = {
-      ...propsObject,
-      children,
-    };
     const returnedElement = element(propsWithChildren);
     childrenElements.push(returnedElement);
 
@@ -162,6 +180,34 @@ function createElement(element, props, ...children) {
     childrenElements
   );
   return htmlElement;
+}
+
+// evaluate a subtree on re-render (i.e. state change)
+function updateSubtreeForElement(reactComponentAsSubtree, updatedProps) {
+  console.log("UPDATE reactComponentAsSubtree", reactComponentAsSubtree);
+  // set this component as the context for handling hooks
+  reactComponentForHooks = reactComponentAsSubtree;
+
+  // call the function with props from last render
+  const functionName = reactComponentAsSubtree.name;
+  const functionArgs = updatedProps
+    ? updatedProps
+    : reactComponentAsSubtree.props;
+
+  // Rerender of `Profile` component works perfectly fine
+  // ! FIXME: propagate state change and rerender downwards
+  // ! such that children, if not unmounted,
+  // ! should not be recreated and should reuse corresponding ReactElement object instead
+  if (typeof window[functionName] === "function") {
+    const subtreeWithUpdatedState = window[functionName].call(
+      null,
+      functionArgs
+    );
+    console.log("subtreeWithUpdatedState", subtreeWithUpdatedState);
+    reactComponentAsSubtree.children = [subtreeWithUpdatedState];
+  } else {
+    console.log(`${functionName} is not a function`);
+  }
 }
 
 // 1.
@@ -210,6 +256,8 @@ function useState(initialValue) {
     throw new Error("useState must be used within a function component");
   }
 
+  console.log("useState hook called for", reactComponentForThisHook.id);
+
   // how many useState calls have been made for this component in this render
   let useStateCallCount = 0;
   if ("useState" in reactComponentForThisHook.hooksCallCounter.values) {
@@ -249,10 +297,10 @@ function useState(initialValue) {
 }
 
 function resetHooksCallCounters(reactElement) {
-  if (reactElement.type !== "ReactComponent") return;
-
-  // reset number of hook calls seen by this React Component
-  reactElement.hooksCallCounter.reset();
+  if (reactElement.type === "ReactComponent") {
+    // reset number of hook calls seen by this React Component
+    reactElement.hooksCallCounter.reset();
+  }
 
   for (let i = 0; i < reactElement.children.length; i++) {
     const child = reactElement.children[i];

@@ -36,25 +36,10 @@ function createBrowserDomForReactElement(reactElement) {
   const htmlElement = document.createElement(reactElement.name);
   htmlElement.setAttribute("id", reactElement.id);
 
-  if (reactElement.props !== undefined && reactElement.props) {
-    for (const [key, value] of Object.entries(reactElement.props)) {
-      const attrKey = key.toLowerCase();
-      let attrValue = value;
-      if (attrKey.startsWith("on")) {
-        // `htmlElement.setAttribute(attrKey, attrValue);` does not work for "onclick" or "onchange"
-        // because DOM sees:
-        //     onclick --> `<button id="button-9" onclick="() => updateCountBy(compounder)">👍🏽</button>`
-        //     onchange --> `<select id="select-6" value="lightcoral" onchange="(event) => updateColor(event)">...</select>`
-        // so, given the style of our funciton passing, we should update corresponding property on this DOM element's object
-        // then DOM sees (can be seen using `console.dir`):
-        //     `<button id="button-9">👍🏽</button>` and `<select id="select-6" value="lightcoral">...</select>`
-        htmlElement[attrKey] = attrValue;
-      } else {
-        htmlElement.setAttribute(attrKey, attrValue);
-      }
-    }
-  }
-
+  /**
+   * select element's value must exactly match one of the option values,
+   * so it must only be set after all its children option elements are seen by the DOM
+   */
   // If the node has children, create and append child nodes
   if (reactElement.children && reactElement.children.length > 0) {
     reactElement.children.forEach((child) => {
@@ -67,6 +52,41 @@ function createBrowserDomForReactElement(reactElement) {
         htmlElement.appendChild(createBrowserDomForReactElement(child));
       }
     });
+  }
+
+  if (reactElement.props !== undefined && reactElement.props) {
+    for (const [key, value] of Object.entries(reactElement.props)) {
+      const attrKey = key.toLowerCase();
+      let attrValue = value;
+
+      // SET DOM element's Property
+      if (attrKey.startsWith("on")) {
+        // `htmlElement.setAttribute(attrKey, attrValue);` does not work for "onclick" or "onchange"
+        // because DOM sees:
+        //     onclick --> `<button id="button-9" onclick="() => updateCountBy(compounder)">👍🏽</button>`
+        //     onchange --> `<select id="select-6" value="lightcoral" onchange="(event) => updateColor(event)">...</select>`
+        // so, given the style of our funciton passing, we should update corresponding property on this DOM element's object
+        // then DOM sees (can be seen using `console.dir`):
+        //     `<button id="button-9">👍🏽</button>` and `<select id="select-6" value="lightcoral">...</select>`
+        htmlElement[attrKey] = attrValue;
+      } else if (reactElement.name === "select" && attrKey === "value") {
+        htmlElement[attrKey] = attrValue;
+        console.log(
+          "htmlElement",
+          attrKey,
+          attrValue,
+          // this will be empty string if "value" property is set
+          // before appending "option" children elements
+          // to this "select" element in the browser DOM
+          `htmlElement[attrKey]: ${htmlElement[attrKey]}`,
+          htmlElement
+        );
+      }
+      // SET DOM element's Attribute
+      else {
+        htmlElement.setAttribute(attrKey, attrValue);
+      }
+    }
   }
 
   return htmlElement;

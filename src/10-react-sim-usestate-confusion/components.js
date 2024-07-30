@@ -73,7 +73,7 @@ function StopwatchTowerComponent() {
           onChange: (event) => updateColor(event),
         },
         createElement("option", { value: "lightcoral" }, "lightcoral"),
-        createElement("option", { value: "midnightblue" }, "midnightblue"),
+        createElement("option", { value: "darkgreen" }, "darkgreen"),
         createElement("option", { value: "rebeccapurple" }, "rebeccapurple")
       )
     ),
