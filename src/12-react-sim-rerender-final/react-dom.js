@@ -53,12 +53,16 @@ const browserDomWriter = {
     // for visual debugging, plot the render tree at the bottom of browser DOM
     rootReactElement.plotRenderTree();
 
-    // TODO: modify browser DOM from renderTree's diff only
-    this.targetNodeInBrowserDom.innerHTML = ""; // clear any existing content
-    const browserDom = createBrowserDomForReactElement(rootReactElement);
+    // TODO: further optimize using reconciliatoin to modify browser DOM from renderTree's diff only
+    const targetSubtreeNodeInBrowserDom = document.getElementById(
+      getBrowserDomIdForRerendering(reactSubtree)
+    );
+
+    targetSubtreeNodeInBrowserDom.innerHTML = ""; // clear any existing content
+    const subtreeInBrowserDom = createBrowserDomForReactElement(reactSubtree);
     // view the all properties and methods of a document object
-    console.dir(browserDom);
-    this.targetNodeInBrowserDom.appendChild(browserDom);
+    console.dir(subtreeInBrowserDom);
+    targetSubtreeNodeInBrowserDom.appendChild(subtreeInBrowserDom);
 
     // post re-render housekeeping
     renderTree.postRenderHandler();
@@ -134,4 +138,13 @@ function createBrowserDomForReactElement(reactElement) {
   }
 
   return htmlElement;
+}
+
+function getBrowserDomIdForRerendering(reactElement) {
+  if (reactElement.type === "ReactComponent") {
+    // browser DOM cares for DOM element from its return block only
+    return getBrowserDomIdForRerendering(reactElement.children[0]);
+  }
+
+  return reactElement.id;
 }
