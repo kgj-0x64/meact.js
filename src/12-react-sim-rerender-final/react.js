@@ -47,7 +47,7 @@ const renderTree = {
    * @param {ReactElement} reactSubtree
    */
   reRender(reactSubtree) {
-    console.log("Re-render from subtree", reactSubtree.id);
+    console.log("Re-render from this subtree root node", reactSubtree.id);
     browserDomWriter.rerenderTheDiff(this.rootNode, reactSubtree);
   },
 };
@@ -124,7 +124,10 @@ class ReactElement {
              */
             updateValue: (index, newValue) => {
               this.stateManager.values[index] = newValue;
-              console.log("this.stateManager.values", this.stateManager.values);
+              console.log(
+                "Updated this.stateManager.values to",
+                this.stateManager.values
+              );
               // re-render the subtree of the render tree which is rooted at this element
               updateSubtreeForElement(this, 0, null);
               // repaint the browser DOM
@@ -167,29 +170,6 @@ class ReactElement {
    */
   plotRenderTree() {
     new ReactElementTreeDebugger(this).renderTreeInHtmlDocument();
-  }
-}
-
-/**
- * A Re-render Tree Node Repr object is just a convenient representation of a possible React Element node during re-rendering
- */
-class RerenderTreeNodeRepr {
-  /**
-   * @param {"NullComponent" | "ReactComponent" | "ReactHtmlElement"} type
-   * @param {string} name
-   * @param {null | string | function} element
-   * @param {object} props
-   * @param {ReactElement[]} children
-   */
-  constructor(type, name, props = {}, children = []) {
-    // type of this node
-    this.type = type;
-    // name of this node
-    this.name = name;
-    // set of props set on this node
-    this.props = props ? props : {}; // map-like object
-    // ordered collection of children nodes of this node
-    this.children = children; // array
   }
 }
 
@@ -451,26 +431,33 @@ function updateSubtreeForElement(
     // set this component as the context for handling hooks
     reactComponentForHooks = subtreeRootNode;
 
-    // ! call the function with appropriate name and args
+    // call the function with appropriate name and args
     const functionArgs = {
       ...subtreeRootNode.props,
       children: subtreeRootNode.propChildrenSnapshot,
     };
+    console.log(
+      "functionArgs for recalculating subtreeRootNodeChild",
+      functionArgs
+    );
 
     subtreeRootNodeChildRecalculated = window[functionName].call(
       null,
       functionArgs
     );
+    console.log(
+      "subtreeRootNodeChildRecalculated",
+      subtreeRootNodeChildRecalculated
+    );
   }
-
-  console.log(
-    "subtreeRootNodeChildRecalculated",
-    subtreeRootNodeChildRecalculated
-  );
 
   // check if this child position is beyond exiting node's children size
   // then we don't have an existing child to update or unmount
   if (childPosition >= subtreeRootNode.children.length) {
+    console.log(
+      "childPosition goes beyond this subtree root node's children size"
+    );
+
     // mount a new child element
     const mountNewChildSubtree = createElementDuringRerender(
       subtreeRootNodeChildRecalculated
@@ -485,7 +472,6 @@ function updateSubtreeForElement(
   // else, a child exists at this position of the given subtree root node
   const existingChildOfSubtreeRootNode =
     subtreeRootNode.children[childPosition];
-  console.log("existingChildOfSubtreeRootNode", existingChildOfSubtreeRootNode);
 
   // is that child same type of element as the recalculated child at this position
   const shouldUpdateExistingChildOfSubtreeRootNode =
@@ -501,6 +487,10 @@ function updateSubtreeForElement(
 
   // unmount the existing child element and mount a new child element
   if (!shouldUpdateExistingChildOfSubtreeRootNode) {
+    console.log(
+      "a different type of element is to be mounted at this position now"
+    );
+
     const mountNewChildSubtree = createElementDuringRerender(
       subtreeRootNodeChildRecalculated
     );
@@ -521,14 +511,24 @@ function updateSubtreeForElement(
   // update props of this child React Element
   existingChildOfSubtreeRootNode.props = subtreeRootNodeChildRecalculated.props;
 
+  // if the child element at this childPosition is a functional component
+  // then it should be handled differently since it won't have children to recurse over
+  if (existingChildOfSubtreeRootNode.type === "ReactComponent") {
+    // children passed from the parent component via props might have refreshed on parent component's state update
+    existingChildOfSubtreeRootNode.propChildrenSnapshot =
+      subtreeRootNodeChildRecalculated.propChildrenSnapshot;
+
+    // call the recursive function which will run this component's function definition with fresh args and state
+    updateSubtreeForElement(existingChildOfSubtreeRootNode, 0, null);
+    return;
+  }
+
+  // else, existingChildOfSubtreeRootNode is a non-functional element i.e. a HTML or Null element
   // recursively update the rendering of children nodes
   const existingNumberOfChildren =
     existingChildOfSubtreeRootNode.children.length;
   const recalculatedNumberOfChildren =
     subtreeRootNodeChildRecalculated.children.length;
-
-  console.log("existingNumberOfChildren", existingNumberOfChildren);
-  console.log("recalculatedNumberOfChildren", recalculatedNumberOfChildren);
 
   // trim away extra children from the existing list
   if (recalculatedNumberOfChildren < existingNumberOfChildren) {
@@ -549,6 +549,7 @@ function updateSubtreeForElement(
       );
   }
 
+  console.log("recusrively update subtree for children elements");
   // recursively call this function for every recalculated child against existing child
   for (let i = 0; i < recalculatedNumberOfChildren; i++) {
     updateSubtreeForElement(

@@ -92,7 +92,7 @@ function TestNestedComponentsState5() {
   console.log("TestNestedComponentsState5 called");
 
   const [color, setColor] = useState("lightcoral");
-  const colors = ["red", "blue", "green", "lightcoral"];
+  const colors = ["red", "blue", "green"];
 
   function updateColor() {
     const randomColor = colors[Math.floor(Math.random() * colors.length)];
@@ -102,7 +102,11 @@ function TestNestedComponentsState5() {
   return createElement(
     ProfileComponent,
     { color },
-    createElement("button", { onClick: () => updateColor() }, "Toggle Color")
+    createElement(
+      "button",
+      { style: `border-color:${color}`, onClick: () => updateColor() },
+      "Toggle Color"
+    )
   );
 }
 
@@ -142,7 +146,7 @@ function TestNestedComponentsState6() {
 // EXAMPLE FROM: https://react.dev/learn/passing-props-to-a-component#passing-jsx-as-children
 
 function ProfileComponent({ color, children }) {
-  console.log("ProfileComponent called");
+  console.log("ProfileComponent called with", color);
 
   const [size, setSize] = useState(100);
 
