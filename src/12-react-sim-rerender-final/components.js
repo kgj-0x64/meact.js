@@ -1,5 +1,113 @@
-function ColoredProfileComponent() {
-  console.log("ColoredProfileComponent called");
+function TestSingleComponentState1() {
+  console.log("TestSingleComponentState1 called");
+
+  const [count, setCount] = useState(1);
+
+  return createElement(
+    "button",
+    { onClick: () => setCount(count * 2) },
+    `Increment count by ${count}`
+  );
+}
+
+function TestSingleComponentState2() {
+  console.log("TestSingleComponentState2 called");
+
+  const [clickCount, setClickCount] = useState(1);
+  const [count, setCount] = useState(1);
+
+  const updateCounter = () => {
+    setCount(count * 2);
+    setClickCount(clickCount + 1);
+  };
+
+  return clickCount % 2
+    ? createElement(
+        "button",
+        {
+          onClick: () => updateCounter(),
+        },
+        `Click ${clickCount}: Increment count by ${count}`
+      )
+    : createElement(
+        "button",
+        { style: "border-color:red", onClick: () => updateCounter() },
+        `Click ${clickCount}: Increment count by ${count}`
+      );
+}
+
+function TestSingleComponentState3() {
+  console.log("TestSingleComponentState3 called");
+
+  const [counter, setCounter] = useState({ clickCount: 0, count: 1 });
+  const { clickCount, count } = counter;
+
+  const updateCounter = () => {
+    setCounter({ clickCount: clickCount + 1, count: count * 2 });
+  };
+
+  return clickCount % 2
+    ? createElement(
+        "button",
+        {
+          onClick: () => updateCounter(),
+        },
+        `Click ${clickCount}: Increment count by ${count}`
+      )
+    : createElement(
+        "button",
+        {
+          style: "border-color:red",
+          onClick: () => updateCounter(),
+        },
+        `Click ${clickCount}: Increment count by ${count}`
+      );
+}
+
+function TestSingleComponentState4() {
+  console.log("TestSingleComponentState4 called");
+
+  const [counter, setCounter] = useState({ clickCount: 0, count: 1 });
+  const { clickCount, count } = counter;
+
+  const updateCounter = () => {
+    setCounter({ clickCount: clickCount + 1, count: count * 2 });
+  };
+
+  return createElement(
+    "button",
+    {
+      style: "border-color:red",
+      onClick: () => updateCounter(),
+    },
+    createElement(
+      clickCount % 2 ? "span" : "h2",
+      null,
+      `Click ${clickCount}: Increment count by ${count}`
+    )
+  );
+}
+
+function TestNestedComponentsState5() {
+  console.log("TestNestedComponentsState5 called");
+
+  const [color, setColor] = useState("lightcoral");
+  const colors = ["red", "blue", "green", "lightcoral"];
+
+  function updateColor() {
+    const randomColor = colors[Math.floor(Math.random() * colors.length)];
+    setColor(randomColor);
+  }
+
+  return createElement(
+    ProfileComponent,
+    { color },
+    createElement("button", { onClick: () => updateColor() }, "Toggle Color")
+  );
+}
+
+function TestNestedComponentsState6() {
+  console.log("TestNestedComponentsState6 called");
 
   const [color, setColor] = useState("lightcoral");
 
