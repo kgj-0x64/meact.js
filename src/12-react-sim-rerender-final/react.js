@@ -1,3 +1,8 @@
+/**
+ * call this to get a unique ID for a ReactElement
+ * @param {string} elementName
+ * @returns {string}
+ */
 let nextId = 0;
 function getnewElementId(elementName) {
   const id = nextId++;
@@ -7,39 +12,61 @@ function getnewElementId(elementName) {
   return instanceId;
 }
 
-// render tree which refreshes on every render and re-render
-// and is used to construct the browser DOM in react-dom.js
+/**
+ * A "render tree" is a tree of objects which is created as the store of all info needed
+ * to construct the browser DOM in react-dom.js on every render and re-render
+ */
 const renderTree = {
   // root node of the render tree
   rootNode: null,
   // how many times this app has been rendered (or rerendered) in browser
   domRefreshCounter: 0,
-  // update root node thus the whole render tree
+
+  /**
+   * call this to update the root node and thus this whole render tree
+   * @param {ReactElement} reactElement new root node
+   */
   setRootNode(reactElement) {
     this.rootNode = reactElement;
     // reset the render counter
     this.domRefreshCounter = 0;
   },
+
+  /**
+   * call this for housekeeping after every render and re-render activity on the browser DOM
+   */
   postRenderHandler() {
-    if (!this.rootNode) return;
     this.domRefreshCounter += 1;
     // reset the hooks counter for all react elements in the render tree
     resetHooksCallCounters(this.rootNode);
-
     console.log("Post Render Cleanup Done!");
   },
+
+  /**
+   * call this to re-paint the browser DOM in sync with this updated sub-tree of the already painted render tree
+   * @param {ReactElement} reactSubtree
+   */
   reRender(reactSubtree) {
     console.log("Re-render from subtree", reactSubtree.id);
     browserDomWriter.rerenderTheDiff(this.rootNode, reactSubtree);
   },
 };
 
+/**
+ * A React Element object is a node in our "render tree"
+ */
 class ReactElement {
+  /**
+   * @param {"NullComponent" | "ReactComponent" | "ReactHtmlElement"} type
+   * @param {string} name
+   * @param {object} props
+   * @param {ReactElement[]} children
+   */
   constructor(type, name, props = {}, children = []) {
     // ID of this element to uniquely identify an instance of it
     this.id = getnewElementId(name);
     // type of this element
-    this.type = type; // "null" | "ReactComponent" | "HtmlElement"
+    this.type = type;
     // name of this element
     this.name = name;
     // set of props set on this element
@@ -51,6 +78,11 @@ class ReactElement {
       type === "ReactComponent"
         ? {
             values: {},
+
+            /**
+             * call this to increment the counter value of this React Element against a given hook name e.g. "useState"
+             * @param {string} hookName
+             */
             increment(hookName) {
               this.values[hookName] =
                 hookName in this.values ? this.values[hookName] + 1 : 1;
@@ -59,7 +91,10 @@ class ReactElement {
                 this.values[hookName]
               );
             },
-            // should be reset to 0 on every render
+
+            /**
+             * call this to reset the hooks call counter values of this React Element after every render or re-render
+             */
             reset() {
               this.values = {};
             },
@@ -71,6 +106,12 @@ class ReactElement {
         ? {
             // ordered collection of state values of this component
             values: [],
+
+            /**
+             * call this to update state value at a given hook position of this React Element
+             * @param {number} index
+             * @param {any} newValue
+             */
             updateValue: (index, newValue) => {
               this.stateManager.values[index] = newValue;
               console.log("this.stateManager.values", this.stateManager.values);
@@ -81,44 +122,60 @@ class ReactElement {
         : undefined;
   }
 
-  // plot render tree beginning from this node for visual debugging
+  /**
+   * call this to pretty-plot the render tree beginning from this node in browser for visual debugging
+   */
   plotRenderTree() {
     new ReactElementTreeDebugger(this).renderTreeInHtmlDocument();
   }
 }
 
 /**
- * `createElement` is just a function which can be called from anywhere
- * and it returns an object which can be used however pleased
+ * call this function to recusrively create a render sub-tree of ReactElement objects
+ * on the initial/first render rooted at this element param as the entry point
+ * and make sure to call it after initializing state hooks
  *
- * SO, it should be remembered that
- * creating a React Element node does not mean that it'll be rendered
+ * since this is a recursion, so `createElement` expressions in the children param
+ * are evaluated to base ReactElement firs, and so we eventually reach atomic html elements
  *
- * To be rendered,
- * it must be present in the return block of a function
- * in the function call chain initiated by ReactDOM.render()
+ * @param {null | string | function} element
+ * @param {object} props
+ * @param  {ReactElement[]} children
+ * @returns {ReactElement}
  */
-
-// takes an entry point as root element and
-// recursively creates ReactElement objects
-// since every child is another call to createElement or a text string
-// so as to eventually reach atomic html elements
 function createElement(element, props, ...children) {
   // default type, props and children
-  let type = "null";
-  let name = element;
+  let type = element
+    ? typeof element === "function"
+      ? "ReactComponent"
+      : "ReactHtmlElement"
+    : "NullComponent";
+  let name = element
+    ? typeof element === "function"
+      ? element.name
+      : element
+    : "null";
   const propsObject = props === undefined || !props ? {} : props;
+
+  // if this is happening within a re-render, then just pass the arguments to
+  // `updateSubtreeForElement` and it will deal with this using existing render tree data appropriately
+  if (renderTree.domRefreshCounter > 0) {
+    console.log("createElement render counter", renderTree.domRefreshCounter);
+    return {
+      type,
+      name,
+      props: propsObject,
+      children,
+    };
+  }
 
   // if it's a null element
   if (!element) {
-    return new ReactElement(type, null, {}, []);
+    return new ReactElement(type, name, {}, []);
   }
 
   // if this is a React component
   if (typeof element === "function") {
-    type = "ReactComponent";
-    name = element.name;
-
     // add children, if any, into props
     // this is the argument sent to component's function definition
     const propsWithChildren = {
@@ -157,7 +214,6 @@ function createElement(element, props, ...children) {
   }
 
   /// else
-  type = "HtmlElement";
   let childrenElements = [];
 
   if (children !== undefined && children && children.length > 0) {
@@ -182,40 +238,16 @@ function createElement(element, props, ...children) {
   return htmlElement;
 }
 
-// evaluate a subtree on re-render (i.e. state change)
-function updateSubtreeForElement(reactComponentAsSubtree, updatedProps) {
-  console.log("UPDATE reactComponentAsSubtree", reactComponentAsSubtree);
-  // set this component as the context for handling hooks
-  reactComponentForHooks = reactComponentAsSubtree;
-
-  // call the function with props from last render
-  const functionName = reactComponentAsSubtree.name;
-  const functionArgs = updatedProps
-    ? updatedProps
-    : reactComponentAsSubtree.props;
-
-  // Rerender of `Profile` component works perfectly fine
-  // ! FIXME: propagate state change and rerender downwards
-  // ! such that children, if not unmounted,
-  // ! should not be recreated and should reuse corresponding ReactElement object instead
-  if (typeof window[functionName] === "function") {
-    const subtreeWithUpdatedState = window[functionName].call(
-      null,
-      functionArgs
-    );
-    console.log("subtreeWithUpdatedState", subtreeWithUpdatedState);
-    reactComponentAsSubtree.children = [subtreeWithUpdatedState];
-  } else {
-    console.log(`${functionName} is not a function`);
-  }
-}
-
 // 1.
 let reactComponentForHooks = null;
 // or, 2. use a global stack to keep track of current ReactComponent being rendered
 // let reactComponentStack = [];
 
-// useState hook
+/**
+ * useState hook
+ * @param {any} initialValue
+ * @returns [any, function]
+ */
 function useState(initialValue) {
   /**
    * ! ALERT
@@ -240,10 +272,8 @@ function useState(initialValue) {
    */
 
   // 1.
-  /**
-   * copying an object reference variable creates one more reference to the same object
-   * so, this local variable is assigned the value of global reference variable `reactComponentForHooks` at the time `useState` is called
-   */
+  // copying an object reference variable creates one more reference to the same object
+  // so, this local variable is assigned the value of global reference variable `reactComponentForHooks` at the time `useState` is called
   const reactComponentForThisHook = reactComponentForHooks;
 
   // Or, 2.
@@ -280,10 +310,12 @@ function useState(initialValue) {
 
   const stateIndex = useStateCallCount;
 
+  // now, this inner function `setStateValue` captures `reactComponentForThisHook` by reference,
+  // which is local to and constant in the scope of `useState` function
+  // so, it will always refer to the same `ReactElement` object within a specific `useState` call's context
   /**
-   * now, this inner function `setStateValue` captures `reactComponentForThisHook` by reference,
-   * which is local to and constant in the scope of `useState` function
-   * so, it will always refer to the same `ReactElement` object within a specific `useState` call's context
+   * call this to trigger a state update
+   * @param {any} newValue
    */
   function setStateValue(newValue) {
     console.log("Updating state in:", reactComponentForThisHook.id);
@@ -296,6 +328,42 @@ function useState(initialValue) {
   return [stateValue, setStateValue];
 }
 
+/**
+ * call this to evaluate a subtree of the render tree on re-render (i.e. on state change)
+ * that is, Create/Update/Delete ReactElement nodes in this sub-tree to reflect the state change in a given ReactComponent type ReactElement
+ * @param {ReactElement} reactComponentAsSubtree
+ * @param {object} updatedProps
+ */
+function updateSubtreeForElement(reactComponentAsSubtree, updatedProps) {
+  console.log("UPDATE reactComponentAsSubtree", reactComponentAsSubtree);
+  // set this component as the context for handling hooks
+  reactComponentForHooks = reactComponentAsSubtree;
+
+  // call the function with props from last render
+  const functionName = reactComponentAsSubtree.name;
+  const functionArgs = updatedProps
+    ? updatedProps
+    : reactComponentAsSubtree.props;
+
+  // propagate state change and rerender downwards
+  // such that children, if not unmounted,
+  // should not be recreated and should reuse corresponding ReactElement object instead
+  if (typeof window[functionName] === "function") {
+    const subtreeWithUpdatedState = window[functionName].call(
+      null,
+      functionArgs
+    );
+    console.log("subtreeWithUpdatedState", subtreeWithUpdatedState);
+    // reactComponentAsSubtree.children = [subtreeWithUpdatedState];
+  } else {
+    console.log(`${functionName} is not a function`);
+  }
+}
+
+/**
+ * call this to reset the hooks call counters of all the nodes in a render tree rooted at the given `reactElement` node
+ * @param {ReactElement} reactElement
+ */
 function resetHooksCallCounters(reactElement) {
   if (reactElement.type === "ReactComponent") {
     // reset number of hook calls seen by this React Component
@@ -308,19 +376,32 @@ function resetHooksCallCounters(reactElement) {
   }
 }
 
+/**
+ * Helper class to pretty-plot a render tree rooted at the given `reactElement` node
+ */
 class ReactElementTreeDebugger {
+  /**
+   * @param {ReactElement} reactElement
+   */
   constructor(reactElement) {
     this.node = reactElement;
     this.treeContainer = document.getElementById("react-element-tree");
   }
 
-  // Function to render the tree for given React Element in HTML document
+  /**
+   * call this trigger function to create browser DOM from the root node of a given render tree
+   * and append it at the appropriate DOM position in the HTML document
+   */
   renderTreeInHtmlDocument() {
     this.treeContainer.innerHTML = ""; // Clear any existing content
     this.createHtmlForTreeNode(this.node, 0);
   }
 
-  // Function to create HTML for tree node
+  /**
+   * call this to create browser DOM from the root node of a given render tree
+   * @param {ReactElement} node
+   * @param {number} level
+   */
   createHtmlForTreeNode(node, level = 0) {
     // margin to leave on the left to align with parent node
     const leftMargin = "_".repeat(level * 2);
