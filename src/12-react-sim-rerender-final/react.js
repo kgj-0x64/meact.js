@@ -123,6 +123,34 @@ class ReactElement {
   }
 
   /**
+   * call this to check whether a React Element object representation created
+   * at this ReactElement node's position during a re-render
+   * represents this same ReactElement node in the render tree or not
+   * @param {{type: string, name: string, props: object}} param0
+   * @returns {boolean}
+   */
+  isSameRenderNodeAs({ type, name, props }) {
+    if (this.type !== type && this.name !== name) {
+      return false;
+    }
+
+    const elementKey = "key" in this.props ? this.props.key : null;
+    const compareToKey = "key" in props ? props.key : null;
+    if (elementKey) {
+      return elementKey === compareToKey;
+    } else {
+      return !compareToKey;
+    }
+  }
+
+  /**
+   * call this to trigger actions on unmounting of this React Element
+   */
+  unmount() {
+    console.log("Unmount this React Element", this.id);
+  }
+
+  /**
    * call this to pretty-plot the render tree beginning from this node in browser for visual debugging
    */
   plotRenderTree() {
@@ -141,7 +169,7 @@ class ReactElement {
  * @param {null | string | function} element
  * @param {object} props
  * @param  {ReactElement[]} children
- * @returns {ReactElement}
+ * @returns {ReactElement} unless hijacked
  */
 function createElement(element, props, ...children) {
   // default type, props and children
@@ -157,13 +185,13 @@ function createElement(element, props, ...children) {
     : "null";
   const propsObject = props === undefined || !props ? {} : props;
 
-  // if this is happening within a re-render, then just pass the arguments to
-  // `updateSubtreeForElement` and it will deal with this using existing render tree data appropriately
-  if (renderTree.domRefreshCounter > 0) {
-    console.log("createElement render counter", renderTree.domRefreshCounter);
+  // if this is happening within a re-render, check whether it should be hijacked for just passing the arguments to
+  // `updateSubtreeForElement` for mount/unmount decisions
+  if (rerenderMonitor.isCreateElementFunctionHijacked()) {
     return {
       type,
       name,
+      element,
       props: propsObject,
       children,
     };
@@ -177,7 +205,8 @@ function createElement(element, props, ...children) {
   // if this is a React component
   if (typeof element === "function") {
     // add children, if any, into props
-    // this is the argument sent to component's function definition
+    // this forms a snapshot of argument sent in last render into a component's function definition
+    // which can be used to call it again during its re-render alongside new state data
     const propsWithChildren = {
       ...propsObject,
       children,
@@ -328,36 +357,119 @@ function useState(initialValue) {
   return [stateValue, setStateValue];
 }
 
+const rerenderMonitor = {
+  isHijackOfCreateElementFnPaused: false,
+  isCreateElementFunctionHijacked() {
+    if (this.isHijackOfCreateElementFnPaused) {
+      return false;
+    }
+    return renderTree.domRefreshCounter > 0;
+  },
+  pauseHijackOfCreateElementFn() {
+    this.isHijackOfCreateElementFnPaused = true;
+  },
+  resumeHijackOfCreateElementFn() {
+    this.isHijackOfCreateElementFnPaused = false;
+  },
+};
+
 /**
  * call this to evaluate a subtree of the render tree on re-render (i.e. on state change)
+ * since it propagates state change and rerender downwards
+ * such that children, if not unmounted, should not be recreated and should reuse corresponding ReactElement object instead
  * that is, Create/Update/Delete ReactElement nodes in this sub-tree to reflect the state change in a given ReactComponent type ReactElement
- * @param {ReactElement} reactComponentAsSubtree
- * @param {object} updatedProps
+ *
+ * @param {ReactElement} subtreeRootReactElement
+ * @param {object} updatedPropsOnParentsRerender
  */
-function updateSubtreeForElement(reactComponentAsSubtree, updatedProps) {
-  console.log("UPDATE reactComponentAsSubtree", reactComponentAsSubtree);
-  // set this component as the context for handling hooks
-  reactComponentForHooks = reactComponentAsSubtree;
+function updateSubtreeForElement(
+  subtreeRootReactElement,
+  updatedPropsOnParentsRerender,
+  childrenReprOnParentsRerender
+) {
+  console.log("UPDATE subtreeRootReactElement", subtreeRootReactElement);
 
-  // call the function with props from last render
-  const functionName = reactComponentAsSubtree.name;
-  const functionArgs = updatedProps
-    ? updatedProps
-    : reactComponentAsSubtree.props;
+  if (subtreeRootReactElement.type === "ReactComponent") {
+    // call the function with props from last render
+    const functionName = subtreeRootReactElement.name;
 
-  // propagate state change and rerender downwards
-  // such that children, if not unmounted,
-  // should not be recreated and should reuse corresponding ReactElement object instead
-  if (typeof window[functionName] === "function") {
-    const subtreeWithUpdatedState = window[functionName].call(
+    // sanity check
+    if (typeof window[functionName] !== "function") {
+      console.log(`${functionName} is not a function`);
+      return;
+    }
+
+    // set this component as the context for handling hooks
+    reactComponentForHooks = subtreeRootReactElement;
+
+    // ! call the function with appropriate name and args
+    const functionArgs = updatedPropsOnParentsRerender
+      ? updatedPropsOnParentsRerender
+      : subtreeRootReactElement.props;
+
+    const subtreeReprAfterStateUpdate = window[functionName].call(
       null,
       functionArgs
     );
-    console.log("subtreeWithUpdatedState", subtreeWithUpdatedState);
-    // reactComponentAsSubtree.children = [subtreeWithUpdatedState];
-  } else {
-    console.log(`${functionName} is not a function`);
+    console.log("subtreeReprAfterStateUpdate", subtreeReprAfterStateUpdate);
+
+    const existingChildElementOfSubtree = subtreeRootReactElement.children[0];
+    const shouldExistingChildElementBeKept =
+      existingChildElementOfSubtree.isSameRenderNodeAs({
+        type: subtreeReprAfterStateUpdate.type,
+        name: subtreeReprAfterStateUpdate.name,
+        props: subtreeReprAfterStateUpdate.props,
+      });
+
+    console.log(
+      "shouldExistingChildElementBeKept",
+      shouldExistingChildElementBeKept
+    );
+
+    // if this child element should be kept and refreshed
+    if (shouldExistingChildElementBeKept) {
+      // update props of this child React Element
+      existingChildElementOfSubtree.props = subtreeReprAfterStateUpdate.props;
+
+      // ! TODO what about children???
+    }
+    // if the existing child element should be unmounted a new child element should be mounted
+    else {
+      const mountNewChildElement = createElementDuringRerender(
+        subtreeReprAfterStateUpdate
+      );
+      console.log("mountNewChildElement", mountNewChildElement);
+
+      // unmount existing child element
+      existingChildElementOfSubtree.unmount();
+
+      // update the render tree
+      subtreeRootReactElement.children = [mountNewChildElement];
+    }
+
+    // we are done with re-rendering this function component
+    return;
   }
+}
+
+/**
+ * call this function to forward the task of creating a ReactElement node (i.e. subtree) to createElement function
+ * by appropriately pausing and resuming its hijack during this re-render
+ *
+ * @param {{element: null | string | function, props: object, children: object[]}}
+ * @returns {ReactElement}
+ */
+function createElementDuringRerender({ element, props, children }) {
+  // pause the hijack and make createElement behave normally as it did during initial rendering
+  rerenderMonitor.pauseHijackOfCreateElementFn();
+
+  // create a fresh new React Element object/subtree
+  const newReactElementSubtree = createElement(element, props, children);
+
+  // resume the hijack and make createElement behave differently during this re-rendering
+  rerenderMonitor.resumeHijackOfCreateElementFn();
+
+  return newReactElementSubtree;
 }
 
 /**
