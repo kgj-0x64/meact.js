@@ -22,7 +22,7 @@ const renderTree = {
   // how many times this app has been rendered (or rerendered) in browser
   domRefreshCounter: 0,
   // queue of all useEffect calls whose dependencies had changed in the last re-render
-  useEffectQueue: [], // {{component: ReactElement, index: number}[]}
+  queueOfEffectHooksForPostRenderHandling: [], // {{component: ReactElement, index: number}[]}
 
   /**
    * call this to update the root node and thus this whole render tree
@@ -37,17 +37,30 @@ const renderTree = {
   /**
    * @param {{component: ReactElement, index: number}} effectObject
    */
-  addEffectToQueue(effectObject) {
-    this.useEffectQueue.push(effectObject);
+  enqueueEffectHook(effectObject) {
+    this.queueOfEffectHooksForPostRenderHandling.push(effectObject);
   },
   /**
-   * @returns {{component: ReactElement, index: number}[]}
+   * @returns {null | {component: ReactElement, index: number}}
    */
-  getLastEffectFromQueue() {
-    if (this.useEffectQueue.length === 0) {
-      return null;
+  dequeueEffectHook() {
+    return this.queueOfEffectHooksForPostRenderHandling.shift();
+  },
+  /**
+   * call to execute all useEffect setup and cleanup functions from this render
+   */
+  processEffectHooksQueue() {
+    while (this.queueOfEffectHooksForPostRenderHandling.length > 0) {
+      const effectObject = this.dequeueEffectHook();
+      const { component, index } = effectObject;
+      console.log(
+        "Calling use effect handler of",
+        component.id,
+        "at position",
+        index
+      );
+      component.executeUseEffectSetupFunction(index);
     }
-    return this.useEffectQueue.pop();
   },
 
   /**
@@ -60,7 +73,7 @@ const renderTree = {
     // reset the hooks counter for all react elements in the render tree
     resetHooksCallCounters(this.rootNode);
     // run useEffect calls from the queue and then reset
-    executeUseEffectQueue();
+    this.processEffectHooksQueue();
 
     console.log("Post Render Cleanup Done!");
   },
@@ -185,6 +198,7 @@ class ReactElement {
 
     // first run the cleanup function if it's not the first render
     if (targetUseEffectHook.cleanupFunc) {
+      console.log("Running the cleanup function at index", index);
       targetUseEffectHook.cleanupFunc();
     }
 
@@ -692,7 +706,8 @@ function useEffect(setup, dependencies) {
     values[thisHookCallCount].depsArray = dependencies;
     values[thisHookCallCount].setupFunc = setup;
 
-    const hasDepsChanged = !arraysEqual(previousDeps, dependencies);
+    const hasDepsChanged =
+      dependencies.length === 0 || !arraysEqual(previousDeps, dependencies);
     if (hasDepsChanged) {
       shouldQueue = true;
     }
@@ -705,10 +720,11 @@ function useEffect(setup, dependencies) {
     });
     shouldQueue = true;
   }
+  console.log("shouldQueue", shouldQueue, dependencies);
 
   // queue this for execution after DOM is rendered
   if (shouldQueue) {
-    renderTree.addEffectToQueue({
+    renderTree.enqueueEffectHook({
       component: reactComponentForThisHook,
       index: thisHookCallCount,
     });
@@ -759,21 +775,6 @@ function resetHooksCallCounters(reactElement) {
     const child = reactElement.children[i];
     resetHooksCallCounters(child);
   }
-}
-
-/**
- * call to execute all useEffect setup and cleanup functions from this render
- */
-function executeUseEffectQueue() {
-  console.log("Called executeUseEffectQueue");
-  const effectObject = renderTree.getLastEffectFromQueue();
-  if (!effectObject) {
-    return;
-  }
-
-  const { component, index } = effectObject;
-  console.log("Calling use effect handler of", component.id, index);
-  component.executeUseEffectSetupFunction(index);
 }
 
 /**
