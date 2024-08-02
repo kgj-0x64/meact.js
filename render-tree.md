@@ -1,6 +1,6 @@
 # Composition of React Components
 
-## [UI as a tree]https://react.dev/learn/understanding-your-ui-as-a-tree)
+## [UI as a tree](https://react.dev/learn/understanding-your-ui-as-a-tree)
 
 In a React app, every piece of UI is a component (a reusable UI element) combining your markup, CSS, and JavaScript.
 

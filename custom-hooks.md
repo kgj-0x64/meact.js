@@ -8,7 +8,7 @@
 
 _Hooks may return arbitrary values._
 
-### What custom hooks? Why?
+### How is it useful?
 
 **Custom hooks in React are a way to reuse stateful logic across different components without duplicating code.**
 
