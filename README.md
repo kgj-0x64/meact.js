@@ -1,4 +1,18 @@
-# WHAT's MISSING
+# Meact.js
+
+## WHAT's THERE
+
+[x] Functional Components
+[x] Declarative programming
+[x] react-dom API
+[x] `props`
+[x] `children`
+[x] `useState`
+[x] `useEffect`
+[x] `useRef`
+[x] Custom Hooks
+
+## WHAT's MISSING
 
 Beyond many for-scale things, these necessary ones:
 
