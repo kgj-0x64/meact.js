@@ -48,7 +48,9 @@ function App() {
 
 function TodoList({ todos, theme, tab }) {
   console.log("TodoList component called", theme, tab);
-  let visibleTodos = filterTodos(todos, tab);
+
+  // const visibleTodos = filterTodos(todos, tab);
+  const visibleTodos = useMemo(() => filterTodos(todos, tab), [todos, tab]);
   console.log("visibleTodos", visibleTodos);
 
   const VisibleTodos = () => {
@@ -62,7 +64,6 @@ function TodoList({ todos, theme, tab }) {
       )
     );
   };
-  console.log("VisibleTodos", VisibleTodos());
 
   return createElement(
     "div",

@@ -835,10 +835,10 @@ function useMemo(calculateValueFn, dependencies) {
 
     if (hasDepsChanged) {
       cachedValue = calculateValueFn();
-      values.push({
+      values[thisHookCallCount] = {
         cachedValue,
         depsArray: dependencies,
-      });
+      };
     } else {
       cachedValue = values[thisHookCallCount].cachedValue;
     }
