@@ -5,6 +5,11 @@ function ProfileComponent({ color, children }) {
 
   const [size, setSize] = useState(100);
 
+  const magnifyButton = useMemo(
+    () => () => setSize(Math.min(size * 2, 400)),
+    [size]
+  );
+
   return createElement(
     CardComponent,
     null,
@@ -23,11 +28,7 @@ function ProfileComponent({ color, children }) {
       },
       `Size: ${size}`
     ),
-    createElement(
-      "button",
-      { onClick: () => setSize(Math.min(size * 2, 400)) },
-      "Magnify"
-    ),
+    createElement("button", { onClick: magnifyButton }, "Magnify"),
     createElement(
       "button",
       { onClick: () => setSize(Math.max(size * 0.5, 25)) },

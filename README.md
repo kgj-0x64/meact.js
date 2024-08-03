@@ -10,9 +10,8 @@
 [x] `useState`
 [x] `useEffect`
 [x] `useRef`
-[] `useCallback`
-[] `useMemo`
 [x] Custom Hooks
+[x] `useMemo`: caches expensive calculations or references to arrays/objects/functions so that they are not necessarily changes across re-renders and thus not reflected as "updates" in browser DOM - [x] `useCallback` (redundant after `useMemo`)
 
 ## WHAT's MISSING
 
