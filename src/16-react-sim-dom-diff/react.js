@@ -32,6 +32,26 @@ const renderTree = {
     this.domRefreshCounter = 0;
   },
 
+  // queues of updated or newly created elements during a re-render
+  rerenderDiffForDomHandler: {
+    queue: [], // {{action: "created" | "updated", parentElementId: string, targetElement: ReactElement, childPosition: number}[]}
+    /**
+     * @param {{action: "created" | "updated", parentElementId: string, targetElement: ReactElement, childPosition: number}} elementSnapshot
+     */
+    enqueue(elementSnapshot) {
+      this.queue.push(elementSnapshot);
+    },
+    /**
+     * @returns {{action: "created" | "updated", parentElementId: string, targetElement: ReactElement, childPosition: number}[]}
+     */
+    getQueue() {
+      return this.queue;
+    },
+    reset() {
+      this.queue = [];
+    },
+  },
+
   // queue of all useEffect calls whose dependencies had changed in the last re-render
   effectHooksForPostRenderHandling: {
     queue: [], // {{component: ReactElement, index: number}[]}
@@ -65,6 +85,8 @@ const renderTree = {
     this.domRefreshCounter += 1;
     // reset the hooks counter for all react elements in the render tree
     resetHooksCallCounters(this.rootNode);
+    // reset the queue of re-render diff
+    this.rerenderDiffForDomHandler.reset();
     // run useEffect calls from the queue and then reset
     this.effectHooksForPostRenderHandling.processQueue();
 
@@ -157,7 +179,7 @@ class ReactElement {
                 newStateValue = newValue(this.stateManager.values[index]);
               }
               this.stateManager.values[index] = newStateValue;
-              // re-render the subtree of the render tree which is rooted at this element
+              // re-evaluate the subtree of the render tree which is rooted at this element
               updateSubtreeForElement(this, 0, null);
               // repaint the browser DOM
               renderTree.reRender(this);
@@ -431,12 +453,11 @@ function updateSubtreeForElement(
   // then we don't have an existing child to update or unmount
   if (childPosition >= subtreeRootNode.children.length) {
     // mount a new child element
-    const mountNewChildSubtree = createElementDuringRerender(
+    createElementDuringRerender(
+      subtreeRootNode,
+      childPosition,
       subtreeRootNodeChildRecalculated
     );
-
-    // update the render tree
-    subtreeRootNode.children[childPosition] = mountNewChildSubtree;
 
     return;
   }
@@ -453,17 +474,18 @@ function updateSubtreeForElement(
       props: subtreeRootNodeChildRecalculated.props,
     });
 
+  // if a new type of element is to added as child at this position, then
   // unmount the existing child element and mount a new child element
   if (!shouldUpdateExistingChildOfSubtreeRootNode) {
-    const mountNewChildSubtree = createElementDuringRerender(
-      subtreeRootNodeChildRecalculated
-    );
-
     // existing child element in the subtree
     const existingChildSubtree = subtreeRootNode.children[childPosition];
 
     // update the render tree
-    subtreeRootNode.children[childPosition] = mountNewChildSubtree;
+    createElementDuringRerender(
+      subtreeRootNode,
+      childPosition,
+      subtreeRootNodeChildRecalculated
+    );
 
     // unmount existing child element
     existingChildSubtree.unmount();
@@ -472,8 +494,28 @@ function updateSubtreeForElement(
   }
 
   // else, this child element should be kept and refreshed
+
+  const lastProps = existingChildOfSubtreeRootNode.props;
+  const newProps = subtreeRootNodeChildRecalculated.props;
+
   // update props of this child React Element
-  existingChildOfSubtreeRootNode.props = subtreeRootNodeChildRecalculated.props;
+  // if it's the same element, then keep the
+  existingChildOfSubtreeRootNode.props = newProps;
+
+  // should DOM element corresponding to this ReactElement be updated or not
+  if (existingChildOfSubtreeRootNode.type !== "ReactComponent") {
+    const isPropsSameInRerender = arePropsEqual(newProps, lastProps);
+
+    if (!isPropsSameInRerender) {
+      // add it to re-render diff
+      renderTree.rerenderDiffForDomHandler.enqueue({
+        action: "updated",
+        parentElementId: subtreeRootNode.id,
+        childPosition,
+        targetElement: existingChildOfSubtreeRootNode, // with updated props
+      });
+    }
+  }
 
   // if the child element at this childPosition is a functional component
   // then it should be handled differently since it won't have children to recurse over
@@ -527,10 +569,15 @@ function updateSubtreeForElement(
  * call this function to forward the task of creating a ReactElement node (i.e. subtree) to createElement function
  * by appropriately pausing and resuming its hijack during this re-render
  *
+ * @param {ReactElement} subtreeRootNode
+ * @param {number} childPosition
  * @param {{type: string, name: string, props: object, children: object[]}}
- * @returns {ReactElement}
  */
-function createElementDuringRerender({ type, name, props, children }) {
+function createElementDuringRerender(
+  subtreeRootNode,
+  childPosition,
+  { type, name, props, children }
+) {
   // pause the hijack and make createElement behave normally as it did during initial rendering
   rerenderMonitor.pauseHijackOfCreateElementFn();
 
@@ -541,10 +588,19 @@ function createElementDuringRerender({ type, name, props, children }) {
   // create a fresh new React Element object/subtree
   const mountNewChildSubtree = createElement(name, props, ...children);
 
+  // update the render tree
+  subtreeRootNode.children[childPosition] = mountNewChildSubtree;
+
+  // add it to re-render diff
+  renderTree.rerenderDiffForDomHandler.enqueue({
+    action: "created",
+    parentElementId: subtreeRootNode.id,
+    childPosition,
+    targetElement: mountNewChildSubtree,
+  });
+
   // resume the hijack and make createElement behave differently during this re-rendering
   rerenderMonitor.resumeHijackOfCreateElementFn();
-
-  return mountNewChildSubtree;
 }
 
 /**
@@ -680,7 +736,7 @@ function useEffect(setup, dependencies) {
 
   badHookCall(reactComponentForThisHook, "useEffect");
 
-  console.log("use effect called for", reactComponentForThisHook.id);
+  console.log("useEffect called for", reactComponentForThisHook.id);
 
   const thisHookCallCount = getHookCallCount(
     reactComponentForThisHook,
@@ -713,7 +769,6 @@ function useEffect(setup, dependencies) {
     });
     shouldQueue = true;
   }
-  console.log("shouldQueue", shouldQueue, dependencies);
 
   // queue this for execution after DOM is rendered
   if (shouldQueue) {
@@ -850,18 +905,55 @@ class ReactElementTreeDebugger {
   }
 }
 
+/**
+ *
+ * @param {any[]} a
+ * @param {any[]} b
+ * @returns {boolean}
+ */
 function arraysEqual(a, b) {
   if (a === b) return true;
   if (a == null || b == null) return false;
   if (a.length !== b.length) return false;
 
-  // If you don't care about the order of the elements inside
-  // the array, you should sort both arrays here.
-  // Please note that calling sort on an array will modify that array.
-  // you might want to clone your array first.
-
   for (var i = 0; i < a.length; ++i) {
     if (a[i] !== b[i]) return false;
   }
+  return true;
+}
+
+/**
+ *
+ * @param {object} newProps
+ * @param {object} lastProps
+ * @returns {boolean}
+ */
+function arePropsEqual(newProps, lastProps) {
+  // Check if both are objects
+  if (
+    typeof newProps !== "object" ||
+    typeof lastProps !== "object" ||
+    newProps === null ||
+    lastProps === null
+  ) {
+    return newProps === lastProps;
+  }
+
+  // Get keys of both objects
+  const newKeys = Object.keys(newProps);
+  const lastKeys = Object.keys(lastProps);
+
+  // If number of properties is different, objects are not equal
+  if (newKeys.length !== lastKeys.length) {
+    return false;
+  }
+
+  // Compare each property
+  for (let key of newKeys) {
+    if (!lastProps.hasOwnProperty(key) || newProps[key] !== lastProps[key]) {
+      return false;
+    }
+  }
+
   return true;
 }
