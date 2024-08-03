@@ -1,178 +1,107 @@
-// EXAMPLE FROM: https://react.dev/learn/passing-props-to-a-component#passing-jsx-as-children
+function createTodos() {
+  const todos = [];
+  for (let i = 0; i < 5; i++) {
+    todos.push({
+      id: i,
+      text: "Todo " + (i + 1),
+      completed: Math.random() > 0.5,
+    });
+  }
+  return todos;
+}
 
-function ProfileComponent({ color, children }) {
-  console.log("ProfileComponent called with", color);
+const todos = createTodos();
 
-  const [size, setSize] = useState(100);
-
-  const magnifyButton = useMemo(
-    () => () => setSize(Math.min(size * 2, 400)),
-    [size]
-  );
+function App() {
+  const [tab, setTab] = useState("all");
+  const [isDark, setIsDark] = useState(true);
 
   return createElement(
-    CardComponent,
+    "div",
     null,
-    ...children,
-    createElement(AvatarComponent, {
-      size,
-      person: {
-        name: "Katsuko Saruhashi",
-        imageId: "YfeOqp2",
-      },
-    }),
-    createElement(
-      "h3",
-      {
-        style: `color:${color}`,
-      },
-      `Size: ${size}`
-    ),
-    createElement("button", { onClick: magnifyButton }, "Magnify"),
+    createElement("button", { onClick: () => setTab("all") }, "All"),
+    createElement("button", { onClick: () => setTab("active") }, "Active"),
     createElement(
       "button",
-      { onClick: () => setSize(Math.max(size * 0.5, 25)) },
-      "Minify"
-    )
+      { onClick: () => setTab("completed") },
+      "Completed"
+    ),
+    createElement("br"),
+    createElement(
+      "label",
+      null,
+      createElement("input", {
+        type: "checkbox",
+        checked: isDark,
+        onChange: (e) => setIsDark(e.target.checked),
+      }),
+      `${isDark ? "Dark" : "Light"} mode`
+    ),
+    createElement("hr"),
+    createElement(TodoList, {
+      todos,
+      tab,
+      theme: isDark ? "dark" : "light",
+    })
   );
 }
 
-function CardComponent({ children }) {
-  console.log("CardComponent called");
+function TodoList({ todos, theme, tab }) {
+  console.log("TodoList component called", theme, tab);
+  let visibleTodos = filterTodos(todos, tab);
+  console.log("visibleTodos", visibleTodos);
 
-  return createElement(
-    "div",
-    {
-      class: "card",
-    },
-    ...children
-  );
-}
-
-function AvatarComponent({ person, size }) {
-  console.log("AvatarComponent called");
-
-  // conditional rendering based on props
-  if (size < 50) {
-    return createElement(
-      "h3",
-      { style: "color:red" },
-      `Do you even want to see ${person.name}? I think not! Zoom on...`
+  const VisibleTodos = () => {
+    return visibleTodos.map((todo) =>
+      createElement(
+        "li",
+        {
+          key: todo.id,
+        },
+        todo.completed ? createElement("s", null, todo.text) : todo.text
+      )
     );
-  }
-
-  return createElement("img", {
-    class: "avatar",
-    src: getImageUrl(person),
-    alt: person.name,
-    width: size,
-    height: size,
-  });
-}
-
-function getImageUrl(person, size = "s") {
-  return "https://i.imgur.com/" + person.imageId + size + ".jpg";
-}
-
-function StopwatchTowerComponent() {
-  console.log("StopwatchTowerComponent called");
-
-  const [color, setColor] = useState("lightcoral");
-
-  function updateColor(event) {
-    setColor(event.target.value);
-  }
-
-  const numOfStopwatchChildren = 5;
-  function getStopwatchesElementsArray() {
-    let elements = [];
-    for (let i = 0; i < numOfStopwatchChildren; i++) {
-      const stopwatchElement = createElement(StopwatchComponent, {
-        key: i,
-        position: i,
-        color,
-      });
-      elements.push(stopwatchElement);
-    }
-
-    return elements;
-  }
+  };
+  console.log("VisibleTodos", VisibleTodos());
 
   return createElement(
     "div",
-    null,
-    // conditional render
-    color === "lightcoral"
-      ? createElement(
-          "p",
-          { style: `color:${color}` },
-          "light coral is the right choice!!!"
-        )
-      : createElement(null),
-    createElement("label", { for: "select-color" }, "Pick a color: "),
+    { class: theme },
     createElement(
-      "select",
-      {
-        id: "select-color",
-        name: "colors",
-        value: color,
-        onChange: (event) => updateColor(event),
-      },
-      createElement("option", { value: "lightcoral" }, "Light Coral"),
-      createElement("option", { value: "darkgreen" }, "Dark Green"),
-      createElement("option", { value: "rebeccapurple" }, "Rebecca Purple")
-    ),
-    createElement("h3", null, `Current selected color option is ${color}`),
-    createElement(
-      ProfileComponent,
-      { color },
+      "p",
+      null,
       createElement(
-        "h6",
+        "b",
         null,
-        `BTW; my parent StopwatchTower Component tells me that it will render ${numOfStopwatchChildren} Stopwatch Components`
+        "Note: ",
+        createElement("code", null, "filterTodos"),
+        " is artificially slowed down!"
       )
     ),
-    createElement("div", null, ...getStopwatchesElementsArray())
+    createElement("ul", null, ...VisibleTodos())
   );
 }
 
-function StopwatchComponent(props) {
-  console.log("StopwatchComponent called");
-
-  const { color, position } = props;
-
-  const [countValue, setCountValue] = useState(1);
-  const [compoundValue, setCompoundValue] = useState(1);
-
-  return createElement(
-    "div",
-    null,
-    createElement(
-      "h3",
-      {
-        style: `color:${color}`,
-      },
-      `Stopwatch #${position + 1}`
-    ),
-    createElement(
-      "div",
-      null,
-      createElement("p", null, `Count value: ${countValue}`),
-      createElement(
-        "button",
-        { onClick: () => setCountValue(countValue + 2) },
-        "Incrementer"
-      )
-    ),
-    createElement(
-      "div",
-      null,
-      createElement("p", null, `Compound value: ${compoundValue}`),
-      createElement(
-        "button",
-        { onClick: () => setCompoundValue(compoundValue * 2) },
-        "Compounder"
-      )
-    )
+function filterTodos(todos, tab) {
+  console.log(
+    "[ARTIFICIALLY SLOW] Filtering " +
+      todos.length +
+      ' todos for "' +
+      tab +
+      '" tab.'
   );
+  let startTime = performance.now();
+  while (performance.now() - startTime < 2000) {
+    // Do nothing for 500 ms to emulate extremely slow code
+  }
+
+  return todos.filter((todo) => {
+    if (tab === "all") {
+      return true;
+    } else if (tab === "active") {
+      return !todo.completed;
+    } else if (tab === "completed") {
+      return todo.completed;
+    }
+  });
 }

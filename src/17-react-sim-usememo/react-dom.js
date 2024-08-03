@@ -118,7 +118,13 @@ function createBrowserDomForReactElement(reactElement) {
         // we're not using `document.createTextNode` because it doesn't handle HTML entities
         // unlike creating a Text Node using `document.createTextNode`,
         // setting innerHTML handles both Unicode characters and HTML entities
-        htmlElement.innerHTML = textContent;
+        // ! BUG: with overwriting `innerHTML`
+        // ```createElement("b", null, "Note: ", createElement("code", null, "filterTodos"), " is artificially slowed down!")```
+        // will produce ```<b data-render-id="b-10"> is artificially slowed down!</b>```
+
+        // Solution: https://stackoverflow.com/questions/20941956/how-to-insert-html-entities-with-createtextnode
+        // You can't create nodes with HTML entities. Your alternatives would be to use unicode values
+        htmlElement.appendChild(document.createTextNode(textContent));
       } else {
         htmlElement.appendChild(createBrowserDomForReactElement(child));
       }
@@ -143,7 +149,7 @@ function upsertBrowserDomForRerenderDiffItem(rerenderDiffItem) {
     findElementByUniqueRenderId(parentElementId);
 
   if (!parentElementInBrowserDom) {
-    console.error(
+    console.warn(
       `Parent element with ID "${parentElementId}" is not found in the browser DOM.`
     );
     return;
@@ -164,14 +170,33 @@ function upsertBrowserDomForRerenderDiffItem(rerenderDiffItem) {
     } else {
       parentElementInBrowserDom.appendChild(targetDomSubtree); // append at the end if childPosition is out of bounds
     }
-  } else {
+  } else if (action === "updated") {
     if (targetElement.name === "text") {
+      // we need the parent DOM element because the DOM doesn't hold ID of a text node created using `document.createTextNode`
       const textContent = targetElement.props.content;
-      parentElementInBrowserDom.innerHTML = textContent;
+      parentElementInBrowserDom.childNodes[childPosition].textContent =
+        textContent;
     } else {
       // find the existing element to update
       const domElementToUpdate = findElementByUniqueRenderId(targetElement.id);
-      setAttributesAndProperties(targetElement, domElementToUpdate);
+
+      if (domElementToUpdate) {
+        setAttributesAndProperties(targetElement, domElementToUpdate);
+      } else {
+        console.warn(
+          `UPDATE: Element with ID "${targetElement.id}" not found.`
+        );
+      }
+    }
+  } else {
+    // find the existing element to delete
+    const domElementToDelete = findElementByUniqueRenderId(targetElement.id);
+
+    if (domElementToDelete) {
+      console.log("domElementToDelete", domElementToDelete);
+      domElementToDelete.parentNode.removeChild(domElementToDelete);
+    } else {
+      console.warn(`DELETE: Element with ID "${targetElement.id}" not found.`);
     }
   }
 }

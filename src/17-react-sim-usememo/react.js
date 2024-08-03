@@ -34,9 +34,9 @@ const renderTree = {
 
   // queues of updated or newly created elements during a re-render
   rerenderDiffForDomHandler: {
-    queue: [], // {{action: "created" | "updated", parentElementId: string, targetElement: ReactElement, childPosition: number}[]}
+    queue: [], // {{action: "created" | "updated" | "deleted", parentElementId: string, targetElement: ReactElement, childPosition: number}[]}
     /**
-     * @param {{action: "created" | "updated", parentElementId: string, targetElement: ReactElement, childPosition: number}} elementSnapshot
+     * @param {{action: "created" | "updated" | "deleted", parentElementId: string, targetElement: ReactElement, childPosition: number}} elementSnapshot
      */
     enqueue(elementSnapshot) {
       this.queue.push(elementSnapshot);
@@ -551,6 +551,13 @@ function updateSubtreeForElement(
       i < existingNumberOfChildren;
       i++
     ) {
+      // add it to re-render diff
+      renderTree.rerenderDiffForDomHandler.enqueue({
+        action: "deleted",
+        parentElementId: existingChildOfSubtreeRootNode.id,
+        childPosition: i,
+        targetElement: existingChildOfSubtreeRootNode.children[i],
+      });
       // unmount existing child element
       existingChildOfSubtreeRootNode.children[i].unmount();
     }
