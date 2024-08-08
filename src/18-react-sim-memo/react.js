@@ -180,7 +180,7 @@ class ReactElement {
               }
               this.stateManager.values[index] = newStateValue;
               // re-evaluate the subtree of the render tree which is rooted at this element
-              updateSubtreeForElement(this, 0, null);
+              updateSubtreeForElement(0, this, 0, null);
               // repaint the browser DOM
               renderTree.reRender(this);
             },
@@ -293,7 +293,8 @@ class ReactElement {
  * @returns {ReactElement | RerenderTreeNodeRepr}
  */
 function createElement(element, props, ...children) {
-  // default type, props and children
+  // default type, name and props
+  const propsObject = props === undefined || !props ? {} : props;
   let type = element
     ? typeof element === "function"
       ? "ReactComponent"
@@ -304,7 +305,6 @@ function createElement(element, props, ...children) {
       ? element.name
       : element
     : "null";
-  const propsObject = props === undefined || !props ? {} : props;
 
   // if it's a null element
   if (!element) {
@@ -316,7 +316,8 @@ function createElement(element, props, ...children) {
     const memoizedFunction = element.componentFn;
     const memoizedFunctionName = memoizedFunction.name;
 
-    // set lastProps value only if it's the initial render, since it'll be set for re-renders in `updateSubtreeForElement` function
+    // set (insert) lastProps value only if it's the initial render,
+    // since it'll be set (updated) for re-renders in `updateSubtreeForElement` function
     if (renderTree.domRefreshCounter === 0) {
       memoizedFunctionsMap.set(memoizedFunctionName, {
         ...memoizedFunctionsMap.get(memoizedFunctionName),
@@ -328,6 +329,12 @@ function createElement(element, props, ...children) {
   }
 
   if (typeof element === "function") {
+    if (!name) {
+      throw new Error(
+        `Anonymous function cannot be used as a component, please use named funciton only`
+      );
+    }
+
     // if this is a React component
     // creating it beforehand to get its ID for handling hooks in its context
     // preserve whole of its argument to reuse in case of its re-rendering
@@ -439,6 +446,7 @@ const rerenderMonitor = {
  * of the parent React component enclosing this subtree root node
  */
 function updateSubtreeForElement(
+  subtreeLevelFromStateChange,
   subtreeRootNode,
   childPosition,
   subtreeRootNodeChildPostStateUpdate
@@ -464,8 +472,11 @@ function updateSubtreeForElement(
       children: subtreeRootNode.propChildrenSnapshot,
     };
 
-    // check if this is a memoized function
-    if (memoizedFunctionsMap.has(functionName)) {
+    // check if this is a memoized function if it's not the root of state change itself
+    if (
+      subtreeLevelFromStateChange > 0 &&
+      memoizedFunctionsMap.has(functionName)
+    ) {
       // check if props has changed versus last render
       const memoizedFunctionMappedValues =
         memoizedFunctionsMap.get(functionName);
@@ -587,7 +598,12 @@ function updateSubtreeForElement(
       subtreeRootNodeChildRecalculated.propChildrenSnapshot;
 
     // call the recursive function which will run this component's function definition with fresh args and state
-    updateSubtreeForElement(existingChildOfSubtreeRootNode, 0, null);
+    updateSubtreeForElement(
+      subtreeLevelFromStateChange + 1,
+      existingChildOfSubtreeRootNode,
+      0,
+      null
+    );
     return;
   }
 
@@ -627,6 +643,7 @@ function updateSubtreeForElement(
   // recursively call this function for every recalculated child against existing child
   for (let i = 0; i < recalculatedNumberOfChildren; i++) {
     updateSubtreeForElement(
+      subtreeLevelFromStateChange + 1,
       existingChildOfSubtreeRootNode,
       i,
       subtreeRootNodeChildRecalculated.children[i]
@@ -804,6 +821,7 @@ function useEffect(setup, dependencies) {
   const reactComponentForThisHook = reactComponentForHooks;
 
   badHookCall(reactComponentForThisHook, "useEffect");
+  badHookDependencyArgs(reactComponentForThisHook, "useEffect", dependencies);
 
   console.log("useEffect called for", reactComponentForThisHook.id);
 
@@ -864,6 +882,7 @@ function useMemo(calculateValueFn, dependencies) {
   const reactComponentForThisHook = reactComponentForHooks;
 
   badHookCall(reactComponentForThisHook, "useMemo");
+  badHookDependencyArgs(reactComponentForThisHook, "useMemo", dependencies);
 
   console.log("useMemo called for", reactComponentForThisHook.id);
 
@@ -912,7 +931,7 @@ function useMemo(calculateValueFn, dependencies) {
 }
 
 /**
- * call this to reuse same code
+ * call this to check if hook call is valid or not
  * @param {ReactElement} reactComponentForThisHook
  * @param {string} hookName
  */
@@ -922,6 +941,23 @@ function badHookCall(reactComponentForThisHook, hookName) {
     !reactComponentForThisHook.hooksCallCounter
   ) {
     throw new Error(`${hookName} must be used within a function component`);
+  }
+}
+
+/**
+ * call this to check if dependency array argument has been passed or not
+ * @param {ReactElement} reactComponentForThisHook
+ * @param {string} hookName
+ */
+function badHookDependencyArgs(
+  reactComponentForThisHook,
+  hookName,
+  dependencies
+) {
+  if (!Array.isArray(dependencies)) {
+    throw new Error(
+      `${hookName} hook in ${reactComponentForThisHook.name} is missing a dependency array`
+    );
   }
 }
 
@@ -977,9 +1013,9 @@ class MemoizedFn {
  */
 function memo(componentFn, arePropsEqualFn) {
   const componentFnName = componentFn.name;
-  // if this is a re-render, don't reset existing values
+  // if this is a re-render, don't reset existing values i.e. lastProps
   if (!memoizedFunctionsMap.has(componentFnName)) {
-    memoizedFunctionsMap.set(componentFn.name, {
+    memoizedFunctionsMap.set(componentFnName, {
       arePropsEqualFn,
     });
   }
@@ -1078,7 +1114,7 @@ function arraysEqual(a, b) {
   if (a == null || b == null) return false;
   if (a.length !== b.length) return false;
 
-  for (var i = 0; i < a.length; ++i) {
+  for (var i = 0; i < a.length; i++) {
     if (a[i] !== b[i]) return false;
   }
   return true;

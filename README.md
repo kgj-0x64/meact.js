@@ -2,6 +2,10 @@
 
 ## WHAT's THERE
 
+Constraint: A component must be defined as a named function only, and not as an anonymous function.
+
+- Because anonymous functions as component definitions don't bring any benefits in ergonomics, while an anonymous component function is bound to be recreated on every render (due to a new ID each time) and it'll be harder to debug in stack traces or logs.
+
 - [x] Functional Components
 - [x] Declarative programming
 - [x] react-dom API
@@ -33,7 +37,7 @@ For insatnce, meact.js does synchronous state updates instead of batching them a
 - Local development server and hot reload
 - Devtools and dev/prod environments
 - Scoped CSS; CSS-in-JS
-- Cross-browser tested API
+- Synthetic events (cross-browser tested API)
 - Ecosystem of client or async state management, UI components, caching, etc
 - Ecosystem of build, bundler and tree-shaking tools
 - Concurrent rendering

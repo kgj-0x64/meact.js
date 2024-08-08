@@ -48,5 +48,21 @@ const MemoizedGreeting = memo(Greeting);
 function Greeting({ name }) {
   console.log("Greeting was rendered at", new Date().toLocaleTimeString());
 
-  return createElement("h3", null, name ? `Hello, ${name}!` : "Hello!");
+  const [count, setCount] = useState(0);
+
+  // useMemo is unnecessary here since this function is bound to be created every time Greeting renders
+  const increment = useMemo(
+    () => () => {
+      setCount(count + 1);
+    },
+    [count]
+  );
+
+  return createElement(
+    "div",
+    null,
+    createElement("h3", null, name ? `Hello, ${name}!` : "Hello!"),
+    createElement("p", null, `Count: ${count}`),
+    createElement("button", { onClick: increment }, "Increment")
+  );
 }
