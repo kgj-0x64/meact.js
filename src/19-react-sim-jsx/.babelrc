@@ -1,0 +1,16 @@
+{
+  "presets": ["@babel/preset-env"],
+  "plugins": [
+    [
+      "@babel/plugin-transform-react-jsx",
+      {
+        // classic does not automatically import anything
+        "runtime": "classic",
+        // replaces the import source when importing functions; defaults to react
+        // "importSource": "meact",
+        // replace the function used when compiling JSX expressions; defaults to React.createElement
+        "pragma": "createElement" // Use your function name here
+      }
+    ]
+  ]
+}
