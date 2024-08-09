@@ -80,7 +80,7 @@ function createBrowserDomForReactElement(reactElement) {
     const nullElement = document.createElement("div");
     nullElement.setAttribute(elementRenderId, reactElement.id);
     // `display: none` turns off the display of an element so that it has no effect on layout
-    placeholderElement.style.display = "none";
+    nullElement.style.display = "none";
     return nullElement;
   }
 

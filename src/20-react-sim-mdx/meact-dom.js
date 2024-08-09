@@ -86,11 +86,20 @@ function createBrowserDomForReactElement(reactElement) {
 
   if (reactElement.type === "ReactComponent") {
     // Create the placeholder element
-    const placeholderElement = document.createElement("div");
+
+    /**
+     * 1. It still adds a div to the DOM, which React's Fragment specifically avoids.
+     * 2. `display: contents` is not supported in all browsers, potentially causing inconsistent behavior.
+     * 3. It may interfere with CSS selectors and DOM traversal scripts.
+     */
+    // const placeholderElement = document.createElement("div");
+    /// `display: contents` causes an element's children to appear
+    /// as if they were direct children of the element's parent, ignoring the element itself
+    // placeholderElement.style.display = "contents";
+
+    // https://developer.mozilla.org/en-US/docs/Web/API/Document/createDocumentFragment
+    const placeholderElement = document.createDocumentFragment();
     placeholderElement.setAttribute(elementRenderId, reactElement.id);
-    // `display: contents` causes an element's children to appear
-    // as if they were direct children of the element's parent, ignoring the element itself
-    placeholderElement.style.display = "contents";
 
     // browser DOM cares for DOM element from its return block only
     const domSubtreeOfThisComponent = createBrowserDomForReactElement(
@@ -101,8 +110,16 @@ function createBrowserDomForReactElement(reactElement) {
     return placeholderElement;
   }
 
+  let htmlElement = null;
+
+  // handle Fragment component separately
+  if (reactElement.name === "Fragment") {
+    htmlElement = document.createDocumentFragment();
+  }
   // show these in the browser DOM
-  const htmlElement = document.createElement(reactElement.name);
+  else {
+    htmlElement = document.createElement(reactElement.name);
+  }
 
   htmlElement.setAttribute(elementRenderId, reactElement.id);
 
@@ -118,7 +135,13 @@ function createBrowserDomForReactElement(reactElement) {
         // we're not using `document.createTextNode` because it doesn't handle HTML entities
         // unlike creating a Text Node using `document.createTextNode`,
         // setting innerHTML handles both Unicode characters and HTML entities
-        htmlElement.innerHTML = textContent;
+        // ! BUG: with overwriting `innerHTML`
+        // ```createElement("b", null, "Note: ", createElement("code", null, "filterTodos"), " is artificially slowed down!")```
+        // will produce ```<b data-render-id="b-10"> is artificially slowed down!</b>```
+
+        // Solution: https://stackoverflow.com/questions/20941956/how-to-insert-html-entities-with-createtextnode
+        // You can't create nodes with HTML entities. Your alternatives would be to use unicode values
+        htmlElement.appendChild(document.createTextNode(textContent));
       } else {
         htmlElement.appendChild(createBrowserDomForReactElement(child));
       }
@@ -143,7 +166,7 @@ function upsertBrowserDomForRerenderDiffItem(rerenderDiffItem) {
     findElementByUniqueRenderId(parentElementId);
 
   if (!parentElementInBrowserDom) {
-    console.error(
+    console.warn(
       `Parent element with ID "${parentElementId}" is not found in the browser DOM.`
     );
     return;
@@ -164,14 +187,32 @@ function upsertBrowserDomForRerenderDiffItem(rerenderDiffItem) {
     } else {
       parentElementInBrowserDom.appendChild(targetDomSubtree); // append at the end if childPosition is out of bounds
     }
-  } else {
+  } else if (action === "updated") {
     if (targetElement.name === "text") {
+      // we need the parent DOM element because the DOM doesn't hold ID of a text node created using `document.createTextNode`
       const textContent = targetElement.props.content;
-      parentElementInBrowserDom.innerHTML = textContent;
+      parentElementInBrowserDom.childNodes[childPosition].textContent =
+        textContent;
     } else {
       // find the existing element to update
       const domElementToUpdate = findElementByUniqueRenderId(targetElement.id);
-      setAttributesAndProperties(targetElement, domElementToUpdate);
+
+      if (domElementToUpdate) {
+        setAttributesAndProperties(targetElement, domElementToUpdate);
+      } else {
+        console.warn(
+          `UPDATE: Element with ID "${targetElement.id}" not found.`
+        );
+      }
+    }
+  } else {
+    // find the existing element to delete
+    const domElementToDelete = findElementByUniqueRenderId(targetElement.id);
+
+    if (domElementToDelete) {
+      domElementToDelete.parentNode.removeChild(domElementToDelete);
+    } else {
+      console.warn(`DELETE: Element with ID "${targetElement.id}" not found.`);
     }
   }
 }

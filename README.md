@@ -19,6 +19,12 @@ Constraint: A component must be defined as a named function only, and not as an 
 - [x] `useCallback` (redundant after `useMemo`)
 - [x] `memo`: force stops reredering of a child subtree when a parent rerenders
 
+### JSX
+
+React supports JSX syntax through transpilation using tools like Babel or TypeScript. To support JSX syntax in your custom UI library, you'll need to set up a build process that transforms JSX into calls to your `createElement` function.
+
+- [JSX vs Template Literals](https://facebook.github.io/jsx/#sec-why-not-template-literals)
+
 ## WHAT's MISSING
 
 For insatnce, meact.js does synchronous state updates instead of batching them and applying them in an asynchronous manner like React.js, and its performance implication ("CPU fan noise") can be observed by running `.src/15-react-sim-sync-setstate-performance/index.html` where the UI does:
@@ -33,13 +39,13 @@ For insatnce, meact.js does synchronous state updates instead of batching them a
 ### Beyond many for-scale things, meact.js doesn't implement these necessary ones (versus react.js)
 
 - Great documentation and OSS community
-- Even better declarative syntax
 - Local development server and hot reload
 - Devtools and dev/prod environments
 - Scoped CSS; CSS-in-JS
 - Synthetic events (cross-browser tested API)
 - Ecosystem of client or async state management, UI components, caching, etc
 - Ecosystem of build, bundler and tree-shaking tools
+- Metadata, SEO tuning, robots.txt, sitemap
 - Concurrent rendering
 - Server side rendering
 - Performance optimizations:

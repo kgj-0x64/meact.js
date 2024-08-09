@@ -1,0 +1,49 @@
+import { GreetingApp } from "./src/components.jsx";
+
+# Heading (rank 1)
+
+{/* A comment! */}
+
+export const Local = (props) => <span style={{ color: "red" }} {...props} />;
+
+An external component:
+
+<GreetingApp />
+and a <Local>local one</Local>.
+
+## Heading 2
+
+### 3
+
+#### 4
+
+##### 5
+
+###### 6
+
+<div class="note">
+
+> And here is _markdown_ in **JSX**!
+
+</div>
+
+<abbr title="HyperText Markup Language">HTML</abbr> is a lovely language.
+
+<section>Two 🍰 is: {Math.PI * 2}</section>
+
+- Unordered
+- List
+
+1. Ordered
+2. List
+
+A paragraph, introducing a thematic break:
+
+---
+
+```js
+some.code();
+```
+
+a [link](https://example.com), an ![image](./image.png), some _emphasis_,
+something **strong**, and finally a little `code()`.

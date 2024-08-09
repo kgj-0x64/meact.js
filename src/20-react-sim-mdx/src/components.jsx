@@ -1,4 +1,4 @@
-function GreetingApp() {
+export function GreetingApp() {
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
 

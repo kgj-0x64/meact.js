@@ -72,8 +72,6 @@ function _iterableToArrayLimit(r, l) {
 function _arrayWithHoles(r) {
   if (Array.isArray(r)) return r;
 }
-// import Meact, { useState, useMemo, memo } from "meact";
-
 function GreetingApp() {
   var _useState = useState(""),
     _useState2 = _slicedToArray(_useState, 2),

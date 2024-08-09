@@ -49,10 +49,10 @@ Here's a step-by-step guide to set this up:
 For example, using Babel CLI:
 
 ```bash
-npx babel src --out-dir jsx-output
+npx babel src --out-dir build
 ```
 
-This will transpile your JSX files in the `src` directory and output the result to the `jsx-output` directory.
+This will transpile your JSX files in the `src` directory and output the result to the `build` directory.
 
 Remember, you'll need to ensure that your `createElement` function and other custom hooks (`useState`, `useMemo`, etc.) are in scope where they're used. You might want to create a single entry point that exports all these functions, similar to how React does it.
 
