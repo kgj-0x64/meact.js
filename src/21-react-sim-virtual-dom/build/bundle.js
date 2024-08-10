@@ -34,14 +34,14 @@ var MdxToJsxBuild = (() => {
     return props.children;
   }
   function jsx(type, props, key) {
-    const { children, restOfProps } = props;
+    const { children, ...restOfProps } = props;
     const propsObject = key === void 0 ? restOfProps : { ...restOfProps, key };
     const child =
       Array.isArray(children) && children.length > 0 ? children[0] : children;
     return createElement(type, propsObject, child);
   }
   function jsxs(type, props, key) {
-    const { children, restOfProps } = props;
+    const { children, ...restOfProps } = props;
     const propsObject = key === void 0 ? restOfProps : { ...restOfProps, key };
     const childrenArray = Array.isArray(children) ? children : [];
     return createElement(type, propsObject, ...childrenArray);
@@ -111,7 +111,7 @@ var MdxToJsxBuild = (() => {
   // build/temp.mdx.js
   var Local = (props) =>
     jsx("span", {
-      style: "color: red",
+      style: "color:Tomato;",
       children: props.children,
     });
   function _createMdxContent(props) {

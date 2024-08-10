@@ -7,7 +7,7 @@ import {
 import { GreetingApp } from "@src/components.jsx";
 export const Local = (props) =>
   _jsx("span", {
-    style: "color: red",
+    style: "color:Tomato;",
     children: props.children,
   });
 function _createMdxContent(props) {

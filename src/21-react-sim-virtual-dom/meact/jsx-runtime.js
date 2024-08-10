@@ -5,8 +5,9 @@ export function Fragment(props) {
 
 // The `jsx` function is used for creating elements with no or one child
 export function jsx(type, props, key) {
-  const { children, restOfProps } = props;
+  const { children, ...restOfProps } = props;
   const propsObject = key === undefined ? restOfProps : { ...restOfProps, key };
+
   // MDX compiler may choose jsx when destructuring children from props
   // if it sees only one child node in the .mdx file
   // e.g. <span>{props.children}</span>
@@ -18,7 +19,7 @@ export function jsx(type, props, key) {
 
 // The `jsxs` function is used for creating elements with multiple children
 export function jsxs(type, props, key) {
-  const { children, restOfProps } = props;
+  const { children, ...restOfProps } = props;
   const propsObject = key === undefined ? restOfProps : { ...restOfProps, key };
   const childrenArray = Array.isArray(children) ? children : [];
 
