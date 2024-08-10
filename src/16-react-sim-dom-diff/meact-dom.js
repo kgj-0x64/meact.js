@@ -76,7 +76,7 @@ function createBrowserDomForReactElement(reactElement) {
   /// render tree nodes which is not meant for browser DOM
 
   if (reactElement.type === "NullComponent") {
-    // browser DOM shouldn't know it since it's just meant to hold a child position in the render tree
+    // let's add it to the browser DOM and let it hold a child position there as well
     const nullElement = document.createElement("div");
     nullElement.setAttribute(elementRenderId, reactElement.id);
     // `display: none` turns off the display of an element so that it has no effect on layout

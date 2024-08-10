@@ -37,7 +37,11 @@ const browserDomWriter = {
     reactElement.plotRenderTree();
 
     this.targetNodeInBrowserDom.innerHTML = ""; // clear any existing content
-    const browserDom = createBrowserDomForReactElement(reactElement);
+    const browserDom = createBrowserDomForReactElement(
+      reactElement,
+      this.targetNodeInBrowserDom.id,
+      0
+    );
     // view the all properties and methods of a document object
     console.dir(browserDom);
     this.targetNodeInBrowserDom.appendChild(browserDom);
@@ -67,12 +71,36 @@ const browserDomWriter = {
   },
 };
 
+// virtual DOM helper mapping a render ID to its DOM parent ID and child position
+const virtualDomHelper = {
+  fragments: new Map(),
+  /**
+   * call this to record parent and virtual positional info for a DOM node
+   * which is present in the render tree but won't be added in the DOM tree
+   * @param {string} reactElementId
+   * @param {string} parentDomElementId
+   * @param {number} virtualChildPosition
+   */
+  addFragmentNode(reactElementId, parentDomElementId, virtualChildPosition) {
+    this.fragments.set(reactElementId, {
+      parentDomElementId,
+      virtualChildPosition,
+    });
+  },
+};
+
 /**
  * call this to create browser DOM elements from a given render tree root
  * @param {ReactElement} reactElement
+ * @param {string} parentDomElementId
+ * @param {number} insertAtChildPosition
  * @returns {HTMLElement}
  */
-function createBrowserDomForReactElement(reactElement) {
+function createBrowserDomForReactElement(
+  reactElement,
+  parentDomElementId,
+  insertAtChildPosition
+) {
   /// render tree nodes which is not meant for browser DOM
 
   if (reactElement.type === "NullComponent") {
@@ -91,61 +119,69 @@ function createBrowserDomForReactElement(reactElement) {
      * 1. It still adds a div to the DOM, which React's Fragment specifically avoids.
      * 2. `display: contents` is not supported in all browsers, potentially causing inconsistent behavior.
      * 3. It may interfere with CSS selectors and DOM traversal scripts.
+     *
+     * BUT
+     * DocumentFragment is a DOM node and not a DOM element,
+     * which means that we can't set ID or any attribute on it
+     * and it's not added as an element to the rendered DOM tree.
      */
-    // const placeholderElement = document.createElement("div");
-    /// `display: contents` causes an element's children to appear
-    /// as if they were direct children of the element's parent, ignoring the element itself
-    // placeholderElement.style.display = "contents";
 
     // https://developer.mozilla.org/en-US/docs/Web/API/Document/createDocumentFragment
     const placeholderElement = document.createDocumentFragment();
-    placeholderElement.setAttribute(elementRenderId, reactElement.id);
 
-    // browser DOM cares for DOM element from its return block only
-    const domSubtreeOfThisComponent = createBrowserDomForReactElement(
-      reactElement.children[0]
+    // storing its parent and positional info in our virtual DOM data structure
+    virtualDomHelper.addFragmentNode(
+      reactElement.id,
+      parentDomElementId,
+      insertAtChildPosition
     );
-    placeholderElement.appendChild(domSubtreeOfThisComponent);
+
+    if (reactElement.children && reactElement.children.length > 0) {
+      reactElement.children.forEach((child, index) => {
+        placeholderElement.appendChild(
+          createBrowserDomForReactElement(
+            child,
+            // actual parent node in the DOM is unchanged for this fragment's children
+            parentDomElementId,
+            // absolute child position under parent node = child position of this fragment under its parent node +  child position under fragment node
+            insertAtChildPosition + index
+          )
+        );
+      });
+    }
 
     return placeholderElement;
   }
 
-  let htmlElement = null;
+  if (reactElement.name === "text") {
+    // ! BUG: when overwriting `innerHTML` so as to handle both Unicode characters and HTML entities
+    // ```createElement("b", null, "Note: ", createElement("code", null, "filterTodos"), " is artificially slowed down!")```
+    // will produce ```<b data-render-id="b-10"> is artificially slowed down!</b>```
 
-  // handle Fragment component separately
-  if (reactElement.name === "Fragment") {
-    htmlElement = document.createDocumentFragment();
+    // Solution: https://stackoverflow.com/questions/20941956/how-to-insert-html-entities-with-createtextnode
+    // You can't create nodes with HTML entities. Use unicode values instead.
+
+    const textContent = child.props.content;
+    return document.createTextNode(textContent);
   }
+
   // show these in the browser DOM
-  else {
-    htmlElement = document.createElement(reactElement.name);
-  }
-
-  console.log("htmlElement", htmlElement);
+  const htmlElement = document.createElement(reactElement.name);
   htmlElement.setAttribute(elementRenderId, reactElement.id);
+
+  // If the node has children, create and append child nodes
+  if (reactElement.children && reactElement.children.length > 0) {
+    reactElement.children.forEach((child, index) => {
+      htmlElement.appendChild(
+        createBrowserDomForReactElement(child, reactElement.id, index)
+      );
+    });
+  }
 
   /**
    * select element's value must exactly match one of the option values,
    * so it must only be set after all its children option elements are seen by the DOM
    */
-  // If the node has children, create and append child nodes
-  if (reactElement.children && reactElement.children.length > 0) {
-    reactElement.children.forEach((child) => {
-      if (child.name === "text") {
-        const textContent = child.props.content;
-        // ! BUG: when overwriting `innerHTML` so as to handle both Unicode characters and HTML entities
-        // ```createElement("b", null, "Note: ", createElement("code", null, "filterTodos"), " is artificially slowed down!")```
-        // will produce ```<b data-render-id="b-10"> is artificially slowed down!</b>```
-
-        // Solution: https://stackoverflow.com/questions/20941956/how-to-insert-html-entities-with-createtextnode
-        // You can't create nodes with HTML entities. Use unicode values instead.
-        htmlElement.appendChild(document.createTextNode(textContent));
-      } else {
-        htmlElement.appendChild(createBrowserDomForReactElement(child));
-      }
-    });
-  }
-
   setAttributesAndProperties(reactElement, htmlElement);
 
   return htmlElement;

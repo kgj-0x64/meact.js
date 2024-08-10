@@ -76,7 +76,7 @@ function createBrowserDomForReactElement(reactElement) {
   /// render tree nodes which is not meant for browser DOM
 
   if (reactElement.type === "NullComponent") {
-    // browser DOM shouldn't know it since it's just meant to hold a child position in the render tree
+    // let's add it to the browser DOM and let it hold a child position there as well
     const nullElement = document.createElement("div");
     nullElement.setAttribute(elementRenderId, reactElement.id);
     // `display: none` turns off the display of an element so that it has no effect on layout
@@ -115,15 +115,12 @@ function createBrowserDomForReactElement(reactElement) {
     reactElement.children.forEach((child) => {
       if (child.name === "text") {
         const textContent = child.props.content;
-        // we're not using `document.createTextNode` because it doesn't handle HTML entities
-        // unlike creating a Text Node using `document.createTextNode`,
-        // setting innerHTML handles both Unicode characters and HTML entities
-        // ! BUG: with overwriting `innerHTML`
+        // ! BUG: when overwriting `innerHTML` so as to handle both Unicode characters and HTML entities
         // ```createElement("b", null, "Note: ", createElement("code", null, "filterTodos"), " is artificially slowed down!")```
         // will produce ```<b data-render-id="b-10"> is artificially slowed down!</b>```
 
         // Solution: https://stackoverflow.com/questions/20941956/how-to-insert-html-entities-with-createtextnode
-        // You can't create nodes with HTML entities. Your alternatives would be to use unicode values
+        // You can't create nodes with HTML entities. Use unicode values instead.
         htmlElement.appendChild(document.createTextNode(textContent));
       } else {
         htmlElement.appendChild(createBrowserDomForReactElement(child));
