@@ -11,3 +11,7 @@ When you append a `DocumentFragment` to the DOM, its children are appended, but 
 We need to maintain a data structure containing information about parent-children relations with positional info.
 
 Because if we don't add corresponding DOM elements for "ReactComponent" or "Fragment" type render tree nodes, then their children get added to an appropriate DOM element
+
+**ISSUE:**
+
+- I keep forgetting to re-generate the bundle after editing code.

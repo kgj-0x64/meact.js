@@ -1,15 +1,15 @@
-/*@jsxRuntime automatic*/
-/*@jsxImportSource meact*/
 /*A comment!*/
+import {
+  Fragment as _Fragment,
+  jsx as _jsx,
+  jsxs as _jsxs,
+} from "@meact/jsx-runtime";
 import { GreetingApp } from "@src/components.jsx";
-export const Local = (props) => (
-  <span
-    style={{
-      color: "red",
-    }}
-    {...props}
-  />
-);
+export const Local = (props) =>
+  _jsx("span", {
+    style: "color: red",
+    children: props.children,
+  });
 function _createMdxContent(props) {
   const _components = {
     a: "a",
@@ -32,108 +32,166 @@ function _createMdxContent(props) {
     ul: "ul",
     ...props.components,
   };
-  return (
-    <>
-      <_components.h1>{"Heading (rank 1)"}</_components.h1>
-      {"\n"}
-      {}
-      {"\n"}
-      {"\n"}
-      <_components.p>{"An external component:"}</_components.p>
-      {"\n"}
-      <GreetingApp />
-      {"\n"}
-      <_components.p>
-        {"and a "}
-        <Local>{"local one"}</Local>
-        {"."}
-      </_components.p>
-      {"\n"}
-      <_components.h2>{"Heading 2"}</_components.h2>
-      {"\n"}
-      <_components.h3>{"3"}</_components.h3>
-      {"\n"}
-      <_components.h4>{"4"}</_components.h4>
-      {"\n"}
-      <_components.h5>{"5"}</_components.h5>
-      {"\n"}
-      <_components.h6>{"6"}</_components.h6>
-      {"\n"}
-      <div class="note">
-        <_components.blockquote>
-          {"\n"}
-          <_components.p>
-            {"And here is "}
-            <_components.em>{"markdown"}</_components.em>
-            {" in "}
-            <_components.strong>{"JSX"}</_components.strong>
-            {"!"}
-          </_components.p>
-          {"\n"}
-        </_components.blockquote>
-      </div>
-      {"\n"}
-      <_components.p>
-        <abbr title="HyperText Markup Language">{"HTML"}</abbr>
-        {" is a lovely language."}
-      </_components.p>
-      {"\n"}
-      <section>
-        {"Two 🍰 is: "}
-        {Math.PI * 2}
-      </section>
-      {"\n"}
-      <_components.ul>
-        {"\n"}
-        <_components.li>{"Unordered"}</_components.li>
-        {"\n"}
-        <_components.li>{"List"}</_components.li>
-        {"\n"}
-      </_components.ul>
-      {"\n"}
-      <_components.ol>
-        {"\n"}
-        <_components.li>{"Ordered"}</_components.li>
-        {"\n"}
-        <_components.li>{"List"}</_components.li>
-        {"\n"}
-      </_components.ol>
-      {"\n"}
-      <_components.p>
-        {"A paragraph, introducing a thematic break:"}
-      </_components.p>
-      {"\n"}
-      <_components.hr />
-      {"\n"}
-      <_components.pre>
-        <_components.code className="language-js">
-          {"some.code();\n"}
-        </_components.code>
-      </_components.pre>
-      {"\n"}
-      <_components.p>
-        {"a "}
-        <_components.a href="https://example.com">{"link"}</_components.a>
-        {", an "}
-        <_components.img src="./image.png" alt="image" />
-        {", some "}
-        <_components.em>{"emphasis"}</_components.em>
-        {",\r\nsomething "}
-        <_components.strong>{"strong"}</_components.strong>
-        {", and finally a little "}
-        <_components.code>{"code()"}</_components.code>
-        {"."}
-      </_components.p>
-    </>
-  );
+  return _jsxs(_Fragment, {
+    children: [
+      _jsx(_components.h1, {
+        children: "Heading (rank 1)",
+      }),
+      "\n",
+      "\n",
+      "\n",
+      _jsx(_components.p, {
+        children: "An external component:",
+      }),
+      "\n",
+      _jsx(GreetingApp, {}),
+      "\n",
+      _jsxs(_components.p, {
+        children: [
+          "and a ",
+          _jsx(Local, {
+            children: "local one",
+          }),
+          ".",
+        ],
+      }),
+      "\n",
+      _jsx(_components.h2, {
+        children: "Heading 2",
+      }),
+      "\n",
+      _jsx(_components.h3, {
+        children: "Heading 3",
+      }),
+      "\n",
+      _jsx(_components.h4, {
+        children: "Heading 4",
+      }),
+      "\n",
+      _jsx(_components.h5, {
+        children: "Heading 5",
+      }),
+      "\n",
+      _jsx(_components.h6, {
+        children: "Heading 6",
+      }),
+      "\n",
+      _jsx("div", {
+        class: "note",
+        children: _jsxs(_components.blockquote, {
+          children: [
+            "\n",
+            _jsxs(_components.p, {
+              children: [
+                "And here is ",
+                _jsx(_components.em, {
+                  children: "markdown",
+                }),
+                " in ",
+                _jsx(_components.strong, {
+                  children: "JSX",
+                }),
+                "!",
+              ],
+            }),
+            "\n",
+          ],
+        }),
+      }),
+      "\n",
+      _jsxs(_components.p, {
+        children: [
+          _jsx("abbr", {
+            title: "HyperText Markup Language",
+            children: "HTML",
+          }),
+          " is a lovely language.",
+        ],
+      }),
+      "\n",
+      _jsxs("section", {
+        children: ["Two 🍰 is: ", Math.PI * 2],
+      }),
+      "\n",
+      _jsxs(_components.ul, {
+        children: [
+          "\n",
+          _jsx(_components.li, {
+            children: "Unordered",
+          }),
+          "\n",
+          _jsx(_components.li, {
+            children: "List",
+          }),
+          "\n",
+        ],
+      }),
+      "\n",
+      _jsxs(_components.ol, {
+        children: [
+          "\n",
+          _jsx(_components.li, {
+            children: "Ordered",
+          }),
+          "\n",
+          _jsx(_components.li, {
+            children: "List",
+          }),
+          "\n",
+        ],
+      }),
+      "\n",
+      _jsx(_components.p, {
+        children: "A paragraph, introducing a thematic break:",
+      }),
+      "\n",
+      _jsx(_components.hr, {}),
+      "\n",
+      _jsx(_components.pre, {
+        children: _jsx(_components.code, {
+          class: "language-js",
+          children: "some.code();\n",
+        }),
+      }),
+      "\n",
+      _jsxs(_components.p, {
+        children: [
+          "a ",
+          _jsx(_components.a, {
+            href: "https://example.com",
+            children: "link",
+          }),
+          ", an ",
+          _jsx(_components.img, {
+            src: "./image.png",
+            alt: "image",
+          }),
+          ", some ",
+          _jsx(_components.em, {
+            children: "emphasis",
+          }),
+          ",\r\nsomething ",
+          _jsx(_components.strong, {
+            children: "strong",
+          }),
+          ", and finally a little ",
+          _jsx(_components.code, {
+            children: "code()",
+          }),
+          ".",
+        ],
+      }),
+    ],
+  });
 }
 export default function MDXContent(props = {}) {
   const { wrapper: MDXLayout } = props.components || {};
-  return MDXLayout ? (
-    <MDXLayout {...props}>
-      <_createMdxContent {...props} />
-    </MDXLayout>
-  ) : (
-    _createMdxContent(props)
-  );
+  return MDXLayout
+    ? _jsx(MDXLayout, {
+        ...props,
+        children: _jsx(_createMdxContent, {
+          ...props,
+        }),
+      })
+    : _createMdxContent(props);
 }

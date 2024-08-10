@@ -161,7 +161,7 @@ function createBrowserDomForReactElement(
     // Solution: https://stackoverflow.com/questions/20941956/how-to-insert-html-entities-with-createtextnode
     // You can't create nodes with HTML entities. Use unicode values instead.
 
-    const textContent = child.props.content;
+    const textContent = reactElement.props.content;
     return document.createTextNode(textContent);
   }
 

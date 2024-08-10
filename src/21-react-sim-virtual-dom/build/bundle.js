@@ -29,6 +29,24 @@ var MdxToJsxBuild = (() => {
     default: () => MDXContent,
   });
 
+  // meact/jsx-runtime.js
+  function Fragment(props) {
+    return props.children;
+  }
+  function jsx(type, props, key) {
+    const { children, restOfProps } = props;
+    const propsObject = key === void 0 ? restOfProps : { ...restOfProps, key };
+    const child =
+      Array.isArray(children) && children.length > 0 ? children[0] : children;
+    return createElement(type, propsObject, child);
+  }
+  function jsxs(type, props, key) {
+    const { children, restOfProps } = props;
+    const propsObject = key === void 0 ? restOfProps : { ...restOfProps, key };
+    const childrenArray = Array.isArray(children) ? children : [];
+    return createElement(type, propsObject, ...childrenArray);
+  }
+
   // src/components.jsx
   function GreetingApp() {
     const [name, setName] = useState("");
@@ -90,26 +108,11 @@ var MdxToJsxBuild = (() => {
     );
   }
 
-  // meact/jsx-runtime.js
-  function Fragment() {
-    return "Fragment";
-  }
-  function jsx(type, props, key) {
-    const { children, restOfProps } = props;
-    return createElement(type, { ...restOfProps, key }, children);
-  }
-  function jsxs(type, props, key) {
-    const { children, restOfProps } = props;
-    return createElement(type, { ...restOfProps, key }, ...children);
-  }
-
   // build/temp.mdx.js
   var Local = (props) =>
-    /* @__PURE__ */ jsx("span", {
-      style: {
-        color: "red",
-      },
-      ...props,
+    jsx("span", {
+      style: "color: red",
+      children: props.children,
     });
   function _createMdxContent(props) {
     const _components = {
@@ -133,47 +136,65 @@ var MdxToJsxBuild = (() => {
       ul: "ul",
       ...props.components,
     };
-    return /* @__PURE__ */ jsxs(Fragment, {
+    return jsxs(Fragment, {
       children: [
-        /* @__PURE__ */ jsx(_components.h1, { children: "Heading (rank 1)" }),
+        jsx(_components.h1, {
+          children: "Heading (rank 1)",
+        }),
         "\n",
         "\n",
         "\n",
-        /* @__PURE__ */ jsx(_components.p, {
+        jsx(_components.p, {
           children: "An external component:",
         }),
         "\n",
-        /* @__PURE__ */ jsx(GreetingApp, {}),
+        jsx(GreetingApp, {}),
         "\n",
-        /* @__PURE__ */ jsxs(_components.p, {
+        jsxs(_components.p, {
           children: [
             "and a ",
-            /* @__PURE__ */ jsx(Local, { children: "local one" }),
+            jsx(Local, {
+              children: "local one",
+            }),
             ".",
           ],
         }),
         "\n",
-        /* @__PURE__ */ jsx(_components.h2, { children: "Heading 2" }),
+        jsx(_components.h2, {
+          children: "Heading 2",
+        }),
         "\n",
-        /* @__PURE__ */ jsx(_components.h3, { children: "3" }),
+        jsx(_components.h3, {
+          children: "Heading 3",
+        }),
         "\n",
-        /* @__PURE__ */ jsx(_components.h4, { children: "4" }),
+        jsx(_components.h4, {
+          children: "Heading 4",
+        }),
         "\n",
-        /* @__PURE__ */ jsx(_components.h5, { children: "5" }),
+        jsx(_components.h5, {
+          children: "Heading 5",
+        }),
         "\n",
-        /* @__PURE__ */ jsx(_components.h6, { children: "6" }),
+        jsx(_components.h6, {
+          children: "Heading 6",
+        }),
         "\n",
-        /* @__PURE__ */ jsx("div", {
+        jsx("div", {
           class: "note",
-          children: /* @__PURE__ */ jsxs(_components.blockquote, {
+          children: jsxs(_components.blockquote, {
             children: [
               "\n",
-              /* @__PURE__ */ jsxs(_components.p, {
+              jsxs(_components.p, {
                 children: [
                   "And here is ",
-                  /* @__PURE__ */ jsx(_components.em, { children: "markdown" }),
+                  jsx(_components.em, {
+                    children: "markdown",
+                  }),
                   " in ",
-                  /* @__PURE__ */ jsx(_components.strong, { children: "JSX" }),
+                  jsx(_components.strong, {
+                    children: "JSX",
+                  }),
                   "!",
                 ],
               }),
@@ -182,9 +203,9 @@ var MdxToJsxBuild = (() => {
           }),
         }),
         "\n",
-        /* @__PURE__ */ jsxs(_components.p, {
+        jsxs(_components.p, {
           children: [
-            /* @__PURE__ */ jsx("abbr", {
+            jsx("abbr", {
               title: "HyperText Markup Language",
               children: "HTML",
             }),
@@ -192,61 +213,75 @@ var MdxToJsxBuild = (() => {
           ],
         }),
         "\n",
-        /* @__PURE__ */ jsxs("section", {
+        jsxs("section", {
           children: ["Two \u{1F370} is: ", Math.PI * 2],
         }),
         "\n",
-        /* @__PURE__ */ jsxs(_components.ul, {
+        jsxs(_components.ul, {
           children: [
             "\n",
-            /* @__PURE__ */ jsx(_components.li, { children: "Unordered" }),
+            jsx(_components.li, {
+              children: "Unordered",
+            }),
             "\n",
-            /* @__PURE__ */ jsx(_components.li, { children: "List" }),
+            jsx(_components.li, {
+              children: "List",
+            }),
             "\n",
           ],
         }),
         "\n",
-        /* @__PURE__ */ jsxs(_components.ol, {
+        jsxs(_components.ol, {
           children: [
             "\n",
-            /* @__PURE__ */ jsx(_components.li, { children: "Ordered" }),
+            jsx(_components.li, {
+              children: "Ordered",
+            }),
             "\n",
-            /* @__PURE__ */ jsx(_components.li, { children: "List" }),
+            jsx(_components.li, {
+              children: "List",
+            }),
             "\n",
           ],
         }),
         "\n",
-        /* @__PURE__ */ jsx(_components.p, {
+        jsx(_components.p, {
           children: "A paragraph, introducing a thematic break:",
         }),
         "\n",
-        /* @__PURE__ */ jsx(_components.hr, {}),
+        jsx(_components.hr, {}),
         "\n",
-        /* @__PURE__ */ jsx(_components.pre, {
-          children: /* @__PURE__ */ jsx(_components.code, {
-            className: "language-js",
+        jsx(_components.pre, {
+          children: jsx(_components.code, {
+            class: "language-js",
             children: "some.code();\n",
           }),
         }),
         "\n",
-        /* @__PURE__ */ jsxs(_components.p, {
+        jsxs(_components.p, {
           children: [
             "a ",
-            /* @__PURE__ */ jsx(_components.a, {
+            jsx(_components.a, {
               href: "https://example.com",
               children: "link",
             }),
             ", an ",
-            /* @__PURE__ */ jsx(_components.img, {
+            jsx(_components.img, {
               src: "./image.png",
               alt: "image",
             }),
             ", some ",
-            /* @__PURE__ */ jsx(_components.em, { children: "emphasis" }),
+            jsx(_components.em, {
+              children: "emphasis",
+            }),
             ",\r\nsomething ",
-            /* @__PURE__ */ jsx(_components.strong, { children: "strong" }),
+            jsx(_components.strong, {
+              children: "strong",
+            }),
             ", and finally a little ",
-            /* @__PURE__ */ jsx(_components.code, { children: "code()" }),
+            jsx(_components.code, {
+              children: "code()",
+            }),
             ".",
           ],
         }),
@@ -256,9 +291,11 @@ var MdxToJsxBuild = (() => {
   function MDXContent(props = {}) {
     const { wrapper: MDXLayout } = props.components || {};
     return MDXLayout
-      ? /* @__PURE__ */ jsx(MDXLayout, {
+      ? jsx(MDXLayout, {
           ...props,
-          children: /* @__PURE__ */ jsx(_createMdxContent, { ...props }),
+          children: jsx(_createMdxContent, {
+            ...props,
+          }),
         })
       : _createMdxContent(props);
   }

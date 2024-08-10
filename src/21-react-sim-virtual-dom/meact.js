@@ -295,13 +295,14 @@ class ReactElement {
 function createElement(element, props, ...children) {
   if (
     !(
-      value === null ||
-      typeof value === "function" ||
-      typeof value === "string"
+      element === null ||
+      typeof element === "string" ||
+      typeof element === "function" ||
+      element instanceof MemoizedFn
     )
   ) {
     throw new Error(
-      "Invalid argument: element must be null, function, or string"
+      "Invalid argument of createElement: element must be null, string, function, or memoized function"
     );
   }
 
@@ -317,6 +318,11 @@ function createElement(element, props, ...children) {
       ? element.name
       : element
     : "null";
+  // handle case where explicit `undefined` is sent as the last argument
+  const childrenArray =
+    Array.isArray(children) && children.length > 0 && children[0] !== undefined
+      ? children
+      : [];
 
   // if it's a null element
   if (!element) {
@@ -337,7 +343,7 @@ function createElement(element, props, ...children) {
       });
     }
 
-    return createElement(memoizedFunction, props, ...children);
+    return createElement(memoizedFunction, props, ...childrenArray);
   }
 
   if (typeof element === "function") {
@@ -356,19 +362,23 @@ function createElement(element, props, ...children) {
       propsObject,
       [],
       // snapshot of children elements passed by the parent component via props
-      children
+      childrenArray
     );
-
-    // if is this a Fragment function
-    if (element.name === "Fragment") {
-      reactComponent.children = element({ children }); // returns an array of ReactElement nodes
-      return reactComponent;
-    }
 
     // if this is happening within a re-render, don't call the function just yet
     // check whether it should be hijacked for just passing the arguments to
     // `updateSubtreeForElement` for mount/unmount decisions and updated set of children
     if (rerenderMonitor.isCreateElementFunctionHijacked()) {
+      return reactComponent;
+    }
+
+    // if is this a Fragment function
+    if (element.name === "Fragment") {
+      const returnedChildrenArray = element({ children: childrenArray }); // returns back this childrenArray
+      const childrenElements = createChildrenElementsHelper(
+        returnedChildrenArray
+      );
+      reactComponent.children = childrenElements;
       return reactComponent;
     }
 
@@ -387,7 +397,7 @@ function createElement(element, props, ...children) {
     // to create args, add children, if any, into props
     const functionArgs = {
       ...propsObject,
-      children,
+      children: childrenArray,
     };
 
     // call the function to get the evaluated ReactElement output through its return block
@@ -410,11 +420,27 @@ function createElement(element, props, ...children) {
   }
 
   /// else
-  let childrenElements = [];
+  const childrenElements = createChildrenElementsHelper(childrenArray);
 
-  if (children !== undefined && children && children.length > 0) {
-    for (let i = 0; i < children.length; i++) {
-      const child = children[i];
+  const htmlElement = new ReactElement(
+    type,
+    name,
+    propsObject,
+    childrenElements
+  );
+  return htmlElement;
+}
+
+/**
+ *
+ * @param {Array} childrenArray
+ * @returns {Array}
+ */
+function createChildrenElementsHelper(childrenArray) {
+  let childrenElements = [];
+  if (childrenArray.length > 0) {
+    for (let i = 0; i < childrenArray.length; i++) {
+      const child = childrenArray[i];
 
       // child is either `createElement()` call or text content
       const childElement =
@@ -426,13 +452,7 @@ function createElement(element, props, ...children) {
     }
   }
 
-  const htmlElement = new ReactElement(
-    type,
-    name,
-    propsObject,
-    childrenElements
-  );
-  return htmlElement;
+  return childrenElements;
 }
 
 // 1.

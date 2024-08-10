@@ -65,7 +65,7 @@ async function transformMdxIntoJsx(mdxFile) {
     write: true, // Write the result to the output file
     alias: {
       // Alias for meact/jsx-runtime to ensure it's correctly resolved
-      "meact/jsx-runtime": path.resolve(process.cwd(), "meact/jsx-runtime.js"),
+      "@meact/jsx-runtime": path.resolve(process.cwd(), "meact/jsx-runtime.js"),
       // Alias for any other local paths if needed
       "@src": path.resolve(process.cwd(), "src"),
     },
