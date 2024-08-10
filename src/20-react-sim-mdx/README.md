@@ -1,5 +1,7 @@
 # MDX
 
+https://www.telerik.com/blogs/asts-markdown-and-mdx
+
 ## Steps
 
 ### 1. JSX Runtime
@@ -48,3 +50,38 @@ BUT type="module" causes another ISSUE:
 Access to script at 'file:///D:/fundamentals/advanced-react/src/20-react-sim-mdx/build/components.js' from origin 'null' has been blocked by CORS policy: Cross origin requests are only supported for protocol schemes: http, data, isolated-app, chrome-extension, chrome, https, chrome-untrusted.
 
 NOT WORKING
+
+---
+
+When you compile MDX that includes imports from other JSX components, you need to handle those dependencies properly. The issue you’re encountering is that esbuild is including require statements, which are not understood by the browser. Instead, you need to ensure that all imported components are included in the final output in a way that’s compatible with the IIFE format.
+
+Here’s how to adjust the compileMDX function to handle such scenarios:
+
+1. `bundle: true`: This option ensures that all imported modules are included in the final output. It will bundle all dependencies into a single file, so you won't see require statements in the final output.
+2. Format as IIFE: By using format: "iife", you ensure that the output is wrapped in an Immediately Invoked Function Expression, which allows it to run directly in the browser.
+
+---
+
+Now I am left with the following error on running compileMDX function:
+
+```
+X [ERROR] Could not resolve "./src/components.jsx"
+
+    build/temp.mdx.js:4:26:
+      4 │ import {GreetingApp} from "./src/components.jsx";
+        ╵                           ~~~~~~~~~~~~~~~~~~~~~~
+
+X [ERROR] Could not resolve "meact/jsx-runtime"
+
+    build/temp.mdx.js:5:30:
+      5 │ export const Local = props => <span style={{
+```
+
+That is, `temp.mdx.js` is copying import path as it is which eventually leads to error during esbuild's build call.
+
+--> The issue arises because the paths in the temporary temp.mdx.js file are not automatically resolved relative to the project structure when using esbuild. This causes esbuild to fail when trying to resolve imports like ./src/components.jsx and meact/jsx-runtime.
+
+To resolve this issue, you need to do the following:
+
+Resolve Import Paths: Make sure the paths in the temporary file are correct and can be resolved by esbuild.
+Provide a jsxImportSource Alias: Make sure meact/jsx-runtime is correctly referenced during the compilation.

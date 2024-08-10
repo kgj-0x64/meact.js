@@ -1,5 +1,5 @@
 let nextId = 0;
-function getnewElementId(elementName) {
+function getNewElementId(elementName) {
   const id = nextId++;
   const instanceId = `${elementName.toLowerCase()}-${id}`;
   return instanceId;
@@ -8,7 +8,7 @@ function getnewElementId(elementName) {
 class ReactElement {
   constructor(type, name, props = {}, children = []) {
     // ID of this element to uniquely identify an instance of it
-    this.id = getnewElementId(name);
+    this.id = getNewElementId(name);
     // type of this element
     this.type = type; // null | "ReactComponent" | "HtmlElement"
     // name of this element

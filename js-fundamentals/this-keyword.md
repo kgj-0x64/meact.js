@@ -11,7 +11,7 @@ In JavaScript, the behavior of this inside a function can vary based on whether 
 ```js
 class ReactElement {
   constructor() {
-    this.id = getnewElementId(name);
+    this.id = getNewElementId(name);
     this.stateManager =
       type === "ReactComponent"
         ? {
@@ -40,7 +40,7 @@ Whereas, I get this error on the console for this second example:
 ```js
 class ReactElement {
   constructor() {
-    this.id = getnewElementId(name);
+    this.id = getNewElementId(name);
     this.stateManager =
       type === "ReactComponent"
         ? {

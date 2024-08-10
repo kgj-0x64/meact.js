@@ -7,7 +7,7 @@ const targetNodeInBrowserDom = document.getElementById("root");
 const browserDomPainterAtTargetNode = createRoot(targetNodeInBrowserDom);
 
 // get the root node of React's render tree
-const renderThisReactNodeAtTarget = createElement(MDXContent);
+const renderThisReactNodeAtTarget = MdxToJsxBuild.default();
 
 // display this render tree at the target node of browser DOM
 browserDomPainterAtTargetNode.render(renderThisReactNodeAtTarget);

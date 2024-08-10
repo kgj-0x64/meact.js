@@ -121,6 +121,7 @@ function createBrowserDomForReactElement(reactElement) {
     htmlElement = document.createElement(reactElement.name);
   }
 
+  console.log("htmlElement", htmlElement);
   htmlElement.setAttribute(elementRenderId, reactElement.id);
 
   /**

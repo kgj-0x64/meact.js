@@ -4,7 +4,7 @@
  * @returns {string}
  */
 let nextId = 0;
-function getnewElementId(elementName) {
+function getNewElementId(elementName) {
   const id = nextId++;
   const instanceId = `${
     elementName ? elementName.toLowerCase() : "null"
@@ -122,7 +122,7 @@ class ReactElement {
     propChildrenSnapshot = undefined
   ) {
     // ID of this element to uniquely identify an instance of it
-    this.id = getnewElementId(name);
+    this.id = getNewElementId(name);
     // type of this element
     this.type = type;
     // name of this element
