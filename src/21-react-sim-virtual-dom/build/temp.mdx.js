@@ -37,15 +37,10 @@ function _createMdxContent(props) {
       _jsx(_components.h1, {
         children: "Heading (rank 1)",
       }),
-      "\n",
-      "\n",
-      "\n",
       _jsx(_components.p, {
         children: "An external component:",
       }),
-      "\n",
       _jsx(GreetingApp, {}),
-      "\n",
       _jsxs(_components.p, {
         children: [
           "and a ",
@@ -55,32 +50,25 @@ function _createMdxContent(props) {
           ".",
         ],
       }),
-      "\n",
       _jsx(_components.h2, {
         children: "Heading 2",
       }),
-      "\n",
       _jsx(_components.h3, {
         children: "Heading 3",
       }),
-      "\n",
       _jsx(_components.h4, {
         children: "Heading 4",
       }),
-      "\n",
       _jsx(_components.h5, {
         children: "Heading 5",
       }),
-      "\n",
       _jsx(_components.h6, {
         children: "Heading 6",
       }),
-      "\n",
       _jsx("div", {
         class: "note",
         children: _jsxs(_components.blockquote, {
           children: [
-            "\n",
             _jsxs(_components.p, {
               children: [
                 "And here is ",
@@ -98,7 +86,6 @@ function _createMdxContent(props) {
           ],
         }),
       }),
-      "\n",
       _jsxs(_components.p, {
         children: [
           _jsx("abbr", {
@@ -108,52 +95,41 @@ function _createMdxContent(props) {
           " is a lovely language.",
         ],
       }),
-      "\n",
       _jsxs("section", {
         children: ["Two 🍰 is: ", Math.PI * 2],
       }),
-      "\n",
       _jsxs(_components.ul, {
         children: [
-          "\n",
           _jsx(_components.li, {
             children: "Unordered",
           }),
-          "\n",
           _jsx(_components.li, {
             children: "List",
           }),
           "\n",
         ],
       }),
-      "\n",
       _jsxs(_components.ol, {
         children: [
-          "\n",
           _jsx(_components.li, {
             children: "Ordered",
           }),
-          "\n",
           _jsx(_components.li, {
             children: "List",
           }),
           "\n",
         ],
       }),
-      "\n",
       _jsx(_components.p, {
         children: "A paragraph, introducing a thematic break:",
       }),
-      "\n",
       _jsx(_components.hr, {}),
-      "\n",
       _jsx(_components.pre, {
         children: _jsx(_components.code, {
           class: "language-js",
           children: "some.code();\n",
         }),
       }),
-      "\n",
       _jsxs(_components.p, {
         children: [
           "a ",

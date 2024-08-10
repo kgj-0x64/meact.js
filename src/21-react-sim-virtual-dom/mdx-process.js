@@ -47,9 +47,10 @@ async function transformMdxIntoJsx(mdxFile) {
 
   // get the compiled value using MDX.js library
   const compiledValue = await compileMDX(mdxSource);
+  const sanitizedCompiledValue = compiledValue.replaceAll(`\"\\n\",`, "");
 
   // Write the compiled JSX code to the temporary file
-  fs.writeFileSync(tempFilePath, compiledValue);
+  fs.writeFileSync(tempFilePath, sanitizedCompiledValue);
 
   // Instead of using transform, which is intended for transforming code without bundling,
   // you should use the build function from esbuild directly to handle both the transformation and bundling in one go.
