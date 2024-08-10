@@ -25,6 +25,8 @@ var MdxToJsxBuild = (() => {
   // build/temp.mdx.js
   var temp_mdx_exports = {};
   __export(temp_mdx_exports, {
+    Greeting: () => Greeting,
+    GreetingApp: () => GreetingApp,
     Local: () => Local,
     default: () => MDXContent,
   });

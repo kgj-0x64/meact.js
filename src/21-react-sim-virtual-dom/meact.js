@@ -505,8 +505,8 @@ function updateSubtreeForElement(
     // call the function with props from last render
     const functionName = subtreeRootNode.name;
 
-    // sanity check
-    if (typeof window[functionName] !== "function") {
+    // access function from build's namespace instead of `window` namespace
+    if (typeof MdxToJsxBuild[functionName] !== "function") {
       console.log(`${functionName} is not a function`);
       return;
     }
@@ -561,7 +561,7 @@ function updateSubtreeForElement(
     reactComponentForHooks = subtreeRootNode;
 
     // call this function to execute the component definition
-    subtreeRootNodeChildRecalculated = window[functionName].call(
+    subtreeRootNodeChildRecalculated = MdxToJsxBuild[functionName].call(
       null,
       functionArgs
     );

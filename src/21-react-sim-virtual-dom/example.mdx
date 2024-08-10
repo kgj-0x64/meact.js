@@ -1,12 +1,9 @@
-import { GreetingApp } from "@src/components.jsx";
+import { GreetingApp, Greeting } from "@src/components.jsx";
 
 # Heading (rank 1)
 
-{/* A comment! */}
-
-export const Local = (props) => (
-  <span style="color:Tomato;">{props.children}</span>
-);
+{/* Only exported values or functions are callable from the window namespace. */}
+export const Local = (props) => <span style="color:Tomato;">{props.children}</span>
 
 An external component:
 
@@ -49,3 +46,5 @@ some.code();
 
 a [link](https://example.com), an ![image](./image.png), some _emphasis_,
 something **strong**, and finally a little `code()`.
+
+export { GreetingApp, Greeting };

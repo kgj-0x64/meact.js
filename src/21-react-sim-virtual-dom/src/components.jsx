@@ -23,7 +23,7 @@ export function GreetingApp() {
 
 const MemoizedGreeting = memo(Greeting);
 
-function Greeting({ name }) {
+export function Greeting({ name }) {
   console.log("Greeting was rendered at", new Date().toLocaleTimeString());
 
   const [count, setCount] = useState(0);

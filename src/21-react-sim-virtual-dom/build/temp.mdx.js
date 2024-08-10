@@ -1,15 +1,16 @@
-/*A comment!*/
+/*Only exported values or functions are callable from the window namespace.*/
 import {
   Fragment as _Fragment,
   jsx as _jsx,
   jsxs as _jsxs,
 } from "@meact/jsx-runtime";
-import { GreetingApp } from "@src/components.jsx";
+import { GreetingApp, Greeting } from "@src/components.jsx";
 export const Local = (props) =>
   _jsx("span", {
     style: "color:Tomato;",
     children: props.children,
   });
+export { GreetingApp, Greeting };
 function _createMdxContent(props) {
   const _components = {
     a: "a",

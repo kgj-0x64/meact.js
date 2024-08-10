@@ -15,3 +15,5 @@ Because if we don't add corresponding DOM elements for "ReactComponent" or "Frag
 **ISSUE:**
 
 - I keep forgetting to re-generate the bundle after editing code.
+
+- Note: component's function definitions are not available in the global `window` namespace for them to be called directly during re-rendering, but they are available in the `MdxToJsxBuild` namespace
