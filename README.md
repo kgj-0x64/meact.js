@@ -1,5 +1,7 @@
 # Meact.js Design
 
+Meact.js = My (implementation of) React.js
+
 ## Scope (in order)
 
 - [x] Functional Components with Template String
@@ -15,10 +17,13 @@
 - [x] `useMemo`: caches expensive calculations or references to arrays/objects/functions so that they (their references) are not recreated across re-renders and thus not reflected as "updates" in the browser DOM
 - [x] `useCallback` (redundant after `useMemo`)
 - [x] `memo`: force stops reredering of a child subtree when a parent rerenders
-- [x] Virtual DOM
-- [x] JSX and JSX Runtime API
-- [x] Esbuild Bundler
-- [x] MDX Support
+- [x] DIFF Re-rendering
+- [x] JSX Syntax
+- [x] Esbuild Bundler (to manually compile JSX)
+- [x] JSX Runtime Factory/API
+- [x] Virtual DOM Nodes (i.e. `DocumentFragment`)
+- [x] MDX Support (manually compiled with Esbuild)
+- [] Build Automation
 
 ### Constraints
 
@@ -48,15 +53,17 @@ In order to do CRUD operations on the browser DOM for target `ReactElement` node
 
   - [JSX vs Template Literals](https://facebook.github.io/jsx/#sec-why-not-template-literals)
 
-- To write modern JavaScript which is not natively understood by older browsers, thus needs a transpiler
+- To write modern JavaScript which is [not natively understood by older browsers](https://esbuild.github.io/api/#target) needs a transformer.
 
   - E.g. use of different module systems (e.g., CommonJS, ES modules)
 
-- To package (or bundle) multiple JavaScript files by resolving their dependencies into a single file (or a few files) that can be efficiently loaded by a web browser
+- To package (or bundle) multiple JavaScript files by resolving their dependencies into a single file (or a few files) that can be efficiently loaded by a web browser.
+
+  - [To bundle a file means to inline any imported dependencies into the file itself.](https://esbuild.github.io/api/#bundle) This process is recursive so dependencies of dependencies (and so on) will also be inlined. By default esbuild will not bundle the input files.
 
 ### Why do we need a Build Setup
 
-- I keep forgetting to re-generate the bundle after editing code, besides it being a unproductive flow-breaker.
+- I keep forgetting to re-generate the bundle after editing code, besides it being a unproductive flow-breaker. So, ["live reload"](https://esbuild.github.io/api/#live-reload) would be much appreciated!
 
 ## Out of Scope
 
