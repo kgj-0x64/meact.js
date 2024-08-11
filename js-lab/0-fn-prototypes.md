@@ -1,4 +1,4 @@
-# Prototypes
+# Functions and Prototypes
 
 ## In JavaScript, is a function an object?
 
@@ -14,7 +14,17 @@ Here are some key points that illustrate how functions in JavaScript are treated
    console.log(example.name); // Output: "example"
    ```
 
-2. **Assigning Functions to Variables**: Functions can be assigned to variables, stored in arrays, or added as properties of other objects.
+2. **Callable Object**: Functions are callable objects, meaning they can be invoked using the `()` operator. This is what distinguishes them from other objects.
+
+   ```javascript
+   function sayHello() {
+     console.log("Hello!");
+   }
+
+   sayHello(); // Output: "Hello!"
+   ```
+
+3. **First-Class Functions**: JavaScript functions are first-class citizens. This means they can be passed as arguments to other functions, returned from functions, and assigned to variables, stored in arrays, or added as properties of other objects.
 
    ```javascript
    const myFunction = function () {
@@ -27,8 +37,6 @@ Here are some key points that illustrate how functions in JavaScript are treated
 
    obj.method(); // Output: "Hello, world!"
    ```
-
-3. **First-Class Functions**: JavaScript functions are first-class citizens. This means they can be passed as arguments to other functions, returned from functions, and assigned to variables.
 
    ```javascript
    function greet(name) {
@@ -64,29 +72,15 @@ Here are some key points that illustrate how functions in JavaScript are treated
    dog.speak(); // Output: "Animal speaks"
    ```
 
-6. **Callable Object**: Functions are callable objects, meaning they can be invoked using the `()` operator. This is what distinguishes them from other objects.
+## Prototypes
 
-   ```javascript
-   function sayHello() {
-     console.log("Hello!");
-   }
+In JavaScript, prototypes and classes are two different but related ways to define and create objects.
 
-   sayHello(); // Output: "Hello!"
-   ```
+A prototype is an object from which other objects inherit properties. Every function in JavaScript has a `prototype` property, which is an object. This `prototype` object is used to build the `__proto__` property of new instances created by calling the function with the `new` keyword.
 
-In summary, while functions in JavaScript have unique characteristics that allow them to be invoked, they also share many features with regular objects, reinforcing the idea that functions are objects in JavaScript.
+### How Prototypes Work
 
-## Please elaborate on function's prototypes, and how is that different from classes?
-
-In JavaScript, prototypes and classes are two different but related ways to define and create objects. Here’s an in-depth look at both:
-
-### Prototypes
-
-A prototype is an object from which other objects inherit properties. Every function in JavaScript has a `prototype` property, which is an object. This prototype object is used to build the `__proto__` property of new instances created by calling the function with the `new` keyword.
-
-#### How Prototypes Work
-
-1. **Prototype Property**: When you define a function (which can be used as a constructor), it automatically gets a `prototype` property. This property is an object that will be used as the prototype for instances created with that constructor.
+1. **Prototype Property**: You can add properties and methods to the prototype at any time, and all instances will inherit them. When you define a function, it automatically gets a `prototype` property and can be used as a constructor. This property is an object that will be used as the prototype for instances created with that constructor.
 
    ```javascript
    function Animal(name) {
@@ -101,7 +95,7 @@ A prototype is an object from which other objects inherit properties. Every func
    dog.speak(); // Output: "Dog makes a noise."
    ```
 
-   Here, `dog` is an instance of `Animal`. When `dog.speak()` is called, JavaScript looks for the `speak` method on the `dog` object. If it doesn’t find it, it looks at `dog.__proto__`, which points to `Animal.prototype`.
+   Here, `dog` is an instance of `Animal`.
 
 2. **Prototype Chain**: If a property or method is not found on an object, JavaScript looks up the prototype chain. The `__proto__` property (or `[[Prototype]]` internal slot) points to the prototype object from which the object inherits.
 
@@ -109,21 +103,13 @@ A prototype is an object from which other objects inherit properties. Every func
    console.log(dog.__proto__ === Animal.prototype); // true
    ```
 
-3. **Adding Properties to the Prototype**: You can add properties and methods to the prototype at any time, and all instances will inherit them.
+   When `dog.speak()` is called, JavaScript looks for the `speak` method on the `dog` object. If it doesn't find it, it looks at `dog.__proto__`, which points to `Animal.prototype`.
 
-   ```javascript
-   Animal.prototype.eat = function () {
-     console.log(this.name + " is eating.");
-   };
+#### Classes
 
-   dog.eat(); // Output: "Dog is eating."
-   ```
+**JavaScript classes, introduced in ES6, provide a more intuitive and syntactically cleaner way to create constructor functions and manage inheritance. Under the hood, classes still use the prototype-based inheritance model.**
 
-### Classes
-
-JavaScript classes, introduced in ES6, provide a more intuitive and syntactically cleaner way to create constructor functions and manage inheritance. Under the hood, classes still use the prototype-based inheritance model.
-
-#### How Classes Work
+### How Classes Work
 
 1. **Class Syntax**: Classes use the `class` keyword to define a constructor and methods.
 
@@ -172,21 +158,19 @@ JavaScript classes, introduced in ES6, provide a more intuitive and syntacticall
    bulldog.speak(); // Output: "Bulldog barks."
    ```
 
-#### Differences Between Prototypes and Classes
+### Differences Between Prototypes and Classes
 
 1. **Syntax and Readability**: Class syntax is more concise and readable compared to the traditional prototype-based approach. It looks similar to classes in other object-oriented languages.
 
 2. **Syntactic Sugar**: Classes in JavaScript are syntactic sugar over the existing prototype-based inheritance. This means that classes do not introduce a new inheritance model; they just provide a cleaner syntax for creating objects and dealing with inheritance.
 
-3. **`constructor` Keyword**: In classes, the `constructor` keyword is used to define the constructor function, which is more intuitive than assigning methods to the prototype.
+3. **Static Methods**: Defining static methods in classes is straightforward using the `static` keyword, whereas, in the prototype-based approach, you manually attach these methods to the constructor function.
 
-4. **Static Methods**: Defining static methods in classes is straightforward using the `static` keyword, whereas, in the prototype-based approach, you manually attach these methods to the constructor function.
+4. **Subclasses and `super`**: The `extends` and `super` keywords make inheritance and calling parent class methods more intuitive and less error-prone compared to setting up prototype chains manually.
 
-5. **Subclasses and `super`**: The `extends` and `super` keywords make inheritance and calling parent class methods more intuitive and less error-prone compared to setting up prototype chains manually.
+## Example Comparison
 
-### Example Comparison
-
-**Prototype-based Inheritance**:
+### Prototype-based Inheritance
 
 ```javascript
 function Animal(name) {
@@ -213,7 +197,7 @@ const husky = new Dog("Husky", "Husky");
 husky.speak(); // Output: "Husky barks."
 ```
 
-**Class-based Inheritance**:
+### Class-based Inheritance
 
 ```javascript
 class Animal {
@@ -240,5 +224,3 @@ class Dog extends Animal {
 const husky = new Dog("Husky", "Husky");
 husky.speak(); // Output: "Husky barks."
 ```
-
-In summary, while prototypes provide the fundamental mechanism for inheritance in JavaScript, classes offer a more familiar and streamlined syntax for developers accustomed to classical inheritance models.

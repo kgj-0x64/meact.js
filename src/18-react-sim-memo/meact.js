@@ -331,7 +331,7 @@ function createElement(element, props, ...children) {
   if (typeof element === "function") {
     if (!name) {
       throw new Error(
-        `Anonymous function cannot be used as a component, please use named funciton only`
+        `Anonymous function cannot be used as a component, please use named function only`
       );
     }
 

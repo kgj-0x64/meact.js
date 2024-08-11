@@ -2,35 +2,70 @@
 
 Meact.js = My (implementation of) React.js
 
-## Scope (in order)
+## Implementation (in order)
 
-- [x] Functional Components with Template String
+- [x] Functional Components (i.e. reusable UI elements) built with "Template Literals" and global State & Event Handler Managers
+
 - [x] React-like (`createElement` and `render`) API
 - [x] Declarative UI Programming using library's functions
-- [x] Render Tree of Meact elements as nodes (plotted in browser as well for debugging)
+- [x] Render Tree (of `MeactElement` objects as nodes)
+  - [x] Render Tree is plotted in browser as well for debugging
+- [x] Event Handlers
 - [x] `props`
-- [x] `children`
-- [x] `useState` (I need `closure`!)
+- [x] Children Elements & Components (and `children` as render props)
+
+- [x] `useState` (I needed `closure`!)
+- [x] DIFF Reconciliation during Re-rendering
+
 - [x] `useEffect`
 - [x] `useRef`
 - [x] Custom Hooks
-- [x] `useMemo`: caches expensive calculations or references to arrays/objects/functions so that they (their references) are not recreated across re-renders and thus not reflected as "updates" in the browser DOM
-- [x] `useCallback` (redundant after `useMemo`)
-- [x] `memo`: force stops reredering of a child subtree when a parent rerenders
-- [x] DIFF Re-rendering
+
+- [x] `useMemo`
+  - [x] `useCallback` (redundant after `useMemo`)
+- [x] `memo`
+
 - [x] JSX Syntax
 - [x] Esbuild Bundler (to manually compile JSX into [`createElement` calls](https://esbuild.github.io/api/#jsx-factory))
 - [x] [JSX Fragment](https://esbuild.github.io/api/#jsx-fragment)
 - [x] `/jsx-runtime` [Entrypoint API](https://esbuild.github.io/api/#jsx-import-source)
-- [x] Virtual DOM Nodes (i.e. `DocumentFragment`)
 - [x] MDX Support (using [MDXjs compiler](https://mdxjs.com/packages/mdx/))
+- [x] Virtual DOM Nodes (i.e. `DocumentFragment` nodes)
+
 - [] Build Automation
+- [] Testing
 
 ### Constraints
 
 - A component must be defined as a named function only, and not as an anonymous function.
 
-  - Because anonymous functions as component definitions don't bring any benefits in ergonomics, while an anonymous component function is bound to be recreated on every render (due to a new node ID with the render tree each time) and it could be harder to debug in stack traces or logs as well.
+  - Why is this okay?: Because anonymous functions as component definitions don't bring any benefits in ergonomics, while an anonymous component function is bound to be recreated on every render (due to a new node ID with the render tree each time) and it could be harder to debug in stack traces or logs as well.
+
+### Optimizations
+
+- DIFF Reconciliation during Re-render: ! TODO
+
+- `useMemo` caches results of expensive calculations or references to arrays/objects/functions so that these result values or references are not recreated across re-renders, are then same values across renders when passed via `props` and are thus not queued as "updates" in the browser DOM by the UI library during a re-render.
+
+  - [React's doc says](https://react.dev/reference/react/useMemo#memoizing-a-function): The only benefit to `useCallback` is that it lets you avoid writing an extra nested function inside. It doesn’t do anything else.
+
+    ```js
+    function useCallback(fn, dependencies) {
+      return useMemo(() => fn, dependencies);
+    }
+    ```
+
+- `memo` is a different optimization feature which is used to force stop the evaluation and thus updation of a child subtree (in the "Render Tree") itself when its parent component re-renders given child's `props` are same across renders.
+
+### Interesting Takeaways
+
+- [JSX Spec - "Why not Template Literals?"](https://facebook.github.io/jsx/#sec-why-not-template-literals)
+
+- React uses the order of hooks inside a component's function definition to manage state and side effects.
+
+- [How different frameworks handle the difference between DOM properties and attributes](https://jakearchibald.com/2024/attributes-vs-properties/#how-frameworks-handle-the-difference)
+
+- React Compiler is a new experimental compiler which requires React 19 RC. It automatically memoizes code using [React's rules](https://react.dev/reference/rules). Also, [React Compiler's eslint plugin](https://react.dev/learn/react-compiler#installing-eslint-plugin-react-compiler) can be used independently of the compiler to display any violations of the rules of React in your editor.
 
 ## Virtual DOM
 
@@ -94,5 +129,6 @@ Beyond many for-scale things, meact.js doesn't implement these necessary ones (v
 - Metadata, SEO tuning, robots.txt, sitemap
 - Server side rendering
 - Concurrent rendering
+- Virtual DOM (an abstraction over different DOM APIs and their quirks)
 - Performance optimizations:
   - The virtual DOM allows React to batch updates and minimize direct manipulation of the real DOM, making the UI faster and more efficient.

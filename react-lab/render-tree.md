@@ -24,9 +24,9 @@ Dependency trees are useful for debugging large bundle sizes that slow time to p
 
 ## Preserving and resetting state
 
-In React, each component on the screen has fully isolated state. When you give a component state, [you might think the state “lives” inside the component. But the state is actually held inside React](https://react.dev/learn/preserving-and-resetting-state).
+In React, each component on the screen has fully isolated state. When you give a component state, [you might think the state "lives" inside the component. But the state is actually held inside React](https://react.dev/learn/preserving-and-resetting-state).
 
-React associates each piece of state it’s holding with the correct component by where that component sits in the render tree.
+React associates each piece of state it's holding with the correct component by where that component sits in the render tree.
 
 **As a rule of thumb, if you want to preserve the state between re-renders, the structure of your tree needs to “match up” from one render to another. If the structure is different, the state gets destroyed because React destroys state when it removes a component from the tree.**
 

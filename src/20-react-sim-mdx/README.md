@@ -53,9 +53,9 @@ NOT WORKING
 
 ---
 
-When you compile MDX that includes imports from other JSX components, you need to handle those dependencies properly. The issue you’re encountering is that esbuild is including require statements, which are not understood by the browser. Instead, you need to ensure that all imported components are included in the final output in a way that’s compatible with the IIFE format.
+When you compile MDX that includes imports from other JSX components, you need to handle those dependencies properly. The issue you’re encountering is that esbuild is including require statements, which are not understood by the browser. Instead, you need to ensure that all imported components are included in the final output in a way that's compatible with the IIFE format.
 
-Here’s how to adjust the compileMDX function to handle such scenarios:
+Here's how to adjust the compileMDX function to handle such scenarios:
 
 1. `bundle: true`: This option ensures that all imported modules are included in the final output. It will bundle all dependencies into a single file, so you won't see require statements in the final output.
 2. Format as IIFE: By using format: "iife", you ensure that the output is wrapped in an Immediately Invoked Function Expression, which allows it to run directly in the browser.

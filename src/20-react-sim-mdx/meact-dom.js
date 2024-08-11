@@ -228,12 +228,12 @@ function setAttributesAndProperties(meactElement, htmlElement) {
 
       // SET DOM element's Property
       if (attrKey.startsWith("on") || attrKey === "value") {
-        // `htmlElement.setAttribute(attrKey, attrValue);` does not work for "onclick" or "onchange"
-        // because DOM sees:
+        // `htmlElement.setAttribute(attrKey, attrValue);` does not work for "onclick" function call or value update on "onchange" function call
+        // because HTML Document sees:
         //     onclick --> `<button id="button-9" onclick="() => updateCountBy(compounder)">👍🏽</button>`
         //     onchange --> `<select id="select-6" value="lightcoral" onchange="(event) => updateColor(event)">...</select>`
-        // so, given the style of our funciton passing, we should update corresponding property on this DOM element's object
-        // then DOM sees (can be seen using `console.dir`):
+        // so, given the style of our function passing, we should update corresponding property on this DOM element's object
+        // then HTML Document sees (can be seen using `console.dir`):
         //     `<button id="button-9">👍🏽</button>` and `<select id="select-6" value="lightcoral">...</select>`
         htmlElement[attrKey] = attrValue;
       }

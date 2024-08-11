@@ -43,14 +43,14 @@ function createBrowserDomForReactElement(meactElement) {
       let attrValue = value;
       if (attrKey === "onclick") {
         // `htmlElement.setAttribute(attrKey, attrValue);` does not work for "onclick"
-        // because DOM sees: `<button id="button-9" onclick="() => updateCountBy(compounder)">👍🏽</button>`
-        // so, given the style of our funciton passing, we should set it on the DOM element's object (can be seen using `console.dir`)
+        // because HTML Document sees: `<button id="button-9" onclick="() => updateCountBy(compounder)">👍🏽</button>`
+        // so, given the style of our function passing, we should set it on the DOM element's object (can be seen using `console.dir`)
 
         // `htmlElement.setAttribute(attrKey, attrValue);` does not work for "onclick"
-        // because DOM sees:
+        // because HTML Document sees:
         //     onclick --> `<button id="button-9" onclick="() => updateCountBy(compounder)">👍🏽</button>`
-        // so, given the style of our funciton passing, we should update corresponding property on this DOM element's object
-        // then DOM sees (can be seen using `console.dir`):
+        // so, given the style of our function passing, we should update corresponding property on this DOM element's object
+        // then HTML Document sees (can be seen using `console.dir`):
         //     `<button id="button-9">👍🏽</button>`
         htmlElement.onclick = attrValue;
       } else {

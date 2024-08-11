@@ -4,7 +4,7 @@
 
 **React applications are built from components. Components are built from Hooks, whether built-in or custom.**
 
-- You’ll likely often use custom Hooks created by others (e.g. `useQuery` from `@tanstack/react-query` library), but occasionally you might write one yourself!
+- You'll likely often use custom Hooks created by others (e.g. `useQuery` from `@tanstack/react-query` library), but occasionally you might write one yourself!
 
 _Hooks may return arbitrary values._
 
@@ -16,7 +16,7 @@ _Hooks may return arbitrary values._
 
 They are JavaScript functions that utilize React's hooks (like `useState`, `useEffect`, etc.) to encapsulate and manage state and side effects. Hook names must start with `use` followed by a capital letter, like `useState` (built-in) or `useOnlineStatus` (custom).
 
-- This convention guarantees that you can always look at a component and know where its state, Effects, and other React features might “hide”. For example, if you see a `getColor()` function call inside your component, you can be sure that it can’t possibly contain React state inside because its name doesn’t start with `use`. However, a function call like `useOnlineStatus()` will most likely contain calls to other Hooks inside!
+- This convention guarantees that you can always look at a component and know where its state, Effects, and other React features might “hide”. For example, if you see a `getColor()` function call inside your component, you can be sure that it can't possibly contain React state inside because its name doesn't start with `use`. However, a function call like `useOnlineStatus()` will most likely contain calls to other Hooks inside!
 
 ### [So, it's like sharing state?](https://react.dev/learn/reusing-logic-with-custom-hooks#custom-hooks-let-you-share-stateful-logic-not-state-itself)
 
@@ -55,14 +55,14 @@ Custom hooks can be _easier to test in isolation_ compared to testing stateful l
 
 #### [Encapsulating network connectivity state](https://react.dev/learn/reusing-logic-with-custom-hooks)
 
-Suppose that you want to warn the user if their network connection has accidentally gone off while they were using your app. It seems like you’ll need two things in your component:
+Suppose that you want to warn the user if their network connection has accidentally gone off while they were using your app. It seems like you'll need two things in your component:
 
 1. A piece of state that tracks whether the network is online
 2. An Effect that subscribes to the global online and offline events, and updates that state.
 
 Now imagine you also want to use the same logic in a different components. Imagine for a moment that, similar to `useState` and `useEffect`, there was a built-in `useOnlineStatus` Hook. Then all of these components could be simplified and you could remove the duplication between them. Although there is no such built-in Hook, you can write it yourself. Declare a function called `useOnlineStatus` and move all the duplicated code into it from the components you wrote earlier.
 
-_Now your components don’t have as much repetitive logic. More importantly, the code inside them describes what they want to do (use the online status!) rather than how to do it (by subscribing to the browser events)._
+_Now your components don't have as much repetitive logic. More importantly, the code inside them describes what they want to do (use the online status!) rather than how to do it (by subscribing to the browser events)._
 
 #### [`useMutation`](https://tanstack.com/router/latest/docs/framework/react/examples/kitchen-sink-file-based)
 

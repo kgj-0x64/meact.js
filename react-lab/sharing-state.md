@@ -2,9 +2,9 @@
 
 ## Lift the state up
 
-Sometimes, _you want the state of two or more components to always change together_. To do it, remove the relevant state from them, **move it to their closest common parent**, and then pass it down to them via props. Finally, pass the event handlers down so that the children can change the parent’s state.
+Sometimes, _you want the state of two or more components to always change together_. To do it, remove the relevant state from them, **move it to their closest common parent**, and then pass it down to them via props. Finally, pass the event handlers down so that the children can change the parent's state.
 
-That is, when you want to coordinate two components, move their state to their common parent. [This is known as lifting state up, and it’s one of the most common things you will do writing React code.](https://react.dev/learn/sharing-state-between-components)
+That is, when you want to coordinate two components, move their state to their common parent. [This is known as lifting state up, and it's one of the most common things you will do writing React code.](https://react.dev/learn/sharing-state-between-components)
 
 ## Move the state down
 

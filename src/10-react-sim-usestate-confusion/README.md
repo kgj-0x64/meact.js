@@ -24,7 +24,7 @@ A few important points to keep in mind:
 - `useState` function does not take any component ID in its arguments.
 - Enforce a constraint that `createElement` must only be called from within a return block so that `useState` and `setState` function calls
   from within that component must be executed before its return block is executed and hence its children elements are created.
-- `setState` is a funciton called from some handler in a rendered DOM, so we can access it using a reference ID created on a render.
+- `setState` is a function called from some handler in a rendered DOM, so we can access it using a reference ID created on a render.
 - While doing DOM manipulation, this updated state value is used to re-evaluate the DOM and rerender it.
 
 ## Component Identifier across Rerenders

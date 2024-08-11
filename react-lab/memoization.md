@@ -22,7 +22,7 @@
 
 ### Versus `useCallback`
 
-Memoizing functions is common enough that React has a built-in Hook specifically for that. Wrap your functions into `useCallback` instead of `useMemo` to avoid having to write an extra nested function.
+[Memoizing functions is common enough that React has a built-in Hook specifically for that. Wrap your functions into `useCallback` instead of `useMemo` to avoid having to write an extra nested function.](https://react.dev/reference/react/useMemo#memoizing-a-function)
 
 - The only benefit to `useCallback` is that it lets you avoid writing an extra nested function inside. It doesn’t do anything else.
 
