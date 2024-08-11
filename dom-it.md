@@ -59,6 +59,8 @@ DOM properties and methods behave just like those of regular JavaScript objects:
 
 - For instance, `value` property of `select` element can only be set to one of the values from its children `option` elements.
 
+> Event handler properties (like `onclick`, `onmouseover`, etc.) are typically lowercase in the DOM, but other properties may retain camelCase or other casing styles (like `innerHTML`, `className`, `style.backgroundColor`).
+
 ### Attribute
 
 HTML attributes have the following features:
