@@ -34,15 +34,15 @@ const renderTree = {
 
   // queues of updated or newly created elements during a re-render
   rerenderDiffForDomHandler: {
-    queue: [], // {{action: "created" | "updated" | "deleted", parentElementId: string, targetElement: ReactElement, childPosition: number}[]}
+    queue: [], // {{action: "created" | "updated" | "deleted", parentElement: ReactElement, childPosition: number, targetElement: ReactElement}[]}
     /**
-     * @param {{action: "created" | "updated" | "deleted", parentElementId: string, targetElement: ReactElement, childPosition: number}} elementSnapshot
+     * @param {{action: "created" | "updated" | "deleted", parentElement: ReactElement, childPosition: number, targetElement: ReactElement}} elementSnapshot
      */
     enqueue(elementSnapshot) {
       this.queue.push(elementSnapshot);
     },
     /**
-     * @returns {{action: "created" | "updated", parentElementId: string, targetElement: ReactElement, childPosition: number}[]}
+     * @returns {{action: "created" | "updated", parentElement: ReactElement, childPosition: number, targetElement: ReactElement}[]}
      */
     getQueue() {
       return this.queue;
@@ -444,9 +444,9 @@ function createChildrenElementsHelper(childrenArray) {
 
       // child is either `createElement()` call or text content
       const childElement =
-        typeof child !== "object"
-          ? createElement("text", { content: child })
-          : child;
+        child instanceof ReactElement
+          ? child
+          : createElement("text", { content: child });
 
       childrenElements.push(childElement);
     }
@@ -625,7 +625,7 @@ function updateSubtreeForElement(
       // add it to re-render diff
       renderTree.rerenderDiffForDomHandler.enqueue({
         action: "updated",
-        parentElementId: subtreeRootNode.id,
+        parentElement: subtreeRootNode,
         childPosition,
         targetElement: existingChildOfSubtreeRootNode, // with updated props
       });
@@ -666,7 +666,7 @@ function updateSubtreeForElement(
       // add it to re-render diff
       renderTree.rerenderDiffForDomHandler.enqueue({
         action: "deleted",
-        parentElementId: existingChildOfSubtreeRootNode.id,
+        parentElement: existingChildOfSubtreeRootNode,
         childPosition: i,
         targetElement: existingChildOfSubtreeRootNode.children[i],
       });
@@ -723,7 +723,7 @@ function createElementDuringRerender(
   // add it to re-render diff
   renderTree.rerenderDiffForDomHandler.enqueue({
     action: "created",
-    parentElementId: subtreeRootNode.id,
+    parentElement: subtreeRootNode,
     childPosition,
     targetElement: mountNewChildSubtree,
   });

@@ -138,15 +138,14 @@ function createBrowserDomForReactElement(
 
     if (reactElement.children && reactElement.children.length > 0) {
       reactElement.children.forEach((child, index) => {
-        placeholderElement.appendChild(
-          createBrowserDomForReactElement(
-            child,
-            // actual parent node in the DOM is unchanged for this fragment's children
-            parentDomElementId,
-            // absolute child position under parent node = child position of this fragment under its parent node +  child position under fragment node
-            insertAtChildPosition + index
-          )
+        const childElementAtThisIndex = createBrowserDomForReactElement(
+          child,
+          // actual parent node in the DOM is unchanged for this fragment's children
+          parentDomElementId,
+          // absolute child position under parent node = child position of this fragment under its parent node +  child position under fragment node
+          insertAtChildPosition + index
         );
+        placeholderElement.appendChild(childElementAtThisIndex);
       });
     }
 
@@ -172,9 +171,12 @@ function createBrowserDomForReactElement(
   // If the node has children, create and append child nodes
   if (reactElement.children && reactElement.children.length > 0) {
     reactElement.children.forEach((child, index) => {
-      htmlElement.appendChild(
-        createBrowserDomForReactElement(child, reactElement.id, index)
+      const childElementAtThisIndex = createBrowserDomForReactElement(
+        child,
+        reactElement.id,
+        index
       );
+      htmlElement.appendChild(childElementAtThisIndex);
     });
   }
 
@@ -189,13 +191,14 @@ function createBrowserDomForReactElement(
 
 /**
  * call this to update or create/insert browser DOM elements in the existing browser DOM from a given render tree root
- * @param {{action: "created" | "updated", parentElementId: string, targetElement: ReactElement, childPosition: number}} rerenderDiffItem
+ * @param {{action: "created" | "updated" | "deleted", parentElement: ReactElement, childPosition: number, targetElement: ReactElement}} rerenderDiffItem
  */
 function upsertBrowserDomForRerenderDiffItem(rerenderDiffItem) {
-  const { action, parentElementId, childPosition, targetElement } =
+  const { action, parentElement, childPosition, targetElement } =
     rerenderDiffItem;
 
-  // get the parent element
+  // get its parent node from DOM
+  // ! TODO const
   const parentElementInBrowserDom =
     findElementByUniqueRenderId(parentElementId);
 
