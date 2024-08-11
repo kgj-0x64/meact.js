@@ -273,18 +273,21 @@ function setAttributesAndProperties(meactElement, htmlElement) {
         // so, given the style of our function passing, we should update corresponding property on this DOM element's object
         // then HTML Document sees (can be seen using `console.dir`):
         //     `<button id="button-9">👍🏽</button>` and `<select id="select-6" value="lightcoral">...</select>`
-        console.log("setting node property", key);
-        htmlElement[key] = value;
+
+        // Event handler properties (like `onclick`, `onmouseover`, etc.) are typically lowercase in the DOM,
+        // but other properties may retain camelCase or other casing styles (like `innerHTML`, `className`, `style.backgroundColor`).
+        // ! FIXME: Follow this style https://jakearchibald.com/2024/attributes-vs-properties/#lit-html
+        const keyValue = key.startsWith("on") ? key.toLowerCase() : key;
+        htmlElement[keyValue] = value;
+      }
+      // assign a ref created using useRef to this DOM element
+      else if (key === "refKey") {
+        console.log("Setting ref value after creating browser DOM node");
+        value.current = htmlElement;
       }
       // SET DOM element's Attribute
       else {
-        // assign a ref created using useRef to this DOM element
-        if (key === "refKey") {
-          console.log("setting ref value after creating browser DOM node");
-          value.current = htmlElement;
-        } else {
-          htmlElement.setAttribute(key.toLowerCase(), value);
-        }
+        htmlElement.setAttribute(key.toLowerCase(), value);
       }
     }
   }
