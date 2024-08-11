@@ -4,7 +4,7 @@ const elementRenderId = "data-render-id";
 
 /**
  * call this to get a browser DOM writer for the given target browser DOM node
- * @param {HTMLElement} rootNodeInBrowserDom target node in browser DOM where our React Component should be appended to
+ * @param {HTMLElement} rootNodeInBrowserDom target node in the browser DOM where our UI elements should be appended to
  * @returns {*} browserDomWriter our DOM manipulator
  */
 function createRoot(rootNodeInBrowserDom) {
@@ -25,19 +25,19 @@ const browserDomWriter = {
   },
 
   /**
-   * call it to display the given "React Elements tree" at the target node of browser DOM
+   * call it to display the given Render Tree (root node) at the target node of browser DOM
    * and take over managing the DOM inside it
-   * @param {ReactElement} reactElement root node of the render tree which is to be rendered in browser DOM
+   * @param {MeactElement} meactElement root node of the render tree which is to be rendered in browser DOM
    */
-  render(reactElement) {
+  render(meactElement) {
     // set this as the root node of the render tree
-    renderTree.setRootNode(reactElement);
+    renderTree.setRootNode(meactElement);
 
     // for visual debugging, plot the render tree at the bottom of browser DOM
-    reactElement.plotRenderTree();
+    meactElement.plotRenderTree();
 
     this.targetNodeInBrowserDom.innerHTML = ""; // clear any existing content
-    const browserDom = createBrowserDomForReactElement(reactElement);
+    const browserDom = createBrowserDomForReactElement(meactElement);
     // view the all properties and methods of a document object
     console.dir(browserDom);
     this.targetNodeInBrowserDom.appendChild(browserDom);
@@ -48,7 +48,7 @@ const browserDomWriter = {
 
   /**
    * call this to update existing DOM's copy based on render tree's diff
-   * @param {ReactElement} rootReactElement root node of the render tree which is already rendered in browser DOM
+   * @param {MeactElement} rootReactElement root node of the render tree which is already rendered in browser DOM
    */
   rerenderTheDiff(rootReactElement) {
     // for visual debugging, plot the render tree at the bottom of browser DOM
@@ -69,32 +69,32 @@ const browserDomWriter = {
 
 /**
  * call this to create browser DOM elements from a given render tree root
- * @param {ReactElement} reactElement
+ * @param {MeactElement} meactElement
  * @returns {HTMLElement}
  */
-function createBrowserDomForReactElement(reactElement) {
+function createBrowserDomForReactElement(meactElement) {
   /// render tree nodes which is not meant for browser DOM
 
-  if (reactElement.type === "NullComponent") {
+  if (meactElement.type === "NullComponent") {
     // let's add it to the browser DOM and let it hold a child position there as well
     const nullElement = document.createElement("div");
-    nullElement.setAttribute(elementRenderId, reactElement.id);
+    nullElement.setAttribute(elementRenderId, meactElement.id);
     // `display: none` turns off the display of an element so that it has no effect on layout
     nullElement.style.display = "none";
     return nullElement;
   }
 
-  if (reactElement.type === "ReactComponent") {
+  if (meactElement.type === "MeactComponent") {
     // Create the placeholder element
     const placeholderElement = document.createElement("div");
-    placeholderElement.setAttribute(elementRenderId, reactElement.id);
+    placeholderElement.setAttribute(elementRenderId, meactElement.id);
     // `display: contents` causes an element's children to appear
     // as if they were direct children of the element's parent, ignoring the element itself
     placeholderElement.style.display = "contents";
 
     // browser DOM cares for DOM element from its return block only
     const domSubtreeOfThisComponent = createBrowserDomForReactElement(
-      reactElement.children[0]
+      meactElement.children[0]
     );
     placeholderElement.appendChild(domSubtreeOfThisComponent);
 
@@ -102,17 +102,17 @@ function createBrowserDomForReactElement(reactElement) {
   }
 
   // show these in the browser DOM
-  const htmlElement = document.createElement(reactElement.name);
+  const htmlElement = document.createElement(meactElement.name);
 
-  htmlElement.setAttribute(elementRenderId, reactElement.id);
+  htmlElement.setAttribute(elementRenderId, meactElement.id);
 
   /**
    * select element's value must exactly match one of the option values,
    * so it must only be set after all its children option elements are seen by the DOM
    */
   // If the node has children, create and append child nodes
-  if (reactElement.children && reactElement.children.length > 0) {
-    reactElement.children.forEach((child) => {
+  if (meactElement.children && meactElement.children.length > 0) {
+    meactElement.children.forEach((child) => {
       if (child.name === "text") {
         const textContent = child.props.content;
         // ! BUG: when overwriting `innerHTML` so as to handle both Unicode characters and HTML entities
@@ -128,14 +128,14 @@ function createBrowserDomForReactElement(reactElement) {
     });
   }
 
-  setAttributesAndProperties(reactElement, htmlElement);
+  setAttributesAndProperties(meactElement, htmlElement);
 
   return htmlElement;
 }
 
 /**
  * call this to update or create/insert browser DOM elements in the existing browser DOM from a given render tree root
- * @param {{action: "created" | "updated", parentElementId: string, targetElement: ReactElement, childPosition: number}} rerenderDiffItem
+ * @param {{action: "created" | "updated", parentElementId: string, targetElement: MeactElement, childPosition: number}} rerenderDiffItem
  */
 function upsertBrowserDomForRerenderDiffItem(rerenderDiffItem) {
   const { action, parentElementId, childPosition, targetElement } =
@@ -199,13 +199,13 @@ function upsertBrowserDomForRerenderDiffItem(rerenderDiffItem) {
 }
 
 /**
- * call this to set attributes and properties on an HTML element given its ReactElement representation
- * @param {ReactElement} reactElement
+ * call this to set attributes and properties on an HTML element given its MeactElement representation
+ * @param {MeactElement} meactElement
  * @param {HTMLElement} htmlElement
  */
-function setAttributesAndProperties(reactElement, htmlElement) {
-  if (reactElement.props !== undefined && reactElement.props) {
-    for (const [key, value] of Object.entries(reactElement.props)) {
+function setAttributesAndProperties(meactElement, htmlElement) {
+  if (meactElement.props !== undefined && meactElement.props) {
+    for (const [key, value] of Object.entries(meactElement.props)) {
       const attrKey = key.toLowerCase();
       let attrValue = value;
 

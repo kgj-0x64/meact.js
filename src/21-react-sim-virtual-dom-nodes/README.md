@@ -8,7 +8,7 @@ When we append a `DocumentFragment` to the DOM, its children are appended, but t
 
 ## Why do we need a virtual DOM
 
-In order to do CRUD operations on the browser DOM for target `ReactElement` nodes, we need access to information about parent-children relations with positional info from the rendered browser DOM tree.
+In order to do CRUD operations on the browser DOM for target `MeactElement` nodes, we need access to information about parent-children relations with positional info from the rendered browser DOM tree.
 
 - The read-only `parentNode` property of the `Node` interface returns the parent of the specified node in the DOM tree. `Document` and `DocumentFragment` nodes can never have a parent, so `parentNode` will always return `null`. It also returns `null` if the node has just been created and is not yet attached to the tree.
 

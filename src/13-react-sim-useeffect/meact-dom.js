@@ -1,6 +1,6 @@
 /**
  * call this to get a browser DOM writer for the given target browser DOM node
- * @param {HTMLElement} rootNodeInBrowserDom target node in browser DOM where our React Component should be appended to
+ * @param {HTMLElement} rootNodeInBrowserDom target node in the browser DOM where our UI elements should be appended to
  * @returns {*} browserDomWriter our DOM manipulator
  */
 function createRoot(rootNodeInBrowserDom) {
@@ -21,19 +21,19 @@ const browserDomWriter = {
   },
 
   /**
-   * call it to display the given "React Elements tree" at the target node of browser DOM
+   * call it to display the given Render Tree (root node) at the target node of browser DOM
    * and take over managing the DOM inside it
-   * @param {ReactElement} reactElement root node of the render tree which is to be rendered in browser DOM
+   * @param {MeactElement} meactElement root node of the render tree which is to be rendered in browser DOM
    */
-  render(reactElement) {
+  render(meactElement) {
     // set this as the root node of the render tree
-    renderTree.setRootNode(reactElement);
+    renderTree.setRootNode(meactElement);
 
     // for visual debugging, plot the render tree at the bottom of browser DOM
-    reactElement.plotRenderTree();
+    meactElement.plotRenderTree();
 
     this.targetNodeInBrowserDom.innerHTML = ""; // clear any existing content
-    const browserDom = createBrowserDomForReactElement(reactElement);
+    const browserDom = createBrowserDomForReactElement(meactElement);
     // view the all properties and methods of a document object
     console.dir(browserDom);
     this.targetNodeInBrowserDom.appendChild(browserDom);
@@ -44,8 +44,8 @@ const browserDomWriter = {
 
   /**
    * call this to update existing DOM's copy based on render tree's diff
-   * @param {ReactElement} rootReactElement root node of the render tree which is already rendered in browser DOM
-   * @param {ReactElement} reactSubtree root node of a subtree from this render tree which should be re-rendered in the browser DOM using fresh values
+   * @param {MeactElement} rootReactElement root node of the render tree which is already rendered in browser DOM
+   * @param {MeactElement} reactSubtree root node of a subtree from this render tree which should be re-rendered in the browser DOM using fresh values
    */
   rerenderTheDiff(rootReactElement, reactSubtree) {
     console.log("rerenderTheDiff reactSubtree", reactSubtree);
@@ -80,13 +80,13 @@ const browserDomWriter = {
 
 /**
  * call this to create browser DOM elements from a given render tree root
- * @param {ReactElement} reactElement
+ * @param {MeactElement} meactElement
  * @returns {HTMLElement}
  */
-function createBrowserDomForReactElement(reactElement) {
+function createBrowserDomForReactElement(meactElement) {
   /// render tree nodes which is not meant for browser DOM
 
-  if (reactElement.type === "NullComponent") {
+  if (meactElement.type === "NullComponent") {
     // browser DOM shouldn't know it since it's meant to hold position in the render tree
     // we use `display:none` on this element,
     // so it neither renders in the document nor affects its layout
@@ -95,22 +95,22 @@ function createBrowserDomForReactElement(reactElement) {
     return nullElement;
   }
 
-  if (reactElement.type === "ReactComponent") {
+  if (meactElement.type === "MeactComponent") {
     // browser DOM cares for DOM element from its return block only
-    return createBrowserDomForReactElement(reactElement.children[0]);
+    return createBrowserDomForReactElement(meactElement.children[0]);
   }
 
   // show these in the browser DOM
-  const htmlElement = document.createElement(reactElement.name);
-  htmlElement.setAttribute("id", reactElement.id);
+  const htmlElement = document.createElement(meactElement.name);
+  htmlElement.setAttribute("id", meactElement.id);
 
   /**
    * select element's value must exactly match one of the option values,
    * so it must only be set after all its children option elements are seen by the DOM
    */
   // If the node has children, create and append child nodes
-  if (reactElement.children && reactElement.children.length > 0) {
-    reactElement.children.forEach((child) => {
+  if (meactElement.children && meactElement.children.length > 0) {
+    meactElement.children.forEach((child) => {
       if (child.name === "text") {
         const textContent = child.props.content;
         // we're not using `document.createTextNode` because it doesn't handle HTML entities
@@ -123,8 +123,8 @@ function createBrowserDomForReactElement(reactElement) {
     });
   }
 
-  if (reactElement.props !== undefined && reactElement.props) {
-    for (const [key, value] of Object.entries(reactElement.props)) {
+  if (meactElement.props !== undefined && meactElement.props) {
+    for (const [key, value] of Object.entries(meactElement.props)) {
       const attrKey = key.toLowerCase();
       let attrValue = value;
 
@@ -154,11 +154,11 @@ function createBrowserDomForReactElement(reactElement) {
   return htmlElement;
 }
 
-function getBrowserDomIdForRerendering(reactElement) {
-  if (reactElement.type === "ReactComponent") {
+function getBrowserDomIdForRerendering(meactElement) {
+  if (meactElement.type === "MeactComponent") {
     // browser DOM cares for DOM element from its return block only
-    return getBrowserDomIdForRerendering(reactElement.children[0]);
+    return getBrowserDomIdForRerendering(meactElement.children[0]);
   }
 
-  return reactElement.id;
+  return meactElement.id;
 }

@@ -11,33 +11,33 @@ class BrowserDomWriter {
 
   // call it to display the given "React node" into this root node of browser DOM
   // and take over managing the DOM inside it
-  render(reactElement) {
+  render(meactElement) {
     this.rootNodeInBrowserDom.innerHTML = ""; // Clear any existing content
-    const browserDom = createBrowserDomForReactElement(reactElement);
+    const browserDom = createBrowserDomForReactElement(meactElement);
     this.rootNodeInBrowserDom.appendChild(browserDom);
   }
 
   destroy() {}
 }
 
-function createBrowserDomForReactElement(reactElement) {
-  if (reactElement.name === "text") {
-    const textContent = reactElement.props.content;
+function createBrowserDomForReactElement(meactElement) {
+  if (meactElement.name === "text") {
+    const textContent = meactElement.props.content;
     return document.createTextNode(textContent);
   }
 
-  const htmlElement = document.createElement(reactElement.name);
-  htmlElement.setAttribute("id", reactElement.id);
+  const htmlElement = document.createElement(meactElement.name);
+  htmlElement.setAttribute("id", meactElement.id);
 
-  if (reactElement.props !== undefined && !reactElement.props) {
-    for (const [key, value] of Object.entries(reactElement.props)) {
+  if (meactElement.props !== undefined && !meactElement.props) {
+    for (const [key, value] of Object.entries(meactElement.props)) {
       htmlElement.setAttribute(key, value);
     }
   }
 
   // If the node has children, create and append child nodes
-  if (reactElement.children && reactElement.children.length > 0) {
-    reactElement.children.forEach((child) => {
+  if (meactElement.children && meactElement.children.length > 0) {
+    meactElement.children.forEach((child) => {
       htmlElement.appendChild(createBrowserDomForReactElement(child));
     });
   }

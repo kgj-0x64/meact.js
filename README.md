@@ -5,12 +5,12 @@ Meact.js = My (implementation of) React.js
 ## Scope (in order)
 
 - [x] Functional Components with Template String
-- [x] Declarative Programming
-- [x] React-like API
-- [x] Render Tree
+- [x] React-like (`createElement` and `render`) API
+- [x] Declarative UI Programming using library's functions
+- [x] Render Tree of Meact elements as nodes (plotted in browser as well for debugging)
 - [x] `props`
 - [x] `children`
-- [x] `useState`
+- [x] `useState` (I need `closure`!)
 - [x] `useEffect`
 - [x] `useRef`
 - [x] Custom Hooks
@@ -19,10 +19,11 @@ Meact.js = My (implementation of) React.js
 - [x] `memo`: force stops reredering of a child subtree when a parent rerenders
 - [x] DIFF Re-rendering
 - [x] JSX Syntax
-- [x] Esbuild Bundler (to manually compile JSX)
-- [x] JSX Runtime Factory/API
+- [x] Esbuild Bundler (to manually compile JSX into [`createElement` calls](https://esbuild.github.io/api/#jsx-factory))
+- [x] [JSX Fragment](https://esbuild.github.io/api/#jsx-fragment)
+- [x] `/jsx-runtime` [Entrypoint API](https://esbuild.github.io/api/#jsx-import-source)
 - [x] Virtual DOM Nodes (i.e. `DocumentFragment`)
-- [x] MDX Support (manually compiled with Esbuild)
+- [x] MDX Support (using [MDXjs compiler](https://mdxjs.com/packages/mdx/))
 - [] Build Automation
 
 ### Constraints
@@ -41,7 +42,7 @@ A `DocumentFragment` is a lightweight, minimalistic document object that can hol
 
 ### Why do we need a Virtual DOM
 
-In order to do CRUD operations on the browser DOM for target `ReactElement` nodes, we need access to information about parent-children relations with positional info from the rendered browser DOM tree.
+In order to do CRUD operations on the browser DOM for target `MeactElement` nodes, we need access to information about parent-children relations with positional info from the rendered browser DOM tree.
 
 - The read-only `parentNode` property of the `Node` interface returns the parent of the specified node in the DOM tree. `Document` and `DocumentFragment` nodes can never have a parent, so `parentNode` will always return `null`. It also returns `null` if the node has just been created and is not yet attached to the tree.
 
@@ -49,7 +50,7 @@ In order to do CRUD operations on the browser DOM for target `ReactElement` node
 
 ### Why do we need a Bundler Tool
 
-- To write JSX synatx which is not natively understood by browsers needs a transpiler that transforms JSX into calls to your `createElement` function.
+- To write JSX synatx which is not natively understood by browsers, we need a transpiler that [transforms JSX](https://esbuild.github.io/api/#jsx) into calls to appropriate library function calls.
 
   - [JSX vs Template Literals](https://facebook.github.io/jsx/#sec-why-not-template-literals)
 

@@ -9,18 +9,17 @@ In JavaScript, the behavior of this inside a function can vary based on whether 
 ### `this` is bound to the `class` and not to the enclosing object
 
 ```js
-class ReactElement {
+class MeactElement {
   constructor() {
     this.id = getNewElementId(name);
     this.stateManager =
-      type === "ReactComponent"
+      type === "MeactComponent"
         ? {
             values: [],
             updateValue: (index, newValue) => {
               console.log("this.values", this.values);
               console.log("this.stateManager.values", this.stateManager.values);
               this.stateManager.values[index] = newValue;
-              // TODO: updateSubtreeForElement(this);
             },
           }
         : null;
@@ -30,7 +29,7 @@ class ReactElement {
 Console log:
 """
 this.values undefined
-react.js:65 this.stateManager.values (2) [1, 1]
+this.stateManager.values (2) [1, 1]
 """
 
 ### `this` is bound to the enclosing object
@@ -38,18 +37,17 @@ react.js:65 this.stateManager.values (2) [1, 1]
 Whereas, I get this error on the console for this second example:
 
 ```js
-class ReactElement {
+class MeactElement {
   constructor() {
     this.id = getNewElementId(name);
     this.stateManager =
-      type === "ReactComponent"
+      type === "MeactComponent"
         ? {
             values: [],
             updateValue(index, newValue) {
               console.log("this.values", this.values);
               console.log("this.stateManager.values", this.stateManager.values);
               this.stateManager.values[index] = newValue;
-              // TODO: updateSubtreeForElement(this);
             },
           }
         : null;
@@ -59,8 +57,7 @@ class ReactElement {
 Console log:
 """
 this.values (2) [1, 1]
-react.js:65 Uncaught TypeError: Cannot read properties of undefined (reading 'values')
-at Object.updateValue (example.js:65:73)
+Uncaught TypeError: Cannot read properties of undefined (reading 'values')
 """
 
 ## Behavior
@@ -68,7 +65,7 @@ at Object.updateValue (example.js:65:73)
 ### Traditional Functions
 
 Traditional functions have their own `this` context, which is determined by how the function is called. In my case, the object calling `updateValue` is the `stateManager` object.
-Therefore, `this` inside `updateValue` refers to the `stateManager` object, not the `ReactElement` instance.
+Therefore, `this` inside `updateValue` refers to the `stateManager` object, not the `MeactElement` instance.
 
 ```js
 function traditionalFunction() {
@@ -90,7 +87,7 @@ traditionalFunction.call({ x: 10 }); // 'this' refers to {x: 10}
 
 ### Arrow Functions
 
-Arrow functions do not have their own `this` context. Instead, they inherit `this` from the surrounding lexical scope, which in my case is the instance of `ReactElement`.
+Arrow functions do not have their own `this` context. Instead, they inherit `this` from the surrounding lexical scope, which in my case is the instance of `MeactElement`.
 
 ```js
 const arrowFunction = () => {

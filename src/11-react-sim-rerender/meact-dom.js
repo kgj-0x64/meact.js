@@ -17,15 +17,15 @@ const browserDomWriter = {
 
   // call it to display the given "React elements tree" into this root node of browser DOM
   // and take over managing the DOM inside it
-  render(reactElement) {
+  render(meactElement) {
     // set this as the root node of the render tree
-    renderTree.setRootNode(reactElement);
+    renderTree.setRootNode(meactElement);
 
     // for visual debugging, plot the render tree at the bottom of browser DOM
-    reactElement.plotRenderTree();
+    meactElement.plotRenderTree();
 
     this.targetNodeInBrowserDom.innerHTML = ""; // clear any existing content
-    const browserDom = createBrowserDomForReactElement(reactElement);
+    const browserDom = createBrowserDomForReactElement(meactElement);
     // view the all properties and methods of a document object
     console.dir(browserDom);
     console.log(browserDom);
@@ -55,10 +55,10 @@ const browserDomWriter = {
   },
 };
 
-function createBrowserDomForReactElement(reactElement) {
+function createBrowserDomForReactElement(meactElement) {
   /// render tree nodes which is not meant for browser DOM
 
-  if (reactElement.type === "null") {
+  if (meactElement.type === "null") {
     // browser DOM shouldn't know it since it's meant to hold position in the render tree
     // we use `display:none` on this element,
     // so it neither renders in the document nor affects its layout
@@ -67,22 +67,22 @@ function createBrowserDomForReactElement(reactElement) {
     return nullElement;
   }
 
-  if (reactElement.type === "ReactComponent") {
+  if (meactElement.type === "MeactComponent") {
     // browser DOM cares for DOM element from its return block only
-    return createBrowserDomForReactElement(reactElement.children[0]);
+    return createBrowserDomForReactElement(meactElement.children[0]);
   }
 
   // show these in the browser DOM
-  const htmlElement = document.createElement(reactElement.name);
-  htmlElement.setAttribute("id", reactElement.id);
+  const htmlElement = document.createElement(meactElement.name);
+  htmlElement.setAttribute("id", meactElement.id);
 
   /**
    * select element's value must exactly match one of the option values,
    * so it must only be set after all its children option elements are seen by the DOM
    */
   // If the node has children, create and append child nodes
-  if (reactElement.children && reactElement.children.length > 0) {
-    reactElement.children.forEach((child) => {
+  if (meactElement.children && meactElement.children.length > 0) {
+    meactElement.children.forEach((child) => {
       if (child.name === "text") {
         const textContent = child.props.content;
         // we're not using `document.createTextNode` because it doesn't handle HTML entities
@@ -95,8 +95,8 @@ function createBrowserDomForReactElement(reactElement) {
     });
   }
 
-  if (reactElement.props !== undefined && reactElement.props) {
-    for (const [key, value] of Object.entries(reactElement.props)) {
+  if (meactElement.props !== undefined && meactElement.props) {
+    for (const [key, value] of Object.entries(meactElement.props)) {
       const attrKey = key.toLowerCase();
       let attrValue = value;
 

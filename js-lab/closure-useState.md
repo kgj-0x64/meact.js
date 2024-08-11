@@ -57,7 +57,7 @@ My solution is:
 > Now, this inner function `setStateValue` captures `reactComponentForThisHook` by reference,
 > which is local to and constant in the scope of `useState` function.
 >
-> So, it will always refer to the same `ReactElement` object within a specific `useState` call's context.
+> So, it will always refer to the same `MeactElement` object within a specific `useState` call's context.
 
 ## Complex Example
 

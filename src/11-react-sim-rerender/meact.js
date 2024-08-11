@@ -8,22 +8,22 @@ function getNewElementId(elementName) {
 }
 
 // render tree which refreshes on every render and re-render
-// and is used to construct the browser DOM in react-dom.js
+// and is used to construct the browser DOM in meact-dom.js
 const renderTree = {
   // root node of the render tree
   rootNode: null,
   // how many times this app has been rendered (or rerendered) in browser
   domRefreshCounter: 0,
   // update root node thus the whole render tree
-  setRootNode(reactElement) {
-    this.rootNode = reactElement;
+  setRootNode(meactElement) {
+    this.rootNode = meactElement;
     // reset the render counter
     this.domRefreshCounter = 0;
   },
   postRenderHandler() {
     if (!this.rootNode) return;
     this.domRefreshCounter += 1;
-    // reset the hooks counter for all react elements in the render tree
+    // reset the hooks counter for all meact elements in the render tree
     resetHooksCallCounters(this.rootNode);
 
     console.log("Post Render Cleanup Done!");
@@ -34,21 +34,21 @@ const renderTree = {
   },
 };
 
-class ReactElement {
+class MeactElement {
   constructor(type, name, props = {}, children = []) {
     // ID of this element to uniquely identify an instance of it
     this.id = getNewElementId(name);
     // type of this element
-    this.type = type; // "null" | "ReactComponent" | "HtmlElement"
+    this.type = type; // "null" | "MeactComponent" | "HtmlElement"
     // name of this element
     this.name = name;
     // set of props set on this element
     this.props = props ? props : {}; // map-like object
     // ordered collection of children elements of this element
     this.children = children; // array
-    // in this render, number of hook calls seen by this React Component
+    // in this render, number of hook calls seen by this component
     this.hooksCallCounter =
-      type === "ReactComponent"
+      type === "MeactComponent"
         ? {
             values: {},
             increment(hookName) {
@@ -65,9 +65,9 @@ class ReactElement {
             },
           }
         : undefined;
-    // state manager useful for an element of type "ReactComponent"
+    // state manager useful for an element of type "MeactComponent"
     this.stateManager =
-      type === "ReactComponent"
+      type === "MeactComponent"
         ? {
             // ordered collection of state values of this component
             values: [],
@@ -92,7 +92,7 @@ class ReactElement {
  * and it returns an object which can be used however pleased
  *
  * SO, it should be remembered that
- * creating a React Element node does not mean that it'll be rendered
+ * creating a MeactElement node does not mean that it'll be rendered
  *
  * To be rendered,
  * it must be present in the return block of a function
@@ -100,7 +100,7 @@ class ReactElement {
  */
 
 // takes an entry point as root element and
-// recursively creates ReactElement objects
+// recursively creates MeactElement objects
 // since every child is another call to createElement or a text string
 // so as to eventually reach atomic html elements
 function createElement(element, props, ...children) {
@@ -111,12 +111,12 @@ function createElement(element, props, ...children) {
 
   // if it's a null element
   if (!element) {
-    return new ReactElement(type, null, {}, []);
+    return new MeactElement(type, null, {}, []);
   }
 
-  // if this is a React component
+  // if this is a component
   if (typeof element === "function") {
-    type = "ReactComponent";
+    type = "MeactComponent";
     name = element.name;
 
     // add children, if any, into props
@@ -128,7 +128,7 @@ function createElement(element, props, ...children) {
 
     // creating it beforehand to get its ID for handling hooks in its context
     // preserve whole of its argument to reuse in case of its re-rendering
-    const reactComponent = new ReactElement(type, name, propsWithChildren, []);
+    const reactComponent = new MeactElement(type, name, propsWithChildren, []);
 
     // hooks are initialized when a ReactComponent's function logic
     // and thus its hooks are executed
@@ -142,7 +142,7 @@ function createElement(element, props, ...children) {
     // reactComponentStack.push(reactComponent);
 
     // call the component function with the received arguments
-    // to finally run a `createElement` call and return its output ReactElement through its return block
+    // to finally run a `createElement` call and return its output MeactElement through its return block
     // which could have however deeply nested `createElement` calls in its children
 
     const returnedElement = element(propsWithChildren);
@@ -173,7 +173,7 @@ function createElement(element, props, ...children) {
     }
   }
 
-  const htmlElement = new ReactElement(
+  const htmlElement = new MeactElement(
     type,
     name,
     propsObject,
@@ -197,7 +197,7 @@ function updateSubtreeForElement(reactComponentAsSubtree, updatedProps) {
   // Rerender of `Profile` component works perfectly fine
   // ! FIXME: propagate state change and rerender downwards
   // ! such that children, if not unmounted,
-  // ! should not be recreated and should reuse corresponding ReactElement object instead
+  // ! should not be recreated and should reuse corresponding MeactElement object instead
   if (typeof window[functionName] === "function") {
     const subtreeWithUpdatedState = window[functionName].call(
       null,
@@ -229,7 +229,7 @@ function useState(initialValue) {
    * - Therefore, any updates to the `reactComponentForHooks` variable
    * - after `setStateValue` is defined will be reflected when `setStateValue` is called.
    *
-   * But the global variable `reactComponentForHooks` itself is a reference to different ReactElement object changing in each run of `createElemet` function.
+   * But the global variable `reactComponentForHooks` itself is a reference to different MeactElement object changing in each run of `createElemet` function.
    * So, if we use the global reference directly inside `setStateValue` function,
    * then by the time `setStateValue` is called,
    * it'll always get reference to the last leaf ReactComponent object.
@@ -283,7 +283,7 @@ function useState(initialValue) {
   /**
    * now, this inner function `setStateValue` captures `reactComponentForThisHook` by reference,
    * which is local to and constant in the scope of `useState` function
-   * so, it will always refer to the same `ReactElement` object within a specific `useState` call's context
+   * so, it will always refer to the same `MeactElement` object within a specific `useState` call's context
    */
   function setStateValue(newValue) {
     console.log("Updating state in:", reactComponentForThisHook.id);
@@ -296,25 +296,25 @@ function useState(initialValue) {
   return [stateValue, setStateValue];
 }
 
-function resetHooksCallCounters(reactElement) {
-  if (reactElement.type === "ReactComponent") {
-    // reset number of hook calls seen by this React Component
-    reactElement.hooksCallCounter.reset();
+function resetHooksCallCounters(meactElement) {
+  if (meactElement.type === "MeactComponent") {
+    // reset number of hook calls seen by this component
+    meactElement.hooksCallCounter.reset();
   }
 
-  for (let i = 0; i < reactElement.children.length; i++) {
-    const child = reactElement.children[i];
+  for (let i = 0; i < meactElement.children.length; i++) {
+    const child = meactElement.children[i];
     resetHooksCallCounters(child);
   }
 }
 
 class ReactElementTreeDebugger {
-  constructor(reactElement) {
-    this.node = reactElement;
-    this.treeContainer = document.getElementById("react-element-tree");
+  constructor(meactElement) {
+    this.node = meactElement;
+    this.treeContainer = document.getElementById("meact-element-tree");
   }
 
-  // Function to render the tree for given React Element in HTML document
+  // Function to render a tree representation for the given Meact Element in the HTML document
   renderTreeInHtmlDocument() {
     this.treeContainer.innerHTML = ""; // Clear any existing content
     this.createHtmlForTreeNode(this.node, 0);
@@ -328,26 +328,26 @@ class ReactElementTreeDebugger {
 
     // node's name
     const nodeNameSpan = document.createElement("span");
-    nodeNameSpan.className = "react-element-tree-node";
+    nodeNameSpan.className = "meact-element-tree-node";
     nodeNameSpan.innerText = `${leftMargin}_node: ${node.name}`;
     this.treeContainer.appendChild(nodeNameSpan);
 
     // node's type
     const nodeTypeSpan = document.createElement("span");
-    nodeTypeSpan.className = "react-element-tree-node";
+    nodeTypeSpan.className = "meact-element-tree-node";
     nodeTypeSpan.innerText = `${nestedLeftMargin}_type: ${node.type}`;
     this.treeContainer.appendChild(nodeTypeSpan);
 
     // node's ID
     const nodeIdSpan = document.createElement("span");
-    nodeIdSpan.className = "react-element-tree-node";
+    nodeIdSpan.className = "meact-element-tree-node";
     nodeIdSpan.innerText = `${nestedLeftMargin}_id: ${node.id}`;
     this.treeContainer.appendChild(nodeIdSpan);
 
-    if (node.type === "ReactComponent") {
+    if (node.type === "MeactComponent") {
       // node's state
       const nodeStateSpan = document.createElement("span");
-      nodeStateSpan.className = "react-element-tree-node";
+      nodeStateSpan.className = "meact-element-tree-node";
       nodeStateSpan.innerText = `${nestedLeftMargin}_STATE: "${JSON.stringify(
         node.stateManager.values
       )}"`;
@@ -358,7 +358,7 @@ class ReactElementTreeDebugger {
     if (node.props !== undefined && node.props) {
       for (const [key, value] of Object.entries(node.props)) {
         const nodeAttributeSpan = document.createElement("span");
-        nodeAttributeSpan.className = "react-element-tree-node";
+        nodeAttributeSpan.className = "meact-element-tree-node";
         nodeAttributeSpan.innerText = `${nestedLeftMargin}_${key}: ${JSON.stringify(
           value
         )}`;

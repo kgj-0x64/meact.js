@@ -5,19 +5,19 @@ function getNewElementId(elementName) {
   return instanceId;
 }
 
-class ReactElement {
+class MeactElement {
   constructor(type, name, props = {}, children = []) {
     // ID of this element to uniquely identify an instance of it
     this.id = getNewElementId(name);
     // type of this element
-    this.type = type; // null | "ReactComponent" | "HtmlElement"
+    this.type = type; // null | "MeactComponent" | "HtmlElement"
     // name of this element
     this.name = name;
     // set of props set on this element
     this.props = props ? props : {}; // map-like object
     // ordered collection of children elements of this element
     this.children = children; // array
-    // state manager useful for an element of type "ReactComponent"
+    // state manager useful for an element of type "MeactComponent"
     this.stateManager = {
       // should be reset to 0 on every render
       useStateCallCount: 0,
@@ -39,7 +39,7 @@ class ReactElement {
  * and it returns an object which can be used however pleased
  *
  * SO, it should be remembered that
- * creating a React Element node does not mean that it'll be rendered
+ * creating a MeactElement node does not mean that it'll be rendered
  *
  * To be rendered,
  * it must be present in the return block of a function
@@ -47,7 +47,7 @@ class ReactElement {
  */
 
 // takes an entry point as root element and
-// recursively creates ReactElement objects
+// recursively creates MeactElement objects
 // since every child is another call to createElement or a text string
 // so as to eventually reach atomic html elements
 function createElement(element, props, ...children) {
@@ -59,16 +59,16 @@ function createElement(element, props, ...children) {
 
   // if it's a null element
   if (!element) {
-    return new ReactElement(null, "null", {}, []);
+    return new MeactElement(null, "null", {}, []);
   }
 
-  // if this is a React component
+  // if this is a component
   if (typeof element === "function") {
-    type = "ReactComponent";
+    type = "MeactComponent";
     name = element.name;
 
     // creating it without children here only to get its ID and handle state etc
-    const reactComponent = new ReactElement(type, name, propsObject, []);
+    const reactComponent = new MeactElement(type, name, propsObject, []);
 
     // all the function logic including `useState`, `setState` etc will be executed when this function is called
     // before its return block is executed which creates nested children elements for it
@@ -77,7 +77,7 @@ function createElement(element, props, ...children) {
     currReactComponentObject = reactComponent;
 
     // call the component function with the received arguments
-    // to finally run a `createElement` call and return its output ReactElement through its return block
+    // to finally run a `createElement` call and return its output MeactElement through its return block
     // which could have however deeply nested `createElement` calls in its children
     const returnedElement = element(propsObject);
     childrenElements.push(returnedElement);
@@ -100,7 +100,7 @@ function createElement(element, props, ...children) {
     }
   }
 
-  const htmlElement = new ReactElement(
+  const htmlElement = new MeactElement(
     type,
     name,
     propsObject,
@@ -171,12 +171,12 @@ function useState(initialValue) {
 }
 
 class ReactElementTreeDebugger {
-  constructor(reactElement) {
-    this.node = reactElement;
-    this.treeContainer = document.getElementById("react-element-tree");
+  constructor(meactElement) {
+    this.node = meactElement;
+    this.treeContainer = document.getElementById("meact-element-tree");
   }
 
-  // Function to render the tree for given React Element in HTML document
+  // Function to render a tree representation for the given Meact Element in the HTML document
   renderTreeInHtmlDocument() {
     this.treeContainer.innerHTML = ""; // Clear any existing content
     this.createHtmlForTreeNode(this.node, 0);
@@ -190,19 +190,19 @@ class ReactElementTreeDebugger {
 
     // node's name
     const nodeNameSpan = document.createElement("span");
-    nodeNameSpan.className = "react-element-tree-node";
+    nodeNameSpan.className = "meact-element-tree-node";
     nodeNameSpan.innerText = `${leftMargin}_node: ${node.name}`;
     this.treeContainer.appendChild(nodeNameSpan);
 
     // node's type
     const nodeTypeSpan = document.createElement("span");
-    nodeTypeSpan.className = "react-element-tree-node";
+    nodeTypeSpan.className = "meact-element-tree-node";
     nodeTypeSpan.innerText = `${nestedLeftMargin}_type: ${node.type}`;
     this.treeContainer.appendChild(nodeTypeSpan);
 
     // node's ID
     const nodeIdSpan = document.createElement("span");
-    nodeIdSpan.className = "react-element-tree-node";
+    nodeIdSpan.className = "meact-element-tree-node";
     nodeIdSpan.innerText = `${nestedLeftMargin}_id: ${node.id}`;
     this.treeContainer.appendChild(nodeIdSpan);
 
@@ -210,7 +210,7 @@ class ReactElementTreeDebugger {
     if (node.stateManager && node.stateManager.values.length > 0) {
       node.stateManager.values.forEach((value, index) => {
         const nodeStateSpan = document.createElement("span");
-        nodeStateSpan.className = "react-element-tree-node";
+        nodeStateSpan.className = "meact-element-tree-node";
         nodeStateSpan.innerText = `${nestedLeftMargin}_${index}: "${value}"`;
         this.treeContainer.appendChild(nodeStateSpan);
       });
@@ -220,7 +220,7 @@ class ReactElementTreeDebugger {
     if (node.props !== undefined && node.props) {
       for (const [key, value] of Object.entries(node.props)) {
         const nodeAttributeSpan = document.createElement("span");
-        nodeAttributeSpan.className = "react-element-tree-node";
+        nodeAttributeSpan.className = "meact-element-tree-node";
         nodeAttributeSpan.innerText = `${nestedLeftMargin}_${key}: "${value}"`;
         this.treeContainer.appendChild(nodeAttributeSpan);
       }
