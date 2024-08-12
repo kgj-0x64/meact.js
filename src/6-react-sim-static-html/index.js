@@ -16,7 +16,7 @@
 const targetNodeInBrowserDom = document.getElementById("root");
 const browserDomPainterAtTargetNode = createRoot(targetNodeInBrowserDom);
 
-const renderThisReactNodeAtTarget = HtmlOnlyCompositeNode();
-renderThisReactNodeAtTarget.plotRenderTree();
+const renderTreeRootNode = HtmlOnlyCompositeNode();
+renderTreeRootNode.plotRenderTree();
 
-browserDomPainterAtTargetNode.render(renderThisReactNodeAtTarget);
+browserDomPainterAtTargetNode.render(renderTreeRootNode);

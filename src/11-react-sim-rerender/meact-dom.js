@@ -15,7 +15,7 @@ const browserDomWriter = {
     this.targetNodeInBrowserDom = nodeInBrowserDom;
   },
 
-  // call it to display the given "React elements tree" into this root node of browser DOM
+  // call it to display the given "Render Tree" into this root node of browser DOM
   // and take over managing the DOM inside it
   render(meactElement) {
     // set this as the root node of the render tree

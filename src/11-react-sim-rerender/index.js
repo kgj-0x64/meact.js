@@ -5,6 +5,6 @@ const targetNodeInBrowserDom = document.getElementById("root");
 const browserDomPainterAtTargetNode = createRoot(targetNodeInBrowserDom);
 
 // StopwatchTowerComponent also works but children (and thus their states) are unmounted on parent's state change
-const renderThisReactNodeAtTarget = createElement(Profile);
+const renderTreeRootNode = createElement(Profile);
 
-browserDomPainterAtTargetNode.render(renderThisReactNodeAtTarget);
+browserDomPainterAtTargetNode.render(renderTreeRootNode);

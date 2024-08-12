@@ -4,7 +4,7 @@
 const targetNodeInBrowserDom = document.getElementById("root");
 const browserDomPainterAtTargetNode = createRoot(targetNodeInBrowserDom);
 
-const renderThisReactNodeAtTarget = createElement(StopwatchTowerComponent);
-renderThisReactNodeAtTarget.plotRenderTree();
+const renderTreeRootNode = createElement(StopwatchTowerComponent);
+renderTreeRootNode.plotRenderTree();
 
-browserDomPainterAtTargetNode.render(renderThisReactNodeAtTarget);
+browserDomPainterAtTargetNode.render(renderTreeRootNode);

@@ -360,7 +360,7 @@ function createElement(element, props, ...children) {
 
     // set this component as the context for handling hooks
     // 1.
-    reactComponentForHooks = reactComponent;
+    currActiveComponentForHooks = reactComponent;
     // or, 2.
     // PUSH the current component to the stack before rendering
     // reactComponentStack.push(reactComponent);
@@ -412,7 +412,7 @@ function createElement(element, props, ...children) {
 }
 
 // 1.
-let reactComponentForHooks = null;
+let currActiveComponentForHooks = null;
 // or, 2. use a global stack to keep track of current ReactComponent being rendered
 // let reactComponentStack = [];
 
@@ -514,7 +514,7 @@ function updateSubtreeForElement(
     }
 
     // set this component as the context for handling hooks
-    reactComponentForHooks = subtreeRootNode;
+    currActiveComponentForHooks = subtreeRootNode;
 
     // call this function to execute the component definition
     subtreeRootNodeChildRecalculated = window[functionName].call(
@@ -701,14 +701,14 @@ function useState(initialValue) {
    *
    * Closures capture variables by reference, not by value.
    *
-   * If we were directly using the global reference variable `reactComponentForHooks` inside the inner function `setStateValue`, then:
-   * - Due to closure, the `setStateValue` function captures a reference to the variable `reactComponentForHooks` and not its value.
-   * - That is, at the time `setStateValue` is defined, `setStateValue` holds a reference to the `reactComponentForHooks` variable itself,
+   * If we were directly using the global reference variable `currActiveComponentForHooks` inside the inner function `setStateValue`, then:
+   * - Due to closure, the `setStateValue` function captures a reference to the variable `currActiveComponentForHooks` and not its value.
+   * - That is, at the time `setStateValue` is defined, `setStateValue` holds a reference to the `currActiveComponentForHooks` variable itself,
    * - not just its value.
-   * - Therefore, any updates to the `reactComponentForHooks` variable
+   * - Therefore, any updates to the `currActiveComponentForHooks` variable
    * - after `setStateValue` is defined will be reflected when `setStateValue` is called.
    *
-   * But the global variable `reactComponentForHooks` itself is a reference to different MeactElement object changing in each run of `createElemet` function.
+   * But the global variable `currActiveComponentForHooks` itself is a reference to different MeactElement object changing in each run of `createElemet` function.
    * So, if we use the global reference directly inside `setStateValue` function,
    * then by the time `setStateValue` is called,
    * it'll always get reference to the last leaf ReactComponent object.
@@ -720,22 +720,22 @@ function useState(initialValue) {
 
   // 1.
   // copying an object reference variable creates one more reference to the same object
-  // so, this local variable is assigned the value of global reference variable `reactComponentForHooks` at the time `useState` is called
-  const reactComponentForThisHook = reactComponentForHooks;
+  // so, this local variable is assigned the value of global reference variable `currActiveComponentForHooks` at the time `useState` is called
+  const targetComponentForThisHook = currActiveComponentForHooks;
 
   // Or, 2.
-  // const reactComponentForThisHook = reactComponentStack[reactComponentStack.length - 1];
+  // const targetComponentForThisHook = reactComponentStack[reactComponentStack.length - 1];
 
-  badHookCall(reactComponentForThisHook, "useState");
+  badHookCall(targetComponentForThisHook, "useState");
 
-  console.log("useState hook called for", reactComponentForThisHook.id);
+  console.log("useState hook called for", targetComponentForThisHook.id);
 
   const thisHookCallCount = getHookCallCount(
-    reactComponentForThisHook,
+    targetComponentForThisHook,
     "useState"
   );
 
-  const { values } = reactComponentForThisHook.stateManager;
+  const { values } = targetComponentForThisHook.stateManager;
 
   let stateValue;
 
@@ -749,7 +749,7 @@ function useState(initialValue) {
     values.push(stateValue);
   }
 
-  // now, this inner function `setStateValue` captures `reactComponentForThisHook` by reference,
+  // now, this inner function `setStateValue` captures `targetComponentForThisHook` by reference,
   // which is local to and constant in the scope of `useState` function
   // so, it will always refer to the same `MeactElement` object within a specific `useState` call's context
   /**
@@ -757,15 +757,15 @@ function useState(initialValue) {
    * @param {any} newValue
    */
   function setStateValue(newValue) {
-    console.log("Updating state in:", reactComponentForThisHook.id);
-    reactComponentForThisHook.stateManager.updateValue(
+    console.log("Updating state in:", targetComponentForThisHook.id);
+    targetComponentForThisHook.stateManager.updateValue(
       thisHookCallCount,
       newValue
     );
   }
 
   // update the call counter
-  reactComponentForThisHook.hooksCallCounter.increment("useState");
+  targetComponentForThisHook.hooksCallCounter.increment("useState");
 
   return [stateValue, setStateValue];
 }
@@ -779,16 +779,16 @@ function useState(initialValue) {
  * @returns {{current: any}}
  */
 function useRef(initialValue) {
-  const reactComponentForThisHook = reactComponentForHooks;
+  const targetComponentForThisHook = currActiveComponentForHooks;
 
-  badHookCall(reactComponentForThisHook, "useRef");
+  badHookCall(targetComponentForThisHook, "useRef");
 
   const thisHookCallCount = getHookCallCount(
-    reactComponentForThisHook,
+    targetComponentForThisHook,
     "useRef"
   );
 
-  const { values } = reactComponentForThisHook.refManager;
+  const { values } = targetComponentForThisHook.refManager;
 
   let refValue = {};
 
@@ -803,7 +803,7 @@ function useRef(initialValue) {
   }
 
   // update the call counter
-  reactComponentForThisHook.hooksCallCounter.increment("useRef");
+  targetComponentForThisHook.hooksCallCounter.increment("useRef");
 
   return refValue;
 }
@@ -819,19 +819,19 @@ function useRef(initialValue) {
  * @param {any[]} dependencies
  */
 function useEffect(setup, dependencies) {
-  const reactComponentForThisHook = reactComponentForHooks;
+  const targetComponentForThisHook = currActiveComponentForHooks;
 
-  badHookCall(reactComponentForThisHook, "useEffect");
-  badHookDependencyArgs(reactComponentForThisHook, "useEffect", dependencies);
+  badHookCall(targetComponentForThisHook, "useEffect");
+  badHookDependencyArgs(targetComponentForThisHook, "useEffect", dependencies);
 
-  console.log("useEffect called for", reactComponentForThisHook.id);
+  console.log("useEffect called for", targetComponentForThisHook.id);
 
   const thisHookCallCount = getHookCallCount(
-    reactComponentForThisHook,
+    targetComponentForThisHook,
     "useEffect"
   );
 
-  const { values } = reactComponentForThisHook.effectManager;
+  const { values } = targetComponentForThisHook.effectManager;
   let shouldQueue = false;
 
   // do we have a state value at (thisHookCallCount+1) position already
@@ -861,13 +861,13 @@ function useEffect(setup, dependencies) {
   // queue this for execution after DOM is rendered
   if (shouldQueue) {
     renderTree.effectHooksForPostRenderHandling.enqueue({
-      component: reactComponentForThisHook,
+      component: targetComponentForThisHook,
       index: thisHookCallCount,
     });
   }
 
   // update the call counter
-  reactComponentForThisHook.hooksCallCounter.increment("useEffect");
+  targetComponentForThisHook.hooksCallCounter.increment("useEffect");
 }
 
 /**
@@ -880,19 +880,19 @@ function useEffect(setup, dependencies) {
  * @param {any[]} dependencies
  */
 function useMemo(calculateValueFn, dependencies) {
-  const reactComponentForThisHook = reactComponentForHooks;
+  const targetComponentForThisHook = currActiveComponentForHooks;
 
-  badHookCall(reactComponentForThisHook, "useMemo");
-  badHookDependencyArgs(reactComponentForThisHook, "useMemo", dependencies);
+  badHookCall(targetComponentForThisHook, "useMemo");
+  badHookDependencyArgs(targetComponentForThisHook, "useMemo", dependencies);
 
-  console.log("useMemo called for", reactComponentForThisHook.id);
+  console.log("useMemo called for", targetComponentForThisHook.id);
 
   const thisHookCallCount = getHookCallCount(
-    reactComponentForThisHook,
+    targetComponentForThisHook,
     "useMemo"
   );
 
-  const { values } = reactComponentForThisHook.cacheManager;
+  const { values } = targetComponentForThisHook.cacheManager;
 
   let cachedValue = null;
 
@@ -926,20 +926,20 @@ function useMemo(calculateValueFn, dependencies) {
   }
 
   // update the call counter
-  reactComponentForThisHook.hooksCallCounter.increment("useMemo");
+  targetComponentForThisHook.hooksCallCounter.increment("useMemo");
 
   return cachedValue;
 }
 
 /**
  * call this to check if hook call is valid or not
- * @param {MeactElement} reactComponentForThisHook
+ * @param {MeactElement} targetComponentForThisHook
  * @param {string} hookName
  */
-function badHookCall(reactComponentForThisHook, hookName) {
+function badHookCall(targetComponentForThisHook, hookName) {
   if (
-    !reactComponentForThisHook ||
-    !reactComponentForThisHook.hooksCallCounter
+    !targetComponentForThisHook ||
+    !targetComponentForThisHook.hooksCallCounter
   ) {
     throw new Error(`${hookName} must be used within a function component`);
   }
@@ -947,30 +947,30 @@ function badHookCall(reactComponentForThisHook, hookName) {
 
 /**
  * call this to check if dependency array argument has been passed or not
- * @param {MeactElement} reactComponentForThisHook
+ * @param {MeactElement} targetComponentForThisHook
  * @param {string} hookName
  */
 function badHookDependencyArgs(
-  reactComponentForThisHook,
+  targetComponentForThisHook,
   hookName,
   dependencies
 ) {
   if (!Array.isArray(dependencies)) {
     throw new Error(
-      `${hookName} hook in ${reactComponentForThisHook.name} is missing a dependency array`
+      `${hookName} hook in ${targetComponentForThisHook.name} is missing a dependency array`
     );
   }
 }
 
 /**
  * call to get number of `hookName` calls made for this component in this render already
- * @param {MeactElement} reactComponentForThisHook
+ * @param {MeactElement} targetComponentForThisHook
  * @param {string} hookName
  * @returns {number}
  */
-function getHookCallCount(reactComponentForThisHook, hookName) {
-  if (hookName in reactComponentForThisHook.hooksCallCounter.values) {
-    return reactComponentForThisHook.hooksCallCounter.values[hookName];
+function getHookCallCount(targetComponentForThisHook, hookName) {
+  if (hookName in targetComponentForThisHook.hooksCallCounter.values) {
+    return targetComponentForThisHook.hooksCallCounter.values[hookName];
   }
   return 0;
 }

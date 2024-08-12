@@ -231,7 +231,7 @@ function createElement(element, props, ...children) {
 
     // set this component as the context for handling hooks
     // 1.
-    reactComponentForHooks = reactComponent;
+    currActiveComponentForHooks = reactComponent;
     // or, 2.
     // PUSH the current component to the stack before rendering
     // reactComponentStack.push(reactComponent);
@@ -282,7 +282,7 @@ function createElement(element, props, ...children) {
 }
 
 // 1.
-let reactComponentForHooks = null;
+let currActiveComponentForHooks = null;
 // or, 2. use a global stack to keep track of current ReactComponent being rendered
 // let reactComponentStack = [];
 
@@ -297,14 +297,14 @@ function useState(initialValue) {
    *
    * Closures capture variables by reference, not by value.
    *
-   * If we were directly using the global reference variable `reactComponentForHooks` inside the inner function `setStateValue`, then:
-   * - Due to closure, the `setStateValue` function captures a reference to the variable `reactComponentForHooks` and not its value.
-   * - That is, at the time `setStateValue` is defined, `setStateValue` holds a reference to the `reactComponentForHooks` variable itself,
+   * If we were directly using the global reference variable `currActiveComponentForHooks` inside the inner function `setStateValue`, then:
+   * - Due to closure, the `setStateValue` function captures a reference to the variable `currActiveComponentForHooks` and not its value.
+   * - That is, at the time `setStateValue` is defined, `setStateValue` holds a reference to the `currActiveComponentForHooks` variable itself,
    * - not just its value.
-   * - Therefore, any updates to the `reactComponentForHooks` variable
+   * - Therefore, any updates to the `currActiveComponentForHooks` variable
    * - after `setStateValue` is defined will be reflected when `setStateValue` is called.
    *
-   * But the global variable `reactComponentForHooks` itself is a reference to different MeactElement object changing in each run of `createElemet` function.
+   * But the global variable `currActiveComponentForHooks` itself is a reference to different MeactElement object changing in each run of `createElemet` function.
    * So, if we use the global reference directly inside `setStateValue` function,
    * then by the time `setStateValue` is called,
    * it'll always get reference to the last leaf ReactComponent object.
@@ -316,29 +316,29 @@ function useState(initialValue) {
 
   // 1.
   // copying an object reference variable creates one more reference to the same object
-  // so, this local variable is assigned the value of global reference variable `reactComponentForHooks` at the time `useState` is called
-  const reactComponentForThisHook = reactComponentForHooks;
+  // so, this local variable is assigned the value of global reference variable `currActiveComponentForHooks` at the time `useState` is called
+  const targetComponentForThisHook = currActiveComponentForHooks;
 
   // Or, 2.
-  // const reactComponentForThisHook = reactComponentStack[reactComponentStack.length - 1];
+  // const targetComponentForThisHook = reactComponentStack[reactComponentStack.length - 1];
 
   if (
-    !reactComponentForThisHook ||
-    !reactComponentForThisHook.hooksCallCounter
+    !targetComponentForThisHook ||
+    !targetComponentForThisHook.hooksCallCounter
   ) {
     throw new Error("useState must be used within a function component");
   }
 
-  console.log("useState hook called for", reactComponentForThisHook.id);
+  console.log("useState hook called for", targetComponentForThisHook.id);
 
   // how many useState calls have been made for this component in this render
   let useStateCallCount = 0;
-  if ("useState" in reactComponentForThisHook.hooksCallCounter.values) {
+  if ("useState" in targetComponentForThisHook.hooksCallCounter.values) {
     useStateCallCount =
-      reactComponentForThisHook.hooksCallCounter.values["useState"];
+      targetComponentForThisHook.hooksCallCounter.values["useState"];
   }
 
-  const { values } = reactComponentForThisHook.stateManager;
+  const { values } = targetComponentForThisHook.stateManager;
   let stateValue;
 
   // do we have a state value at (useStateCallCount+1) position already
@@ -353,7 +353,7 @@ function useState(initialValue) {
 
   const stateIndex = useStateCallCount;
 
-  // now, this inner function `setStateValue` captures `reactComponentForThisHook` by reference,
+  // now, this inner function `setStateValue` captures `targetComponentForThisHook` by reference,
   // which is local to and constant in the scope of `useState` function
   // so, it will always refer to the same `MeactElement` object within a specific `useState` call's context
   /**
@@ -361,12 +361,12 @@ function useState(initialValue) {
    * @param {any} newValue
    */
   function setStateValue(newValue) {
-    console.log("Updating state in:", reactComponentForThisHook.id);
-    reactComponentForThisHook.stateManager.updateValue(stateIndex, newValue);
+    console.log("Updating state in:", targetComponentForThisHook.id);
+    targetComponentForThisHook.stateManager.updateValue(stateIndex, newValue);
   }
 
   // update the call counter
-  reactComponentForThisHook.hooksCallCounter.increment("useState");
+  targetComponentForThisHook.hooksCallCounter.increment("useState");
 
   return [stateValue, setStateValue];
 }
@@ -429,7 +429,7 @@ function updateSubtreeForElement(
     }
 
     // set this component as the context for handling hooks
-    reactComponentForHooks = subtreeRootNode;
+    currActiveComponentForHooks = subtreeRootNode;
 
     // call the function with appropriate name and args
     const functionArgs = {

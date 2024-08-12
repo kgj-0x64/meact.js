@@ -74,7 +74,7 @@ function createElement(element, props, ...children) {
     // before its return block is executed which creates nested children elements for it
     // so, if a call to `useState` (directly as GET or as SET via calling `setState`) then it must be corresponding to this component only
     reactComponent.functionRef = element;
-    currReactComponentObject = reactComponent;
+    currActiveComponentForHooks = reactComponent;
 
     // call the component function with the received arguments
     // to finally run a `createElement` call and return its output MeactElement through its return block
@@ -117,10 +117,10 @@ function createElement(element, props, ...children) {
  * This approach is as faulty as it felt in my head!
  * It works only for one single stateful component.
  * By the time `updateState` is called via `setState`,
- * `currReactComponentObject` would be set to the last React Component dealt with in `createElement`
+ * `currActiveComponentForHooks` would be set to the last Component dealt with in `createElement`
  */
 
-let currReactComponentObject = null;
+let currActiveComponentForHooks = null;
 function updateState(reactComponentObject, valueIndex, newValue) {
   console.log("updateState", reactComponentObject, valueIndex, newValue);
   reactComponentObject.stateManager.values[valueIndex] = newValue;
@@ -128,20 +128,20 @@ function updateState(reactComponentObject, valueIndex, newValue) {
   // TODO: rerender
   reactComponentObject.plotRenderTree();
   // update the call counter since useState will be called again due to function call
-  currReactComponentObject.stateManager.useStateCallCount = 0;
+  currActiveComponentForHooks.stateManager.useStateCallCount = 0;
   reactComponentObject.functionRef(reactComponentObject.props);
 }
 
 function useState(initialValue) {
   console.log("useState", initialValue);
-  console.log("currReactComponentObject", currReactComponentObject);
+  console.log("currActiveComponentForHooks", currActiveComponentForHooks);
   // this is initial value on first render
   let stateValue = initialValue;
 
   // how many useState calls have been made for this component in this render
-  const { useStateCallCount } = currReactComponentObject.stateManager;
+  const { useStateCallCount } = currActiveComponentForHooks.stateManager;
   const numOfStoredStateValues =
-    currReactComponentObject.stateManager.values.length;
+    currActiveComponentForHooks.stateManager.values.length;
   console.log(
     "useStateCallCount",
     useStateCallCount,
@@ -153,19 +153,19 @@ function useState(initialValue) {
   if (numOfStoredStateValues >= useStateCallCount + 1) {
     // GET value from last render
     stateValue =
-      currReactComponentObject.stateManager.values[useStateCallCount];
+      currActiveComponentForHooks.stateManager.values[useStateCallCount];
   } else {
     // SET initial value
-    currReactComponentObject.stateManager.values[useStateCallCount] =
+    currActiveComponentForHooks.stateManager.values[useStateCallCount] =
       initialValue;
   }
 
   function setStateValue(newValue) {
-    updateState(currReactComponentObject, useStateCallCount, newValue);
+    updateState(currActiveComponentForHooks, useStateCallCount, newValue);
   }
 
   // update the call counter
-  currReactComponentObject.stateManager.useStateCallCount += 1;
+  currActiveComponentForHooks.stateManager.useStateCallCount += 1;
 
   return [stateValue, setStateValue];
 }

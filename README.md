@@ -33,8 +33,9 @@ Meact.js = My (implementation of) React.js
 
 - [x] Virtual DOM Nodes (i.e. `DocumentFragment` nodes)
 
-- [] Build Automation
 - [] Router (server-side)
+
+- [] Build Automation
 - [] Tree Shaking (by routes)
 
 ### Constraints

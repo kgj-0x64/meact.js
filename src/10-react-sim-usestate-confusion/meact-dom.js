@@ -1,4 +1,4 @@
-// call it to create a React root for displaying content inside a browser DOM element
+// call it to create a root node for displaying content inside a browser DOM element
 function createRoot(nodeInBrowserDom) {
   const browserDomWriterAtNode = new BrowserDomWriter(nodeInBrowserDom);
   return browserDomWriterAtNode;
@@ -9,7 +9,7 @@ class BrowserDomWriter {
     this.rootNodeInBrowserDom = rootNodeInBrowserDom;
   }
 
-  // call it to display the given "React node" into this root node of browser DOM
+  // call it to display the given "Render Tree" into this root node of browser DOM
   // and take over managing the DOM inside it
   render(meactElement) {
     this.rootNodeInBrowserDom.innerHTML = ""; // Clear any existing content
