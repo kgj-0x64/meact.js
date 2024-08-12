@@ -30,10 +30,12 @@ Meact.js = My (implementation of) React.js
 - [x] [JSX Fragment](https://esbuild.github.io/api/#jsx-fragment)
 - [x] `/jsx-runtime` [Entrypoint API](https://esbuild.github.io/api/#jsx-import-source)
 - [x] MDX Support (using [MDXjs compiler](https://mdxjs.com/packages/mdx/))
+
 - [x] Virtual DOM Nodes (i.e. `DocumentFragment` nodes)
 
 - [] Build Automation
-- [] Testing
+- [] Router (server-side)
+- [] Tree Shaking (by routes)
 
 ### Constraints
 
@@ -129,6 +131,6 @@ Beyond many for-scale things, meact.js doesn't implement these necessary ones (v
 - Metadata, SEO tuning, robots.txt, sitemap
 - Server side rendering
 - Concurrent rendering
-- Virtual DOM (an abstraction over different DOM APIs and their quirks)
 - Performance optimizations:
-  - The virtual DOM allows React to batch updates and minimize direct manipulation of the real DOM, making the UI faster and more efficient.
+  - The virtual DOM (an abstraction over different DOM APIs and their quirks) allows React to batch updates and minimize direct manipulation of the real DOM, making the UI faster and more efficient.
+  - Memory management (e.g. garbage collection)

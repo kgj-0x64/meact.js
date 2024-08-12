@@ -87,6 +87,14 @@ const virtualDomHelper = {
       virtualChildPosition,
     });
   },
+  /**
+   *
+   * @param {string} reactElementId
+   * @returns {{parentDomElementId:string, virtualChildPosition:number}}
+   */
+  getFragmentNode(reactElementId) {
+    return this.fragments.get(reactElementId);
+  },
 };
 
 /**
@@ -197,39 +205,38 @@ function upsertBrowserDomForRerenderDiffItem(rerenderDiffItem) {
   const { action, parentElement, childPosition, targetElement } =
     rerenderDiffItem;
 
-  // get its parent node from DOM
-  // ! TODO const
-  const parentElementInBrowserDom =
-    findElementByUniqueRenderId(parentElementId);
+  // get info about its parent element from the DOM
+  const parentInfoFromBrowserDom = findParentDomElementByParentRenderId(
+    parentElement,
+    childPosition
+  );
 
-  if (!parentElementInBrowserDom) {
-    console.warn(
-      `Parent element with ID "${parentElementId}" is not found in the browser DOM.`
-    );
-    return;
-  }
+  const parentElementInBrowserDom = parentInfoFromBrowserDom.parentDomElement;
+  const childPositionInBrowserDom = parentInfoFromBrowserDom.childPositionInDom;
 
   if (action === "created") {
     const targetDomSubtree = createBrowserDomForReactElement(targetElement);
 
-    // overwrite the element at the specified childPosition or append if childPosition is out of bounds
+    // overwrite the element at the specified child position or append if it's available
     if (
-      childPosition >= 0 &&
-      childPosition < parentElementInBrowserDom.children.length
+      childPositionInBrowserDom >= 0 &&
+      childPositionInBrowserDom < parentElementInBrowserDom.children.length
     ) {
       parentElementInBrowserDom.replaceChild(
         targetDomSubtree,
-        parentElementInBrowserDom.children[childPosition]
+        parentElementInBrowserDom.children[childPositionInBrowserDom]
       );
     } else {
-      parentElementInBrowserDom.appendChild(targetDomSubtree); // append at the end if childPosition is out of bounds
+      // append at the end if the specified child position if it's out of bounds
+      parentElementInBrowserDom.appendChild(targetDomSubtree);
     }
   } else if (action === "updated") {
     if (targetElement.name === "text") {
       // we need the parent DOM element because the DOM doesn't hold ID of a text node created using `document.createTextNode`
       const textContent = targetElement.props.content;
-      parentElementInBrowserDom.childNodes[childPosition].textContent =
-        textContent;
+      parentElementInBrowserDom.childNodes[
+        childPositionInBrowserDom
+      ].textContent = textContent;
     } else {
       // find the existing element to update
       const domElementToUpdate = findElementByUniqueRenderId(targetElement.id);
@@ -237,20 +244,13 @@ function upsertBrowserDomForRerenderDiffItem(rerenderDiffItem) {
       if (domElementToUpdate) {
         setAttributesAndProperties(targetElement, domElementToUpdate);
       } else {
-        console.warn(
-          `UPDATE: Element with ID "${targetElement.id}" not found.`
-        );
+        console.warn(`UPDATE: Element with ID ${targetElement.id} not found.`);
       }
     }
   } else {
     // find the existing element to delete
     const domElementToDelete = findElementByUniqueRenderId(targetElement.id);
-
-    if (domElementToDelete) {
-      domElementToDelete.parentNode.removeChild(domElementToDelete);
-    } else {
-      console.warn(`DELETE: Element with ID "${targetElement.id}" not found.`);
-    }
+    parentElementInBrowserDom.removeChild(domElementToDelete);
   }
 }
 
@@ -337,6 +337,42 @@ function isDomNodeProperty(propName, propValue) {
 function isGuaranteedHtmlAttributeName(attrName) {
   const pattern = /^[a-z]+-[a-z]+(?:-[a-z]+)*$/;
   return pattern.test(attrName);
+}
+
+/**
+ *
+ * @param {MeactElement} parentRenderElement
+ * @param {number} childPosition
+ * @returns {{parentDomElement: HTMLElement, childPositionInDom: number}}
+ */
+function findParentDomElementByParentRenderId(
+  parentRenderElement,
+  childPosition
+) {
+  const parentRenderElementId = parentRenderElement.id;
+
+  // parent element from the render tree is virtual in the DOM
+  if (parentRenderElement.type === "MeactComponent") {
+    const virtualParentElementInfo = virtualDomHelper.getFragmentNode(
+      parentRenderElementId
+    );
+    const parentDomElement = findElementByUniqueRenderId(
+      virtualParentElementInfo.parentDomElementId
+    );
+    return {
+      parentDomElement,
+      childPositionInDom:
+        virtualParentElementInfo.virtualChildPosition + childPosition,
+    };
+  }
+  // parent element from the render tree is present in the DOM
+  else {
+    const parentDomElement = findElementByUniqueRenderId(parentRenderElementId);
+    return {
+      parentDomElement,
+      childPositionInDom: childPosition,
+    };
+  }
 }
 
 /**
