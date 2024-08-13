@@ -2,13 +2,11 @@ import { join } from "path";
 import { __dirname } from "../config.js";
 
 // absolute path of constants directory
-export const CONSTANTS_DIRECTORY_NAME = "constants";
+const CONSTANTS_DIRECTORY_NAME = "constants";
 export const CONSTANTS_DIRECTORY = join(__dirname, CONSTANTS_DIRECTORY_NAME);
 
 // absolute path of pages directory
 export const APP_DIRECTORY_NAME = "app";
-export const APP_DIRECTORY = join(__dirname, APP_DIRECTORY_NAME);
-
 export const PAGES_DIRECTORY_NAME = "pages";
 export const STYLES_DIRECTORY_NAME = "styles";
 export const GLOBAL_STYLES_FILE_NAME = "global.css";
@@ -21,23 +19,23 @@ export const BUILD_OUTPUT_DIRECTORY = join(
 );
 
 // absolute path of meact library's directory
-export const MEACT_LIB_DIRECTORY_NAME = "meact";
+const MEACT_LIB_DIRECTORY_NAME = "meact";
 export const MEACT_LIB_DIRECTORY = join(__dirname, MEACT_LIB_DIRECTORY_NAME);
-export const MEACT_LIB_RENDER_TREE_DIRECTORY_NAME = "render-tree";
+const MEACT_LIB_RENDER_TREE_DIRECTORY_NAME = "render-tree";
 export const MEACT_LIB_RENDER_TREE_DIRECTORY = join(
   MEACT_LIB_DIRECTORY,
   MEACT_LIB_RENDER_TREE_DIRECTORY_NAME
 );
 
 // absolute path of meact-dom library's directory
-export const MEACT_DOM_LIB_DIRECTORY_NAME = "meact-dom";
+const MEACT_DOM_LIB_DIRECTORY_NAME = "meact-dom";
 export const MEACT_DOM_LIB_DIRECTORY = join(
   __dirname,
   MEACT_DOM_LIB_DIRECTORY_NAME
 );
 
 // absolute path of CSR functionality directory
-export const MEACT_CSR_LIB_DIRECTORY_NAME = "meact-csr";
+const MEACT_CSR_LIB_DIRECTORY_NAME = "meact-csr";
 export const MEACT_CSR_LIB_DIRECTORY = join(
   __dirname,
   MEACT_CSR_LIB_DIRECTORY_NAME

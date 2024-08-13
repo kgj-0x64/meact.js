@@ -1,19 +1,18 @@
 import mdx from "@mdx-js/esbuild";
 import { build } from "esbuild";
-import { readdirSync, existsSync, rmSync } from "fs";
+import { existsSync, rmSync } from "fs";
 import { join } from "path";
 import {
   BUILD_OUTPUT_DIRECTORY,
-  APP_DIRECTORY,
+  APP_DIRECTORY_NAME,
   PAGES_DIRECTORY_NAME,
   STYLES_DIRECTORY_NAME,
-  GLOBAL_STYLES_FILE_NAME,
   MEACT_LIB_DIRECTORY,
   MEACT_LIB_RENDER_TREE_DIRECTORY,
   MEACT_DOM_LIB_DIRECTORY,
-  MEACT_CSR_LIB_DIRECTORY_NAME,
   MEACT_CSR_LIB_DIRECTORY,
   MEACT_CSR_CLIENT_FILE_NAME,
+  BUILD_OUTPUT_DIRECTORY_NAME,
 } from "./constants/fileAndDirectoryNameAndPaths.js";
 
 const meactLibAlias = {
@@ -45,51 +44,22 @@ const jsxExtension = {
   jsxImportSource: "@meact",
 };
 
-async function buildStylesheets() {
-  const entryPoint = join(
-    APP_DIRECTORY,
-    STYLES_DIRECTORY_NAME,
-    GLOBAL_STYLES_FILE_NAME
-  );
-  const outfile = join(
-    BUILD_OUTPUT_DIRECTORY,
-    STYLES_DIRECTORY_NAME,
-    GLOBAL_STYLES_FILE_NAME
-  );
-
+async function buildScriptBundles() {
+  // bundle both of these entrypoint-patterns together
+  // so as to get the benefit of code splitting between them as well
   await build({
-    entryPoints: [entryPoint],
-    outfile,
-    bundle: true,
-    treeShaking: true,
-    minify: true,
-  });
-}
-
-async function buildPages() {
-  const appPagesDirectory = join(APP_DIRECTORY, PAGES_DIRECTORY_NAME);
-  const pages = readdirSync(appPagesDirectory).filter((file) =>
-    file.endsWith(".js")
-  );
-
-  const entryPoints = pages.map((page) =>
-    join(APP_DIRECTORY, PAGES_DIRECTORY_NAME, page)
-  );
-  const buildOutputPagesDirectory = join(
-    BUILD_OUTPUT_DIRECTORY,
-    PAGES_DIRECTORY_NAME
-  );
-
-  await build({
-    entryPoints,
-    outdir: buildOutputPagesDirectory, // outdir is required when code splitting is active
-    globalName: "page", // Define a global name to access exported values from the compiled script
+    entryPoints: [
+      `${APP_DIRECTORY_NAME}/${PAGES_DIRECTORY_NAME}/*.js`,
+      `${MEACT_CSR_LIB_DIRECTORY}/${MEACT_CSR_CLIENT_FILE_NAME}`,
+    ],
+    outdir: BUILD_OUTPUT_DIRECTORY_NAME, // outdir is required when code splitting is active
+    // globalName: "page", // when format: "iife" - define a global name to access exported values from the compiled script
     ...jsxExtension,
     ...commonClientFacingBuildOptions,
     alias: meactLibAlias,
     plugins: [
       mdx({
-        /* compile options */
+        /* MDX compile options */
         jsx: false, // produce code which uses jsx-runtime instead of JSX syntax
         jsxImportSource: "@meact", // Use '@meact/jsx-runtime' for JSX processing
         jsxRuntime: "automatic",
@@ -101,16 +71,13 @@ async function buildPages() {
   });
 }
 
-async function buildMeactCsrClient() {
-  const entryPoint = join(MEACT_CSR_LIB_DIRECTORY, MEACT_CSR_CLIENT_FILE_NAME);
-  const outdir = join(BUILD_OUTPUT_DIRECTORY, MEACT_CSR_LIB_DIRECTORY_NAME);
-
+async function buildStylesheetBundles() {
   await build({
-    entryPoints: [entryPoint],
-    outdir, // outdir is required when code splitting is active
-    ...commonClientFacingBuildOptions,
-    ...jsxExtension,
-    alias: meactLibAlias,
+    entryPoints: [`${APP_DIRECTORY_NAME}/${STYLES_DIRECTORY_NAME}/*.css`],
+    outdir: `${BUILD_OUTPUT_DIRECTORY_NAME}/${STYLES_DIRECTORY_NAME}`,
+    bundle: true,
+    minify: true, // Minifies the output CSS
+    loader: { ".css": "css" }, // Ensures CSS files are handled correctly
   });
 }
 
@@ -125,9 +92,8 @@ async function initBuild() {
 
   console.log(`Populating ${BUILD_OUTPUT_DIRECTORY}`);
 
-  await buildPages();
-  await buildStylesheets();
-  await buildMeactCsrClient();
+  await buildScriptBundles();
+  await buildStylesheetBundles();
 
   console.log("Build completed...");
 }

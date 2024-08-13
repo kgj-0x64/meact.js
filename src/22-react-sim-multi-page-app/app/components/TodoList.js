@@ -18,7 +18,7 @@ export function TodoList({ todos, theme, tab }) {
     <div class={theme}>
       <p>
         <b>
-          "Note: " <code>"filterTodos"</code> " is artificially slowed down!"
+          Note: <code>filterTodos</code> is artificially slowed down!
         </b>
       </p>
       <ul>{VisibleTodos()}</ul>

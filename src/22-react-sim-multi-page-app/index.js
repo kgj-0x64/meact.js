@@ -8,6 +8,7 @@ import {
   GLOBAL_STYLES_FILE_NAME,
   STYLES_DIRECTORY_NAME,
   PAGES_DIRECTORY_NAME,
+  APP_DIRECTORY_NAME,
 } from "./constants/fileAndDirectoryNameAndPaths.js";
 import { prepareHtmlForPageRequest } from "#meact-csr/server.js";
 
@@ -35,12 +36,8 @@ app.get("/:page", (req, res) => {
     GLOBAL_STYLES_FILE_NAME
   );
 
-  const scriptBundleRelativePath = `${PAGES_DIRECTORY_NAME}/${page}.js`;
-  const jsBundlePath = join(
-    BUILD_OUTPUT_DIRECTORY,
-    PAGES_DIRECTORY_NAME,
-    `${page}.js`
-  );
+  const scriptBundleRelativePath = `${APP_DIRECTORY_NAME}/${PAGES_DIRECTORY_NAME}/${page}.js`;
+  const jsBundlePath = join(BUILD_OUTPUT_DIRECTORY, scriptBundleRelativePath);
 
   // Check if both the JS and CSS files for the requested page exist
   if (existsSync(jsBundlePath) && existsSync(globalCssBundlePath)) {
@@ -60,7 +57,7 @@ app.get("/:page", (req, res) => {
 });
 
 // Default route to handle the root ("/") and redirect to a specific page, e.g., page1
-app.get("/", (req, res) => {
+app.get("/", (_, res) => {
   res.redirect("/home");
 });
 

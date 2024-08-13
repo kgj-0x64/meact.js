@@ -1,4 +1,4 @@
-function Layout({ children }) {
+export function Layout({ children }) {
   return (
     <div>
       <nav>
@@ -8,5 +8,3 @@ function Layout({ children }) {
     </div>
   );
 }
-
-export default Layout;
