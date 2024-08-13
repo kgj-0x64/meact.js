@@ -5,6 +5,7 @@ import { join, parse } from "path";
 import {
   meactLibDirectory,
   appPagesDirectory,
+  appStylesDirectory,
   buildOutputDirectory,
   buildOutputPagesDirectory,
 } from "./constants.js";
@@ -49,16 +50,29 @@ async function buildPage(page) {
   });
 }
 
+async function buildStylesheets() {
+  const entryPoint = join(appStylesDirectory, "global.css");
+  const outfile = join(buildOutputDirectory, "global.css");
+
+  await build({
+    entryPoints: [entryPoint],
+    outfile,
+    bundle: true,
+    treeShaking: true,
+    minify: true,
+  });
+}
+
 async function buildServer() {
-  // Build server
   await build({
     entryPoints: ["index.js"],
     outdir: buildOutputDirectory,
     bundle: true,
+    // use "platform: 'node'" to resolve packages built into Node.js runtime e.g. fs, path etc
     platform: "node",
     format: "esm",
     write: true, // Write the result to the output file
-    splitting: true,
+    splitting: false, // Splitting currently only works with the "esm" format
     treeShaking: true,
     sourcemap: false,
     minify: true,
@@ -72,7 +86,7 @@ async function initBuild() {
     file.endsWith(".js")
   );
   await Promise.all(pages.map((item) => buildPage(item)));
-
+  await buildStylesheets();
   await buildServer();
 
   console.log("Build completed...");

@@ -14,6 +14,7 @@ const appDirectoryName = "app";
 export const appDirectory = join(__dirname, appDirectoryName);
 export const indexHtmlPath = join(appDirectory, "index.html");
 export const appPagesDirectory = join(appDirectory, "pages");
+export const appStylesDirectory = join(appDirectory, "styles");
 
 // Define the absolute path where the bundled script output will be saved
 const buildOutputDirectoryName = "dist";

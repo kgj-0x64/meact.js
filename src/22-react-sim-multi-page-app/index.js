@@ -1,7 +1,11 @@
 import express from "express";
 import { readFileSync, existsSync } from "fs";
 import { join } from "path";
-import { indexHtmlPath, buildOutputDirectory } from "./constants.js";
+import {
+  indexHtmlPath,
+  buildOutputDirectory,
+  buildOutputPagesDirectory,
+} from "./constants.js";
 
 // Create an Express application
 const app = express();
@@ -17,7 +21,7 @@ app.get("/:page", (req, res) => {
   const page = req.params.page;
 
   // Construct the expected paths for the JS and CSS bundles
-  const jsBundlePath = join(buildOutputDirectory, `${page}.js`);
+  const jsBundlePath = join(buildOutputPagesDirectory, `${page}.js`);
   const cssBundlePath = join(buildOutputDirectory, "global.css");
 
   // Check if both the JS and CSS files for the requested page exist

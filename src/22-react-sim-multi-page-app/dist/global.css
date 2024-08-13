@@ -1,0 +1,40 @@
+* {
+  box-sizing: border-box;
+}
+body {
+  font-family: sans-serif;
+  margin: 20px;
+  padding: 0;
+}
+button {
+  padding: 16px;
+  margin: 16px;
+}
+.dark {
+  background-color: #000;
+  color: #fff;
+}
+.light {
+  background-color: #fff;
+  color: #000;
+}
+code {
+  font-size: 1.2em;
+}
+ul {
+  padding-inline-start: 20px;
+}
+label {
+  display: block;
+  margin-top: 10px;
+}
+#meact-element-tree {
+  padding: 8px 0;
+  border: 1px solid #909090;
+  background-color: #f5f5f5;
+}
+.meact-element-tree-node {
+  display: block;
+  margin: 16px 0;
+  border-left: 4px solid #f00;
+}
