@@ -14,7 +14,6 @@ export function prepareHtmlForPageRequest(
     // Replace the placeholder values in the HTML
     html = html.replaceAll("$stylesheetBundlePath", stylesheetBundlePath);
     html = html.replaceAll("$scriptBundlePath", scriptBundlePath);
-    console.log("All assets have been loaded successfully.");
     return html;
   } catch (error) {
     console.error("An error occurred while loading assets:", error);

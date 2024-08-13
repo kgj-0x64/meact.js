@@ -1,6 +1,7 @@
-// import { createRoot } from "@meact/dom";
-// import Meact from "@meact"
-import MyApp from "../app/app.js";
+import { createRoot } from "@meact-dom";
+// simply assume that library could impose constraint of mandating a default export from "app/index.js"
+// to keep this implementation independent of "app author's code"
+import MyApp from "../app/index.js";
 
 export function hydration(PageComponent, pageProps) {
   // get DOM element where our Meact application will be mounted
@@ -10,10 +11,9 @@ export function hydration(PageComponent, pageProps) {
   const browserDomPainterAtTargetNode = createRoot(targetNodeInBrowserDom);
 
   // get the root node of Meact's render tree
-  const renderTreeRootNode = createElement(MyApp, {
-    Page: PageComponent,
-    pageProps: pageProps,
-  });
+  const renderTreeRootNode = (
+    <MyApp Page={PageComponent} pageProps={pageProps} />
+  );
 
   // display this render tree at the target node of browser DOM
   browserDomPainterAtTargetNode.render(renderTreeRootNode);
@@ -32,8 +32,6 @@ export async function run({ scriptBundlePath }) {
 
     // mount the Meact Render Tree at the target HTML node
     hydration(pageBuildRef.default, {});
-
-    console.log("App script has been loaded and executed successfully");
   } catch (error) {
     console.error(
       "An error occurred in loading or executing app script:",

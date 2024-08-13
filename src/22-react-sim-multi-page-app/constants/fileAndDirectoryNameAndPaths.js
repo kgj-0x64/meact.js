@@ -23,6 +23,11 @@ export const BUILD_OUTPUT_DIRECTORY = join(
 // absolute path of meact library's directory
 export const MEACT_LIB_DIRECTORY_NAME = "meact";
 export const MEACT_LIB_DIRECTORY = join(__dirname, MEACT_LIB_DIRECTORY_NAME);
+export const MEACT_LIB_RENDER_TREE_DIRECTORY_NAME = "render-tree";
+export const MEACT_LIB_RENDER_TREE_DIRECTORY = join(
+  MEACT_LIB_DIRECTORY,
+  MEACT_LIB_RENDER_TREE_DIRECTORY_NAME
+);
 
 // absolute path of meact-dom library's directory
 export const MEACT_DOM_LIB_DIRECTORY_NAME = "meact-dom";

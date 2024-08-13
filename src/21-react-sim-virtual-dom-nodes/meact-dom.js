@@ -340,7 +340,7 @@ function isGuaranteedHtmlAttributeName(attrName) {
 }
 
 /**
- *
+ * call this to find actual parent element in the HTML document
  * @param {MeactElement} parentRenderElement
  * @param {number} childPosition
  * @returns {{parentDomElement: HTMLElement, childPositionInDom: number}}
