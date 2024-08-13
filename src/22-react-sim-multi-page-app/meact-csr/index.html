@@ -19,7 +19,6 @@
     <script>
       // set these values dynamically while handling GET request for a page
       let scriptBundlePath = "$scriptBundlePath";
-      let stylesheetBundlePath = "$stylesheetBundlePath";
 
       // https://stackoverflow.com/a/41395202/3083243
       // Let your inline script wait for the document and the deferred scripts to be loaded.
@@ -31,7 +30,6 @@
         // access function from build's namespace instead of `window` namespace
         meactCsrClientRef["run"].call(null, {
           scriptBundlePath,
-          stylesheetBundlePath,
         });
       });
     </script>

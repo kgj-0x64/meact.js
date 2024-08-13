@@ -70,7 +70,7 @@ async function transformMdxIntoJsx(mdxFile) {
       // Alias for any other local paths if needed
       "@src": path.resolve(process.cwd(), "src"),
     },
-    globalName: "MdxToJsxBuild", // Define a global name to access the compiled component
+    globalName: "MdxToJsxBuild", // Define a global name to access exported values from the compiled script
     inject: [], // Avoid injecting anything extra
   });
 

@@ -71,8 +71,8 @@ const browserDomWriter = {
   },
 };
 
-// virtual DOM helper mapping a render ID to its DOM parent ID and child position
-const virtualDomHelper = {
+// DOM virtual node helper mapping a render ID to its DOM parent ID and child position
+const domVirtualNodeHelper = {
   fragments: new Map(),
   /**
    * call this to record parent and virtual positional info for a DOM node
@@ -137,8 +137,8 @@ function createBrowserDomForReactElement(
     // https://developer.mozilla.org/en-US/docs/Web/API/Document/createDocumentFragment
     const placeholderElement = document.createDocumentFragment();
 
-    // storing its parent and positional info in our virtual DOM data structure
-    virtualDomHelper.addFragmentNode(
+    // storing its parent and positional info in our DOM virtual node helper data structure
+    domVirtualNodeHelper.addFragmentNode(
       meactElement.id,
       parentDomElementId,
       insertAtChildPosition
@@ -353,7 +353,7 @@ function findParentDomElementByParentRenderId(
 
   // parent element from the render tree is virtual in the DOM
   if (parentRenderElement.type === "MeactComponent") {
-    const virtualParentElementInfo = virtualDomHelper.getFragmentNode(
+    const virtualParentElementInfo = domVirtualNodeHelper.getFragmentNode(
       parentRenderElementId
     );
     const parentDomElement = findElementByUniqueRenderId(

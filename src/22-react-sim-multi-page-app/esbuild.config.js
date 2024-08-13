@@ -14,7 +14,6 @@ import {
   MEACT_CSR_LIB_DIRECTORY,
   MEACT_CSR_CLIENT_FILE_NAME,
   CONSTANTS_DIRECTORY,
-  CONSTANTS_DIRECTORY_NAME,
 } from "./constants/fileAndDirectoryNameAndPaths.js";
 import { MEACT_CSR_CLIENT_NAMESPACE } from "./constants/globalNamespacesOnClient.js";
 

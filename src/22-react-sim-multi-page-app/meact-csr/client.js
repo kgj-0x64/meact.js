@@ -21,9 +21,9 @@ export function hydration(PageComponent, pageProps) {
 
 /**
  * call this from the client after DOM is ready to hydrate the app on initial render
- * @param {{stylesheetBundlePath: string, scriptBundlePath: string}}
+ * @param {{scriptBundlePath: string}}
  */
-export async function run({ stylesheetBundlePath, scriptBundlePath }) {
+export async function run({ scriptBundlePath }) {
   try {
     const pageName = getFileNameWithoutExtension(scriptBundlePath);
 
@@ -41,21 +41,6 @@ export async function run({ stylesheetBundlePath, scriptBundlePath }) {
     );
   }
 }
-
-// call this to add a script to the document using async-await syntax
-// const addScriptToDocument = async (src) => {
-//   const el = document.createElement("script");
-//   el.src = src;
-//   // wrap the event listeners in a Promise
-//   const scriptLoadPromise = new Promise((resolve, reject) => {
-//     el.addEventListener("load", resolve);
-//     el.addEventListener("error", reject);
-//   });
-//   // add the script to the document
-//   document.body.append(el);
-//   // pause the execution of the function until the scriptLoadPromise is either resolved or rejected
-//   await scriptLoadPromise;
-// };
 
 function getFileNameWithoutExtension(relativePath) {
   // Get the file name with extension

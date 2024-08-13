@@ -87,3 +87,28 @@ When a DOM node is created for a given HTML element, many of its properties rela
 - In contrast, the `value` property doesn't reflect the `value` attribute. Instead, it's the _current value_ of the input. When the user manually changes the value of the input box, the `value` property will reflect this change. The `value` property reflects the **current** text-content inside the input box, whereas the `value` attribute contains the **initial** text-content of the `value` attribute from the HTML source code. So if you want to know what's currently inside the text-box, read the property. If you, however, want to know what the initial value of the text-box was, read the attribute. Or you can use the `defaultValue` property, which is a pure reflection of the `value` attribute.
 
 There are several properties that directly reflect their attribute (`rel`, `id`), some are direct reflections with slightly-different names (`htmlFor` reflects the `for` attribute, `className` reflects the `class` attribute), many that reflect their attribute but with restrictions/modifications (`src`, `href`, `disabled`, `multiple`), and so on. [The spec](https://www.w3.org/TR/html5/infrastructure.html#reflect) covers the various kinds of reflection.
+
+## Scripting
+
+### `defer` Attribute
+
+This `Boolean` attribute allows the elimination of parser-blocking JavaScript where the browser would have to load and evaluate scripts before continuing to parse. `async` has a similar effect in this case.
+
+Scripts with the `defer` attribute will prevent the `DOMContentLoaded` event from firing until the script has loaded and finished evaluating.
+
+Scripts with the `defer` attribute are guaranteed to execute in the order in which they appear in the document.
+
+- [`defer` is not the same as placing scripts at the bottom of the HTML.](https://stackoverflow.com/questions/10808109/script-tag-async-defer#comment100070581_10808109) When you set it to `defer`, the browser will download the JS in the background while it continues to construct the DOM. Once the DOM is constructed (and `DOMContendLoaded` is fired), the browser will then execute the JS that is has downloaded. Placing at the bottom of the HTML will delay downloading and execution of the JS until the DOM is constructed, but you will still incur an additional delay by waiting for the download.
+
+### `defer` vs Inline Script
+
+The scripts with the `defer` attribute load in the order they are specified, but not before the document itself has been loaded. [As `defer` has no effect on script tags unless they also have the `src` and `defer` attribute, the first script that gets executed is your inline script.](https://stackoverflow.com/a/41395202/3083243)
+
+### `defer` vs `async`
+
+`async` attribute also allows non-blocking download of the script, but that script is executed as soon as it is downloaded and loaded into memory irrepective of the status of HTML parsing and DOM construction.
+
+[See the visual explanation here](https://stackoverflow.com/a/39711009/3083243)
+
+- Async scripts are executed as soon as the script is loaded, so it doesn't guarantee the order of execution (a script you included at the end may execute before the first script file)
+- Defer scripts guarantee the order of execution in which they appear in the page.

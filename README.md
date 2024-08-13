@@ -33,7 +33,8 @@ Meact.js = My (implementation of) React.js
 
 - [x] Virtual DOM Nodes (i.e. `DocumentFragment` nodes)
 
-- [x] Server-side Router
+- [x] Multi-Page Application (i.e. Server-side Routing)
+- [x] Client-Side Rendering (CSR)
 - [x] Tree Shaking (by routes)
 
 ### Constraints
