@@ -1,4 +1,4 @@
-# Why Make Single Bundle of Library?
+# Why should we make Single Entrypoint of the Library?
 
 Apart from size increase due to redundancy...
 

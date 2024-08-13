@@ -14,6 +14,28 @@ export function getNewElementId(elementName) {
   return instanceId;
 }
 
+const componentRegistry = "components";
+window.MeactApp = window.MeactApp || {};
+window.MeactApp[componentRegistry] = new Map();
+export const globalMeactComponentRegistry = {
+  /**
+   * call this  to get a component's function definition
+   * @param {string} componentName
+   * @returns {Function}
+   */
+  get(componentName) {
+    return window.MeactApp[componentRegistry].get(componentName);
+  },
+  /**
+   * call this to map a component's name to its function definition
+   * @param {string} componentName
+   * @param {Function} componentFn
+   */
+  set(componentName, componentFn) {
+    window.MeactApp[componentRegistry].set(componentName, componentFn);
+  },
+};
+
 /**
  * Re-render monitor object to enforce different return behaviour of `createElement` function during re-render dynamically
  */

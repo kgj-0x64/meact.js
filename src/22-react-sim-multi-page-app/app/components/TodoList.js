@@ -21,7 +21,7 @@ export function TodoList({ todos, theme, tab }) {
           Note: <code>filterTodos</code> is artificially slowed down!
         </b>
       </p>
-      <ul>{VisibleTodos()}</ul>
+      <ul>{...VisibleTodos()}</ul>
     </div>
   );
 }

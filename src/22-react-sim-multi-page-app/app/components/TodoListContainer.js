@@ -10,11 +10,23 @@ export function TodoListContainer({ todos }) {
   return createElement(
     "div",
     null,
-    createElement("button", { onClick: () => setTab("all") }, "All"),
-    createElement("button", { onClick: () => setTab("active") }, "Active"),
     createElement(
       "button",
-      { onClick: () => setTab("completed") },
+      { type: "button", name: "show-all", onClick: () => setTab("all") },
+      "All"
+    ),
+    createElement(
+      "button",
+      { type: "button", name: "show-active", onClick: () => setTab("active") },
+      "Active"
+    ),
+    createElement(
+      "button",
+      {
+        type: "button",
+        name: "show-completed",
+        onClick: () => setTab("completed"),
+      },
       "Completed"
     ),
     createElement("br"),

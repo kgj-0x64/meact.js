@@ -1,6 +1,9 @@
 import { createBrowserDomForReactElement } from "./createDomElement.js";
 import { setAttributesAndProperties } from "./domAttrAndProp.js";
-import { findParentDomElementByParentRenderId } from "./utils.js";
+import {
+  findParentDomElementByParentRenderId,
+  findElementByUniqueRenderId,
+} from "./utils.js";
 
 /**
  * call this to update or create/insert browser DOM elements in the existing browser DOM from a given render tree root

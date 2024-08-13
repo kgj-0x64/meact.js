@@ -1,6 +1,6 @@
 import MeactElement from "./element.js";
 import { currActiveComponentForHooks } from "./hooks/global.js";
-import { rerenderMonitor } from "./utils.js";
+import { globalMeactComponentRegistry, rerenderMonitor } from "./utils.js";
 import { MemoizedFn, memoizedFunctionsMap } from "./memo.js";
 
 /**
@@ -95,6 +95,9 @@ export function createElement(element, props, ...children) {
     if (rerenderMonitor.isCreateElementFunctionHijacked()) {
       return reactComponent;
     }
+
+    // register this function into the global scope for direct access during re-rendering
+    globalMeactComponentRegistry.set(element.name, element);
 
     // if is this a Fragment function
     if (element.name === "Fragment") {

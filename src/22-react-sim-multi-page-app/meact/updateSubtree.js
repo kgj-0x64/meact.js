@@ -1,7 +1,12 @@
 import renderTree from "@meact/render-tree";
+import { createElement } from "./createElement.js";
 import { currActiveComponentForHooks } from "./hooks/global.js";
 import { memoizedFunctionsMap } from "./memo.js";
-import { arePropsEqual, rerenderMonitor } from "./utils.js";
+import {
+  arePropsEqual,
+  globalMeactComponentRegistry,
+  rerenderMonitor,
+} from "./utils.js";
 
 /**
  * call this to evaluate a subtree of the render tree on re-render (i.e. on state change)
@@ -29,9 +34,10 @@ export function updateSubtreeForElement(
     // call the function with props from last render
     const functionName = subtreeRootNode.name;
 
-    // ! FIXME Namespace should be picked from client side global scope
-    // access function from build's namespace instead of `window` namespace
-    if (typeof MdxToJsxBuild[functionName] !== "function") {
+    // access component's function definition from the global namespace
+    const functionRef = globalMeactComponentRegistry.get(functionName);
+
+    if (typeof functionRef !== "function") {
       console.log(`${functionName} is not a function`);
       return;
     }
@@ -83,14 +89,10 @@ export function updateSubtreeForElement(
     }
 
     // set this component as the context for handling hooks
-    currActiveComponentForHooks.set(reactComponent);
+    currActiveComponentForHooks.set(subtreeRootNode);
 
-    // ! FIXME Namespace should be picked from client side global scope
     // call this function to execute the component definition
-    subtreeRootNodeChildRecalculated = MdxToJsxBuild[functionName].call(
-      null,
-      functionArgs
-    );
+    subtreeRootNodeChildRecalculated = functionRef.call(null, functionArgs);
   }
 
   // check if this child position is beyond exiting node's children size

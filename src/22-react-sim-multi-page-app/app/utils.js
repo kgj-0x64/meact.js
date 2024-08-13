@@ -19,7 +19,7 @@ export function filterTodos(todos, tab) {
       '" tab.'
   );
   let startTime = performance.now();
-  while (performance.now() - startTime < 2000) {
+  while (performance.now() - startTime < 500) {
     // Do nothing for 500 ms to emulate extremely slow code
   }
 
