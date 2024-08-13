@@ -34,14 +34,19 @@ Meact.js = My (implementation of) React.js
 - [x] Virtual DOM Nodes (i.e. `DocumentFragment` nodes)
 
 - [x] Multi-Page Application (i.e. Server-side Routing)
+- [x] Page-based Router
+
 - [x] Client-Side Rendering (CSR)
-- [x] Tree Shaking (by routes)
+- [x] [Tree Shaking](https://github.com/evanw/esbuild/blob/main/docs/architecture.md#tree-shaking) (by routes)
+- [x] [Code splitting](https://github.com/evanw/esbuild/blob/main/docs/architecture.md#code-splitting) (chunks shared between routes)
 
 ### Constraints
 
 - A component must be defined as a named function only, and not as an anonymous function.
 
   - Why is this okay?: Because anonymous functions as component definitions don't bring any benefits in ergonomics, while an anonymous component function is bound to be recreated on every render (due to a new node ID with the render tree each time) and it could be harder to debug in stack traces or logs as well.
+
+- `app/index.js` should default export component that should be rendered for a URL/path, and each page component (inside `app/pages/*.js`) should also default export their corresponding function definitions.
 
 ### Optimizations
 

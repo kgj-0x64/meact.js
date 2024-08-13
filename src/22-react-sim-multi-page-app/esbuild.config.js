@@ -1,7 +1,7 @@
 import mdx from "@mdx-js/esbuild";
 import { build } from "esbuild";
 import { readdirSync, existsSync, rmSync } from "fs";
-import { join, parse } from "path";
+import { join } from "path";
 import {
   BUILD_OUTPUT_DIRECTORY,
   APP_DIRECTORY,
@@ -14,9 +14,7 @@ import {
   MEACT_CSR_LIB_DIRECTORY_NAME,
   MEACT_CSR_LIB_DIRECTORY,
   MEACT_CSR_CLIENT_FILE_NAME,
-  CONSTANTS_DIRECTORY,
 } from "./constants/fileAndDirectoryNameAndPaths.js";
-import { MEACT_CSR_CLIENT_NAMESPACE } from "./constants/globalNamespacesOnClient.js";
 
 const meactLibAlias = {
   // Alias to ensure the path is correctly resolved
@@ -27,12 +25,14 @@ const meactLibAlias = {
 };
 
 const commonClientFacingBuildOptions = {
-  format: "iife", // Use IIFE format for direct execution of code in browsers when the script is loaded, without needing a module system
+  format: "esm", // Use IIFE format for direct execution of code in browsers when the script is loaded, without needing a module system
   target: "esnext", // Target modern JavaScript
   write: true, // Write the result to the output file
   bundle: true,
-  splitting: false, // Splitting currently only works with the "esm" format
+  // https://github.com/evanw/esbuild/blob/main/docs/architecture.md#tree-shaking
   treeShaking: true,
+  // https://github.com/evanw/esbuild/blob/main/docs/architecture.md#code-splitting
+  splitting: true, // Splitting currently only works with the "esm" format
   sourcemap: !process.env.NODE_ENV === "prod",
   minify: process.env.NODE_ENV === "prod",
   inject: [], // Avoid injecting anything extra
@@ -66,22 +66,27 @@ async function buildStylesheets() {
   });
 }
 
-async function buildPage(page) {
-  const entryPoint = join(APP_DIRECTORY, PAGES_DIRECTORY_NAME, page);
-  const pageName = parse(page).name;
+async function buildPages() {
+  const appPagesDirectory = join(APP_DIRECTORY, PAGES_DIRECTORY_NAME);
+  const pages = readdirSync(appPagesDirectory).filter((file) =>
+    file.endsWith(".js")
+  );
 
+  const entryPoints = pages.map((page) =>
+    join(APP_DIRECTORY, PAGES_DIRECTORY_NAME, page)
+  );
   const buildOutputPagesDirectory = join(
     BUILD_OUTPUT_DIRECTORY,
     PAGES_DIRECTORY_NAME
   );
 
   await build({
-    entryPoints: [entryPoint],
-    // outfile,
+    entryPoints,
     outdir: buildOutputPagesDirectory, // outdir is required when code splitting is active
-    globalName: pageName, // Define a global name to access exported values from the compiled script
+    globalName: "page", // Define a global name to access exported values from the compiled script
     ...jsxExtension,
     ...commonClientFacingBuildOptions,
+    alias: meactLibAlias,
     plugins: [
       mdx({
         /* compile options */
@@ -93,7 +98,6 @@ async function buildPage(page) {
         stylePropertyNameCase: "css",
       }),
     ],
-    alias: meactLibAlias,
   });
 }
 
@@ -104,24 +108,31 @@ async function buildMeactCsrClient() {
   await build({
     entryPoints: [entryPoint],
     outdir, // outdir is required when code splitting is active
-    globalName: MEACT_CSR_CLIENT_NAMESPACE, // Define a global name to access exported values from the compiled script
     ...commonClientFacingBuildOptions,
     ...jsxExtension,
     alias: meactLibAlias,
   });
 }
 
-async function buildClientSideGlobalNamespaces() {
-  const entryPoint = join(CONSTANTS_DIRECTORY, "globalNamespacesOnClient.js");
-  const outfile = join(BUILD_OUTPUT_DIRECTORY, "globals.js");
+async function initBuild() {
+  console.log("Build started...");
 
-  await build({
-    entryPoints: [entryPoint],
-    outfile,
-    globalName: "namespaces", // Define a global name to access exported values from the compiled script
-    ...commonClientFacingBuildOptions,
-  });
+  // Delete the dist directory if it exists
+  if (existsSync(BUILD_OUTPUT_DIRECTORY)) {
+    rmSync(BUILD_OUTPUT_DIRECTORY, { recursive: true, force: true });
+    console.log(`Deleted ${BUILD_OUTPUT_DIRECTORY}`);
+  }
+
+  console.log(`Populating ${BUILD_OUTPUT_DIRECTORY}`);
+
+  await buildPages();
+  await buildStylesheets();
+  await buildMeactCsrClient();
+
+  console.log("Build completed...");
 }
+
+initBuild();
 
 // async function buildServer() {
 //   await build({
@@ -138,27 +149,3 @@ async function buildClientSideGlobalNamespaces() {
 //     minify: true,
 //   });
 // }
-
-async function initBuild() {
-  console.log("Build started...");
-
-  // Delete the dist directory if it exists
-  if (existsSync(BUILD_OUTPUT_DIRECTORY)) {
-    rmSync(BUILD_OUTPUT_DIRECTORY, { recursive: true, force: true });
-    console.log(`Deleted ${BUILD_OUTPUT_DIRECTORY}`);
-  }
-
-  console.log(`Populating ${BUILD_OUTPUT_DIRECTORY}`);
-  const appPagesDirectory = join(APP_DIRECTORY, PAGES_DIRECTORY_NAME);
-  const pages = readdirSync(appPagesDirectory).filter((file) =>
-    file.endsWith(".js")
-  );
-  await Promise.all(pages.map((item) => buildPage(item)));
-  await buildStylesheets();
-  await buildMeactCsrClient();
-  await buildClientSideGlobalNamespaces();
-
-  console.log("Build completed...");
-}
-
-initBuild();

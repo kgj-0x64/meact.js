@@ -20,40 +20,20 @@ export function hydration(PageComponent, pageProps) {
 }
 
 /**
- * call this from the client after DOM is ready to hydrate the app on initial render
- * @param {{scriptBundlePath: string}}
+ * called by "DOMContentLoaded" event listener from the client
+ * after DOM is ready so as to hydrate the app (i.e. do initial rendering)
  */
-export async function run({ scriptBundlePath }) {
+export async function run() {
   try {
-    const pageName = getFileNameWithoutExtension(scriptBundlePath);
-
-    // accessing this page's built object from the global window namespace
-    const pageBuildRef = window[pageName];
+    const { currentPageModule } = window;
+    const PageComponent = currentPageModule.default;
 
     // mount the Meact Render Tree at the target HTML node
-    hydration(pageBuildRef.default, {});
+    hydration(PageComponent, {});
   } catch (error) {
     console.error(
       "An error occurred in loading or executing app script:",
       error
     );
   }
-}
-
-function getFileNameWithoutExtension(relativePath) {
-  // Get the file name with extension
-  const fileNameWithExtension = relativePath.slice(
-    relativePath.lastIndexOf("/") + 1
-  );
-
-  // Find the position of the last '.' in the file name
-  const lastDotIndex = fileNameWithExtension.lastIndexOf(".");
-
-  // Extract the file name excluding the extension
-  const fileNameWithoutExtension =
-    lastDotIndex !== -1
-      ? fileNameWithExtension.slice(0, lastDotIndex)
-      : fileNameWithExtension;
-
-  return fileNameWithoutExtension;
 }

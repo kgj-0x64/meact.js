@@ -1,160 +1,3 @@
-// meact/hooks/hookHelpers.js
-function resetHooksCallCounters(meactElement) {
-  if (meactElement.type === "MeactComponent") {
-    meactElement.hooksCallCounter.reset();
-  }
-  for (let i = 0; i < meactElement.children.length; i++) {
-    const child = meactElement.children[i];
-    resetHooksCallCounters(child);
-  }
-}
-
-// meact/render-tree/render-tree.js
-var renderTree2 = {
-  // root node of the render tree
-  rootNode: null,
-  // how many times this app has been rendered (or rerendered) in browser
-  domRefreshCounter: 0,
-  /**
-   * call this to update the root node and thus this whole render tree
-   * @param {MeactElement} meactElement new root node
-   */
-  setRootNode(meactElement) {
-    this.rootNode = meactElement;
-    this.domRefreshCounter = 0;
-  },
-  // queues of updated or newly created elements during a re-render
-  rerenderDiffForDomHandler: {
-    queue: [],
-    // {{action: "created" | "updated" | "deleted", parentElement: MeactElement, childPosition: number, targetElement: MeactElement}[]}
-    /**
-     * @param {{action: "created" | "updated" | "deleted", parentElement: MeactElement, childPosition: number, targetElement: MeactElement}} elementSnapshot
-     */
-    enqueue(elementSnapshot) {
-      this.queue.push(elementSnapshot);
-    },
-    /**
-     * @returns {{action: "created" | "updated", parentElement: MeactElement, childPosition: number, targetElement: MeactElement}[]}
-     */
-    getQueue() {
-      return this.queue;
-    },
-    reset() {
-      this.queue = [];
-    }
-  },
-  // queue of all useEffect calls whose dependencies had changed in the last re-render
-  effectHooksForPostRenderHandling: {
-    queue: [],
-    // {{component: MeactElement, index: number}[]}
-    /**
-     * @param {{component: MeactElement, index: number}} effectObject
-     */
-    enqueue(effectObject) {
-      this.queue.push(effectObject);
-    },
-    dequeue() {
-      return this.queue.shift();
-    },
-    /**
-     * call to execute all useEffect setup and cleanup functions from this render
-     */
-    processQueue() {
-      while (this.queue.length > 0) {
-        const effectObject = this.dequeue();
-        const { component, index } = effectObject;
-        component.executeUseEffectSetupFunction(index);
-      }
-    }
-  },
-  /**
-   * call this for housekeeping after every render and re-render activity on the browser DOM
-   */
-  postRenderHandler() {
-    console.log("Post Render Cleanup Initiated...");
-    this.domRefreshCounter += 1;
-    resetHooksCallCounters(this.rootNode);
-    this.rerenderDiffForDomHandler.reset();
-    this.effectHooksForPostRenderHandling.processQueue();
-    console.log("Post Render Cleanup Done!");
-  },
-  /**
-   * call this to re-paint the browser DOM in sync with this updated sub-tree of the already painted render tree
-   * @param {MeactElement} reactSubtree
-   */
-  reRender(reactSubtree) {
-    console.log("Re-render from this subtree root node", reactSubtree.id);
-    browserDomWriter.rerenderTheDiff(this.rootNode, reactSubtree);
-  }
-};
-var render_tree_default = renderTree2;
-
-// meact/render-tree/treeDebugger.js
-var ReactElementTreeDebugger = class {
-  /**
-   * @param {MeactElement} meactElement
-   */
-  constructor(meactElement) {
-    this.node = meactElement;
-    this.treeContainer = document.getElementById("meact-element-tree");
-  }
-  /**
-   * call this trigger function to create browser DOM from the root node of a given render tree
-   * and append it at the appropriate DOM position in the HTML document
-   */
-  renderTreeInHtmlDocument() {
-    this.treeContainer.innerHTML = "";
-    this.createHtmlForTreeNode(this.node, 0);
-  }
-  /**
-   * call this to create browser DOM from the root node of a given render tree
-   * @param {MeactElement} node
-   * @param {number} level
-   */
-  createHtmlForTreeNode(node, level = 0) {
-    const leftMargin = "_".repeat(level * 2);
-    const nestedLeftMargin = "_".repeat((level + 1) * 2);
-    const nodeNameSpan = document.createElement("span");
-    nodeNameSpan.className = "meact-element-tree-node";
-    nodeNameSpan.innerText = `${leftMargin}_node: ${node.name}`;
-    this.treeContainer.appendChild(nodeNameSpan);
-    const nodeTypeSpan = document.createElement("span");
-    nodeTypeSpan.className = "meact-element-tree-node";
-    nodeTypeSpan.innerText = `${nestedLeftMargin}_type: ${node.type}`;
-    this.treeContainer.appendChild(nodeTypeSpan);
-    const nodeIdSpan = document.createElement("span");
-    nodeIdSpan.className = "meact-element-tree-node";
-    nodeIdSpan.innerText = `${nestedLeftMargin}_id: ${node.id}`;
-    this.treeContainer.appendChild(nodeIdSpan);
-    if (node.type === "MeactComponent") {
-      const nodeStateSpan = document.createElement("span");
-      nodeStateSpan.className = "meact-element-tree-node";
-      nodeStateSpan.innerText = `${nestedLeftMargin}_STATE: "${JSON.stringify(
-        node.stateManager.values
-      )}"`;
-      this.treeContainer.appendChild(nodeStateSpan);
-    }
-    if (node.props !== void 0 && node.props) {
-      for (const [key, value] of Object.entries(node.props)) {
-        const nodeAttributeSpan = document.createElement("span");
-        nodeAttributeSpan.className = "meact-element-tree-node";
-        nodeAttributeSpan.innerText = `${nestedLeftMargin}_${key}: ${JSON.stringify(
-          value
-        )}`;
-        this.treeContainer.appendChild(nodeAttributeSpan);
-      }
-    }
-    if (node.children && node.children.length > 0) {
-      node.children.forEach((child) => {
-        this.createHtmlForTreeNode(child, level + 1);
-      });
-    }
-  }
-};
-
-// meact/render-tree/index.js
-var render_tree_default2 = render_tree_default;
-
 // meact-dom/virtualNodeHelper.js
 var domVirtualNodeHelper = {
   fragments: /* @__PURE__ */ new Map(),
@@ -348,7 +191,7 @@ var browserDomWriter = {
    * @param {MeactElement} meactElement root node of the render tree which is to be rendered in browser DOM
    */
   render(meactElement) {
-    render_tree_default2.setRootNode(meactElement);
+    render_tree_default.setRootNode(meactElement);
     meactElement.plotRenderTree();
     this.targetNodeInBrowserDom.innerHTML = "";
     const browserDom = createBrowserDomForReactElement(
@@ -358,7 +201,7 @@ var browserDomWriter = {
     );
     console.dir(browserDom);
     this.targetNodeInBrowserDom.appendChild(browserDom);
-    render_tree_default2.postRenderHandler();
+    render_tree_default.postRenderHandler();
   },
   /**
    * call this to update existing DOM's copy based on render tree's diff
@@ -366,20 +209,189 @@ var browserDomWriter = {
    */
   rerenderTheDiff(rootReactElement) {
     rootReactElement.plotRenderTree();
-    const rerenderDiffQueue = render_tree_default2.rerenderDiffForDomHandler.getQueue();
+    const rerenderDiffQueue = render_tree_default.rerenderDiffForDomHandler.getQueue();
     console.log("Rerender DIFF Queue", rerenderDiffQueue);
     for (let i = 0; i < rerenderDiffQueue.length; i++) {
       upsertBrowserDomForRerenderDiffItem(rerenderDiffQueue[i]);
     }
-    render_tree_default2.postRenderHandler();
+    render_tree_default.postRenderHandler();
   }
 };
 
-// meact-dom/index.js
-function createRoot(rootNodeInBrowserDom) {
-  browserDomWriter.setbrowserDomWriterAtNode(rootNodeInBrowserDom);
-  return browserDomWriter;
+// meact/hooks/hookHelpers.js
+function badHookCall(targetComponentForThisHook, hookName) {
+  if (!targetComponentForThisHook || !targetComponentForThisHook.hooksCallCounter) {
+    throw new Error(`${hookName} must be used within a function component`);
+  }
 }
+function badHookDependencyArgs(targetComponentForThisHook, hookName, dependencies) {
+  if (!Array.isArray(dependencies)) {
+    throw new Error(
+      `${hookName} hook in ${targetComponentForThisHook.name} is missing a dependency array`
+    );
+  }
+}
+function getHookCallCount(targetComponentForThisHook, hookName) {
+  if (hookName in targetComponentForThisHook.hooksCallCounter.values) {
+    return targetComponentForThisHook.hooksCallCounter.values[hookName];
+  }
+  return 0;
+}
+function resetHooksCallCounters(meactElement) {
+  if (meactElement.type === "MeactComponent") {
+    meactElement.hooksCallCounter.reset();
+  }
+  for (let i = 0; i < meactElement.children.length; i++) {
+    const child = meactElement.children[i];
+    resetHooksCallCounters(child);
+  }
+}
+
+// meact/render-tree/render-tree.js
+var renderTree2 = {
+  // root node of the render tree
+  rootNode: null,
+  // how many times this app has been rendered (or rerendered) in browser
+  domRefreshCounter: 0,
+  /**
+   * call this to update the root node and thus this whole render tree
+   * @param {MeactElement} meactElement new root node
+   */
+  setRootNode(meactElement) {
+    this.rootNode = meactElement;
+    this.domRefreshCounter = 0;
+  },
+  // queues of updated or newly created elements during a re-render
+  rerenderDiffForDomHandler: {
+    queue: [],
+    // {{action: "created" | "updated" | "deleted", parentElement: MeactElement, childPosition: number, targetElement: MeactElement}[]}
+    /**
+     * @param {{action: "created" | "updated" | "deleted", parentElement: MeactElement, childPosition: number, targetElement: MeactElement}} elementSnapshot
+     */
+    enqueue(elementSnapshot) {
+      this.queue.push(elementSnapshot);
+    },
+    /**
+     * @returns {{action: "created" | "updated", parentElement: MeactElement, childPosition: number, targetElement: MeactElement}[]}
+     */
+    getQueue() {
+      return this.queue;
+    },
+    reset() {
+      this.queue = [];
+    }
+  },
+  // queue of all useEffect calls whose dependencies had changed in the last re-render
+  effectHooksForPostRenderHandling: {
+    queue: [],
+    // {{component: MeactElement, index: number}[]}
+    /**
+     * @param {{component: MeactElement, index: number}} effectObject
+     */
+    enqueue(effectObject) {
+      this.queue.push(effectObject);
+    },
+    dequeue() {
+      return this.queue.shift();
+    },
+    /**
+     * call to execute all useEffect setup and cleanup functions from this render
+     */
+    processQueue() {
+      while (this.queue.length > 0) {
+        const effectObject = this.dequeue();
+        const { component, index } = effectObject;
+        component.executeUseEffectSetupFunction(index);
+      }
+    }
+  },
+  /**
+   * call this for housekeeping after every render and re-render activity on the browser DOM
+   */
+  postRenderHandler() {
+    console.log("Post Render Cleanup Initiated...");
+    this.domRefreshCounter += 1;
+    resetHooksCallCounters(this.rootNode);
+    this.rerenderDiffForDomHandler.reset();
+    this.effectHooksForPostRenderHandling.processQueue();
+    console.log("Post Render Cleanup Done!");
+  },
+  /**
+   * call this to re-paint the browser DOM in sync with this updated sub-tree of the already painted render tree
+   * @param {MeactElement} reactSubtree
+   */
+  reRender(reactSubtree) {
+    console.log("Re-render from this subtree root node", reactSubtree.id);
+    browserDomWriter.rerenderTheDiff(this.rootNode, reactSubtree);
+  }
+};
+var render_tree_default2 = renderTree2;
+
+// meact/render-tree/treeDebugger.js
+var ReactElementTreeDebugger = class {
+  /**
+   * @param {MeactElement} meactElement
+   */
+  constructor(meactElement) {
+    this.node = meactElement;
+    this.treeContainer = document.getElementById("meact-element-tree");
+  }
+  /**
+   * call this trigger function to create browser DOM from the root node of a given render tree
+   * and append it at the appropriate DOM position in the HTML document
+   */
+  renderTreeInHtmlDocument() {
+    this.treeContainer.innerHTML = "";
+    this.createHtmlForTreeNode(this.node, 0);
+  }
+  /**
+   * call this to create browser DOM from the root node of a given render tree
+   * @param {MeactElement} node
+   * @param {number} level
+   */
+  createHtmlForTreeNode(node, level = 0) {
+    const leftMargin = "_".repeat(level * 2);
+    const nestedLeftMargin = "_".repeat((level + 1) * 2);
+    const nodeNameSpan = document.createElement("span");
+    nodeNameSpan.className = "meact-element-tree-node";
+    nodeNameSpan.innerText = `${leftMargin}_node: ${node.name}`;
+    this.treeContainer.appendChild(nodeNameSpan);
+    const nodeTypeSpan = document.createElement("span");
+    nodeTypeSpan.className = "meact-element-tree-node";
+    nodeTypeSpan.innerText = `${nestedLeftMargin}_type: ${node.type}`;
+    this.treeContainer.appendChild(nodeTypeSpan);
+    const nodeIdSpan = document.createElement("span");
+    nodeIdSpan.className = "meact-element-tree-node";
+    nodeIdSpan.innerText = `${nestedLeftMargin}_id: ${node.id}`;
+    this.treeContainer.appendChild(nodeIdSpan);
+    if (node.type === "MeactComponent") {
+      const nodeStateSpan = document.createElement("span");
+      nodeStateSpan.className = "meact-element-tree-node";
+      nodeStateSpan.innerText = `${nestedLeftMargin}_STATE: "${JSON.stringify(
+        node.stateManager.values
+      )}"`;
+      this.treeContainer.appendChild(nodeStateSpan);
+    }
+    if (node.props !== void 0 && node.props) {
+      for (const [key, value] of Object.entries(node.props)) {
+        const nodeAttributeSpan = document.createElement("span");
+        nodeAttributeSpan.className = "meact-element-tree-node";
+        nodeAttributeSpan.innerText = `${nestedLeftMargin}_${key}: ${JSON.stringify(
+          value
+        )}`;
+        this.treeContainer.appendChild(nodeAttributeSpan);
+      }
+    }
+    if (node.children && node.children.length > 0) {
+      node.children.forEach((child) => {
+        this.createHtmlForTreeNode(child, level + 1);
+      });
+    }
+  }
+};
+
+// meact/render-tree/index.js
+var render_tree_default = render_tree_default2;
 
 // meact/utils.js
 var nextId = 0;
@@ -394,7 +406,7 @@ var rerenderMonitor = {
     if (this.isHijackOfCreateElementFnPaused) {
       return false;
     }
-    return render_tree_default2.domRefreshCounter > 0;
+    return render_tree_default.domRefreshCounter > 0;
   },
   pauseHijackOfCreateElementFn() {
     this.isHijackOfCreateElementFnPaused = true;
@@ -403,6 +415,15 @@ var rerenderMonitor = {
     this.isHijackOfCreateElementFnPaused = false;
   }
 };
+function areArraysEqual(a, b) {
+  if (a === b) return true;
+  if (a == null || b == null) return false;
+  if (a.length !== b.length) return false;
+  for (var i = 0; i < a.length; i++) {
+    if (a[i] !== b[i]) return false;
+  }
+  return true;
+}
 function arePropsEqual(oldProps, newProps) {
   if (typeof newProps !== "object" || typeof oldProps !== "object" || newProps === null || oldProps === null) {
     return newProps === oldProps;
@@ -521,7 +542,7 @@ function updateSubtreeForElement(subtreeLevelFromStateChange, subtreeRootNode, c
   if (existingChildOfSubtreeRootNode.type !== "MeactComponent") {
     const isPropsSameInRerender = arePropsEqual(lastProps, newProps);
     if (!isPropsSameInRerender) {
-      render_tree_default2.rerenderDiffForDomHandler.enqueue({
+      render_tree_default.rerenderDiffForDomHandler.enqueue({
         action: "updated",
         parentElement: subtreeRootNode,
         childPosition,
@@ -544,7 +565,7 @@ function updateSubtreeForElement(subtreeLevelFromStateChange, subtreeRootNode, c
   const recalculatedNumberOfChildren = subtreeRootNodeChildRecalculated.children.length;
   if (recalculatedNumberOfChildren < existingNumberOfChildren) {
     for (let i = recalculatedNumberOfChildren; i < existingNumberOfChildren; i++) {
-      render_tree_default2.rerenderDiffForDomHandler.enqueue({
+      render_tree_default.rerenderDiffForDomHandler.enqueue({
         action: "deleted",
         parentElement: existingChildOfSubtreeRootNode,
         childPosition: i,
@@ -573,7 +594,7 @@ function createElementDuringRerender(subtreeRootNode, childPosition, { type, nam
   }
   const mountNewChildSubtree = createElement(name, props, ...children);
   subtreeRootNode.children[childPosition] = mountNewChildSubtree;
-  render_tree_default2.rerenderDiffForDomHandler.enqueue({
+  render_tree_default.rerenderDiffForDomHandler.enqueue({
     action: "created",
     parentElement: subtreeRootNode,
     childPosition,
@@ -633,7 +654,7 @@ var MeactElement = class {
         }
         this.stateManager.values[index] = newStateValue;
         updateSubtreeForElement(0, this, 0, null);
-        render_tree_default2.reRender(this);
+        render_tree_default.reRender(this);
       }
     } : void 0;
     this.refManager = type === "MeactComponent" ? {
@@ -786,6 +807,70 @@ function createChildrenElementsHelper(childrenArray) {
   return childrenElements;
 }
 
+// meact/hooks/useState.js
+function useState(initialValue) {
+  const targetComponentForThisHook = currActiveComponentForHooks.get();
+  badHookCall(targetComponentForThisHook, "useState");
+  console.log("useState hook called for", targetComponentForThisHook.id);
+  const thisHookCallCount = getHookCallCount(
+    targetComponentForThisHook,
+    "useState"
+  );
+  const { values } = targetComponentForThisHook.stateManager;
+  let stateValue;
+  if (values.length > thisHookCallCount) {
+    stateValue = values[thisHookCallCount];
+  } else {
+    stateValue = initialValue;
+    values.push(stateValue);
+  }
+  function setStateValue(newValue) {
+    console.log("Updating state in:", targetComponentForThisHook.id);
+    targetComponentForThisHook.stateManager.updateValue(
+      thisHookCallCount,
+      newValue
+    );
+  }
+  targetComponentForThisHook.hooksCallCounter.increment("useState");
+  return [stateValue, setStateValue];
+}
+
+// meact/hooks/useMemo.js
+function useMemo(calculateValueFn, dependencies) {
+  const targetComponentForThisHook = currActiveComponentForHooks.get();
+  badHookCall(targetComponentForThisHook, "useMemo");
+  badHookDependencyArgs(targetComponentForThisHook, "useMemo", dependencies);
+  console.log("useMemo called for", targetComponentForThisHook.id);
+  const thisHookCallCount = getHookCallCount(
+    targetComponentForThisHook,
+    "useMemo"
+  );
+  const { values } = targetComponentForThisHook.cacheManager;
+  let cachedValue = null;
+  if (values.length > thisHookCallCount) {
+    const previousDeps = values[thisHookCallCount].depsArray;
+    values[thisHookCallCount].depsArray = dependencies;
+    const hasDepsChanged = dependencies.length === 0 || !areArraysEqual(previousDeps, dependencies);
+    if (hasDepsChanged) {
+      cachedValue = calculateValueFn();
+      values[thisHookCallCount] = {
+        cachedValue,
+        depsArray: dependencies
+      };
+    } else {
+      cachedValue = values[thisHookCallCount].cachedValue;
+    }
+  } else {
+    cachedValue = calculateValueFn();
+    values.push({
+      cachedValue,
+      depsArray: dependencies
+    });
+  }
+  targetComponentForThisHook.hooksCallCounter.increment("useMemo");
+  return cachedValue;
+}
+
 // meact/index.js
 var Meact = {
   createElement: createElement2
@@ -807,45 +892,10 @@ function jsxs(type, props, key) {
   return createElement3(type, propsObject, ...childrenArray);
 }
 
-// app/components/Layout.js
-function Layout({ children }) {
-  return /* @__PURE__ */ jsxs("div", { children: [
-    /* @__PURE__ */ jsxs("nav", { children: [
-      /* @__PURE__ */ jsx("a", { href: "/home", children: "Home" }),
-      " | ",
-      /* @__PURE__ */ jsx("a", { href: "/about", children: "About" })
-    ] }),
-    /* @__PURE__ */ jsx("main", { children })
-  ] });
-}
-var Layout_default = Layout;
-
-// app/index.js
-function MyApp({ Page, pageProps }) {
-  return /* @__PURE__ */ jsx(Layout_default, { children: /* @__PURE__ */ jsx(Page, { ...pageProps }) });
-}
-var app_default = MyApp;
-
-// meact-csr/client.js
-function hydration(PageComponent, pageProps) {
-  const targetNodeInBrowserDom = document.getElementById("root");
-  const browserDomPainterAtTargetNode = createRoot(targetNodeInBrowserDom);
-  const renderTreeRootNode = /* @__PURE__ */ jsx(app_default, { Page: PageComponent, pageProps });
-  browserDomPainterAtTargetNode.render(renderTreeRootNode);
-}
-async function run() {
-  try {
-    const { currentPageModule } = window;
-    const PageComponent = currentPageModule.default;
-    hydration(PageComponent, {});
-  } catch (error) {
-    console.error(
-      "An error occurred in loading or executing app script:",
-      error
-    );
-  }
-}
 export {
-  hydration,
-  run
+  useState,
+  useMemo,
+  meact_default,
+  jsx,
+  jsxs
 };
