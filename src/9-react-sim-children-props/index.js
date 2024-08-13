@@ -1,6 +1,6 @@
 // Same API as React //
 
-// Render the Counter component into the DOM
+// get DOM element where our Meact application will be mounted
 const targetNodeInBrowserDom = document.getElementById("root");
 const browserDomPainterAtTargetNode = createRoot(targetNodeInBrowserDom);
 

@@ -1,0 +1,19 @@
+{
+  "name": "22-react-sim-multi-page-app",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "build": "node --env-file=.env esbuild.config.js",
+    "start": "node --env-file=.env dist/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "22-react-sim-multi-page-app": "file:",
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "@mdx-js/esbuild": "^3.0.1",
+    "esbuild": "^0.23.0"
+  }
+}

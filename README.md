@@ -33,10 +33,8 @@ Meact.js = My (implementation of) React.js
 
 - [x] Virtual DOM Nodes (i.e. `DocumentFragment` nodes)
 
-- [] Router (server-side)
-
-- [] Build Automation
-- [] Tree Shaking (by routes)
+- [x] Server-side Router
+- [x] Tree Shaking (by routes)
 
 ### Constraints
 
@@ -46,7 +44,9 @@ Meact.js = My (implementation of) React.js
 
 ### Optimizations
 
-- DIFF Reconciliation during Re-render: ! TODO
+- DIFF Reconciliation: [Reconciliation is the algorithm behind what is popularly understood as the "virtual DOM."](https://github.com/acdlite/react-fiber-architecture) When the application is rendered, a tree of nodes (i.e. the "render tree") that describes the app is generated and saved in memory. The renderer translates the render tree into a set of DOM operations. It's designed such that reconciliation and rendering are separate phases where the reconciler does the work of computing which parts of the tree have changed and the renderer then uses this information about the minimum set of changes required to update the actual DOM so as to update the rendered app. (This is why "virtual DOM" is a bit of a misnomer.)
+
+  - Fancy side note: We could maybe say that the render tree is a more specific implementation that embodies the concept of the virtual DOM. Like, Inversion of Control (IoC) is a design principle (concept) where the control flow of a program is inverted from our custom logic to the framework or runtime and the Spring frmaework (an IoC container) implements that as dependency injection using reflection at runtime.
 
 - `useMemo` caches results of expensive calculations or references to arrays/objects/functions so that these result values or references are not recreated across re-renders, are then same values across renders when passed via `props` and are thus not queued as "updates" in the browser DOM by the UI library during a re-render.
 
@@ -64,25 +64,22 @@ Meact.js = My (implementation of) React.js
 
 - [JSX Spec - "Why not Template Literals?"](https://facebook.github.io/jsx/#sec-why-not-template-literals)
 
-- React uses the order of hooks inside a component's function definition to manage state and side effects.
+- **React uses the order of hooks inside a component's function definition to manage state and side effects.**
 
 - [How different frameworks handle the difference between DOM properties and attributes](https://jakearchibald.com/2024/attributes-vs-properties/#how-frameworks-handle-the-difference)
 
-- React Compiler is a new experimental compiler which requires React 19 RC. It automatically memoizes code using [React's rules](https://react.dev/reference/rules). Also, [React Compiler's eslint plugin](https://react.dev/learn/react-compiler#installing-eslint-plugin-react-compiler) can be used independently of the compiler to display any violations of the rules of React in your editor.
+- A `JSX Runtime` is a set of functions that a compiler (like Babel) uses to transform JSX syntax into JavaScript function calls. In the React ecosystem, these are provided by the "@jsx-runtime/react" package. Instead of just a single `createElement` function, modern JSX runtimes usually define:
 
-## Virtual DOM
+  - `Fragment`: A component used to group multiple elements without adding extra nodes to the DOM.
+  - `jsx`: For handling JSX elements.
+  - `jsxs`: For handling JSX elements with multiple children (used for optimization).
+  - `jsxDEV`: A version of jsx with additional development features (like better error messages).
 
-### Fragment
+- `DocumentFragment`: To mimic React.js's `Fragment` or to create a DOM node respective to a functional component node from the render tree, we can use a `DocumentFragment` object.
 
-To mimic React.js's `Fragment` or to create a DOM node respective to a functional component as a render tree node, we can use a `DocumentFragment` object.
+  - A `DocumentFragment` is a lightweight, minimalistic document object that can hold and manipulate a group of nodes. When we append a `DocumentFragment` to the DOM, its children are appended, but the fragment itself is not (similar to how a React `Fragment` works). That is, just like a React `Fragment`, a `DocumentFragment` doesn’t create an extra node in the DOM tree, and only its child elements are added. But, `Document` and `DocumentFragment` nodes can never have a parent, so `parentNode` will always return `null`.
 
-A `DocumentFragment` is a lightweight, minimalistic document object that can hold and manipulate a group of nodes. When we append a `DocumentFragment` to the DOM, its children are appended, but the fragment itself is not (similar to how a React `Fragment` works). That is, just like a React `Fragment`, a `DocumentFragment` doesn’t create an extra node in the DOM tree, and only its child elements are added.
-
-### Why do we need a Virtual DOM
-
-In order to do CRUD operations on the browser DOM for target `MeactElement` nodes, we need access to information about parent-children relations with positional info from the rendered browser DOM tree.
-
-- The read-only `parentNode` property of the `Node` interface returns the parent of the specified node in the DOM tree. `Document` and `DocumentFragment` nodes can never have a parent, so `parentNode` will always return `null`. It also returns `null` if the node has just been created and is not yet attached to the tree.
+- **React Compiler is a new experimental compiler which requires React 19 RC. It automatically memoizes code using** [**React's rules**](https://react.dev/reference/rules). Also, [React Compiler's eslint plugin](https://react.dev/learn/react-compiler#installing-eslint-plugin-react-compiler) can be used independently of the compiler to display any violations of the rules of React in your editor.
 
 ## Build Tools
 
@@ -104,34 +101,46 @@ In order to do CRUD operations on the browser DOM for target `MeactElement` node
 
 - I keep forgetting to re-generate the bundle after editing code, besides it being a unproductive flow-breaker. So, ["live reload"](https://esbuild.github.io/api/#live-reload) would be much appreciated!
 
+- When you import a script via a `<script>` tag, the code is expected to be directly executable in the browser without any additional environment.
+
+  - `require()` is a Node.js module system function, and it's not supported in browsers.
+
+  - ES Modules (ESM) are a standardized module system in JavaScript. They use `import` and `export` statements and are supported by modern browsers. However, for the browser to recognize and correctly parse a JavaScript file that uses ES Modules, you need to indicate this with the `type="module"` attribute in the `<script>` tag. But, `type="module"` causes following issue which can be solved using a server.
+
+    ```text
+    Access to script at '.../components.js' from origin "null" has been blocked by CORS policy: Cross origin requests are only supported for protocol schemes: http, data, isolated-app, chrome-extension, chrome, https, chrome-untrusted.
+    ```
+
+  - By using format: "iife", you ensure that the output is wrapped in an Immediately Invoked Function Expression, which allows it to run directly in the browser.
+
 ## Out of Scope
 
-### Asynchronous State Updates
+### [Scheduling Updates](https://github.com/acdlite/react-fiber-architecture?tab=readme-ov-file#scheduling)
 
-meact.js does synchronous state updates instead of batching them and applying them in an asynchronous manner like React.js, and its performance implication ("CPU fan noise") can be observed by running
+meact.js does synchronous state updates instead of batching them and applying them in an asynchronous manner like React.js, and its performance implication ("CPU fan noise") can be observed by running `.src/15-react-sim-sync-setstate-performance/index.html` where the UI implements a React Component which renders a colored circle following the mouse position, and another colored circle following first circle's position delayed by 100ms and so on (for total 5-6 circles).
 
-- `.src/15-react-sim-sync-setstate-performance/index.html` where the UI implements a React Component which renders a colored circle following the mouse position, and another colored circle following first circle's position delayed by 100ms and so on (for total 5-6 circles).
+[Why is `setState` in react.js Async instead of Sync?](https://github.com/acdlite/react-fiber-architecture?tab=readme-ov-file#scheduling)
 
-[Why is `setState` in react.js Async instead of Sync?](https://stackoverflow.com/a/48438145/3083243)
+1. In a UI, it's not necessary for every update to be applied immediately; in fact, doing so can be wasteful, causing frames to drop and degrading the user experience.
+2. Different types of updates have different priorities — an animation update needs to complete more quickly than, say, an update from a data store.
+3. A push-based approach requires the app (you, the programmer) to decide how to schedule work. A pull-based approach allows the framework (React) to be smart and make those decisions for you.
+   React doesn't currently take advantage of scheduling in a significant way; an update results in the entire subtree being re-rendered immediately. Overhauling React's core algorithm to take advantage of scheduling is the driving idea behind Fiber.
 
-ReactJS takes into consideration many variables in the scenario that you're changing the state in, to decide when the state should actually be updated and your component rerendered.
-
-- A simple example to demonstrate this, is that if you call `setState` as a reaction to a user action, then the state will probably be updated immediately (although, again, you can't count on it), so the user won't feel any delay, but if you call `setState` in reaction to an ajax call response or some other event that isn't triggered by the user, then the state might be updated with a slight delay, since the user won't really feel this delay, and it will improve performance by waiting to batch multiple state updates together and rerender the DOM fewer times.
+- A [simple example to demonstrate this](https://stackoverflow.com/a/48438145/3083243), is that if you call `setState` as a reaction to a user action, then the state will probably be updated immediately (although, again, you can't count on it), so the user won't feel any delay, but if you call `setState` in reaction to an ajax call response or some other event that isn't triggered by the user, then the state might be updated with a slight delay, since the user won't really feel this delay, and it will improve performance by waiting to batch multiple state updates together and rerender the DOM fewer times.
 
 ### WHAT's MISSING
 
 Beyond many for-scale things, meact.js doesn't implement these necessary ones (versus react.js)
 
-- Great documentation and OSS community
-- Local development server and hot reload
-- Devtools and dev/prod environments
+- Great documentation, extensive testing and OSS community
+- Dev tools and Hot Reload in dev environment
 - Scoped CSS; CSS-in-JS
-- Synthetic events (cross-browser tested API)
-- Ecosystem of client or async state management, UI components, caching, etc
-- Ecosystem of build, bundler and tree-shaking tools
+- Synthetic events and Cross-browser API for setting DOM node attributes and properties
+- Ecosystem of libraries and frameworks (e.g. Astro, Next.js, client or async state management, UI components, caching, etc)
 - Metadata, SEO tuning, robots.txt, sitemap
 - Server side rendering
 - Concurrent rendering
 - Performance optimizations:
-  - The virtual DOM (an abstraction over different DOM APIs and their quirks) allows React to batch updates and minimize direct manipulation of the real DOM, making the UI faster and more efficient.
+  - Scheduling of state updates
   - Memory management (e.g. garbage collection)
+  - Compiler like Svelte/Solid (under development)
