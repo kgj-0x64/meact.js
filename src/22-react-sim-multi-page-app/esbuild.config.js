@@ -1,58 +1,67 @@
 import mdx from "@mdx-js/esbuild";
 import { build } from "esbuild";
-import { readdirSync } from "fs";
+import { readdirSync, existsSync, rmSync } from "fs";
 import { join, parse } from "path";
 import {
-  meactLibDirectory,
-  appPagesDirectory,
-  appStylesDirectory,
-  buildOutputDirectory,
-  buildOutputPagesDirectory,
-} from "./constants.js";
+  BUILD_OUTPUT_DIRECTORY,
+  APP_DIRECTORY,
+  PAGES_DIRECTORY_NAME,
+  STYLES_DIRECTORY_NAME,
+  GLOBAL_STYLES_FILE_NAME,
+  MEACT_LIB_DIRECTORY_NAME,
+  MEACT_DOM_LIB_DIRECTORY_NAME,
+  MEACT_CSR_LIB_DIRECTORY_NAME,
+  MEACT_CSR_LIB_DIRECTORY,
+  MEACT_CSR_CLIENT_FILE_NAME,
+  CONSTANTS_DIRECTORY,
+  CONSTANTS_DIRECTORY_NAME,
+} from "./constants/fileAndDirectoryNameAndPaths.js";
+import { MEACT_CSR_CLIENT_NAMESPACE } from "./constants/globalNamespacesOnClient.js";
 
-async function buildPage(page) {
-  const entryPoint = join(appPagesDirectory, page);
-  const pageName = parse(page).name;
+const meactLibAlias = {
+  // Alias to ensure the path is correctly resolved
+  "@meact": join(BUILD_OUTPUT_DIRECTORY, MEACT_LIB_DIRECTORY_NAME, "index.js"),
+  "@meact/jsx-runtime": join(
+    BUILD_OUTPUT_DIRECTORY,
+    MEACT_LIB_DIRECTORY_NAME,
+    "jsx-runtime.js"
+  ),
+  "@meact-dom": join(
+    BUILD_OUTPUT_DIRECTORY,
+    MEACT_DOM_LIB_DIRECTORY_NAME,
+    "index.js"
+  ),
+};
 
-  await build({
-    entryPoints: [entryPoint],
-    // outfile,
-    outdir: buildOutputPagesDirectory, // outdir is required when code splitting is active
-    bundle: true, // Bundle all dependencies into the output
-    format: "iife", // Use IIFE format for direct execution of code in browsers when the script is loaded, without needing a module system
-    target: "esnext", // Target modern JavaScript
-    globalName: pageName, // Define a global name to access the compiled component
-    loader: { ".js": "jsx" }, // To be able to parse JSX syntax
-    jsxFactory: "createElement", // JSX factory function
-    jsxFragment: "Fragment", // JSX fragment function
-    write: true, // Write the result to the output file
-    splitting: false, // Splitting currently only works with the "esm" format
-    treeShaking: true,
-    sourcemap: false,
-    // minify: true,
-    plugins: [
-      mdx({
-        /* compile options */
-        jsx: false, // produce code which uses jsx-runtime instead of JSX syntax
-        jsxImportSource: "@meact", // Use 'meact/jsx-runtime' for JSX processing
-        jsxRuntime: "automatic",
-        outputFormat: "program",
-        elementAttributeNameCase: "html",
-        stylePropertyNameCase: "css",
-      }),
-    ],
-    alias: {
-      // Alias for meact and meact/jsx-runtime to ensure it's correctly resolved
-      "@meact": meactLibDirectory,
-      "@meact/jsx-runtime": join(meactLibDirectory, "jsx-runtime.js"),
-    },
-    inject: [], // Avoid injecting anything extra
-  });
-}
+const commonClientFacingBuildOptions = {
+  format: "iife", // Use IIFE format for direct execution of code in browsers when the script is loaded, without needing a module system
+  target: "esnext", // Target modern JavaScript
+  write: true, // Write the result to the output file
+  bundle: true,
+  splitting: false, // Splitting currently only works with the "esm" format
+  treeShaking: true,
+  sourcemap: !process.env.NODE_ENV === "prod",
+  minify: process.env.NODE_ENV === "prod",
+  inject: [], // Avoid injecting anything extra
+};
+
+const jsxExtension = {
+  loader: { ".js": "jsx" }, // To be able to parse JSX syntax
+  jsxFactory: "createElement", // JSX factory function
+  jsxFragment: "Fragment", // JSX fragment function
+};
 
 async function buildStylesheets() {
-  const entryPoint = join(appStylesDirectory, "global.css");
-  const outfile = join(buildOutputDirectory, "global.css");
+  const entryPoint = join(
+    APP_DIRECTORY,
+    STYLES_DIRECTORY_NAME,
+    GLOBAL_STYLES_FILE_NAME
+  );
+  const outfile = join(
+    BUILD_OUTPUT_DIRECTORY,
+    STYLES_DIRECTORY_NAME,
+    GLOBAL_STYLES_FILE_NAME
+  );
 
   await build({
     entryPoints: [entryPoint],
@@ -63,31 +72,96 @@ async function buildStylesheets() {
   });
 }
 
-async function buildServer() {
+async function buildPage(page) {
+  const entryPoint = join(APP_DIRECTORY, PAGES_DIRECTORY_NAME, page);
+  const pageName = parse(page).name;
+
+  const buildOutputPagesDirectory = join(
+    BUILD_OUTPUT_DIRECTORY,
+    PAGES_DIRECTORY_NAME
+  );
+
   await build({
-    entryPoints: ["index.js"],
-    outdir: buildOutputDirectory,
-    bundle: true,
-    // use "platform: 'node'" to resolve packages built into Node.js runtime e.g. fs, path etc
-    platform: "node",
-    format: "esm",
-    write: true, // Write the result to the output file
-    splitting: false, // Splitting currently only works with the "esm" format
-    treeShaking: true,
-    sourcemap: false,
-    minify: true,
+    entryPoints: [entryPoint],
+    // outfile,
+    outdir: buildOutputPagesDirectory, // outdir is required when code splitting is active
+    globalName: pageName, // Define a global name to access exported values from the compiled script
+    ...jsxExtension,
+    ...commonClientFacingBuildOptions,
+    plugins: [
+      mdx({
+        /* compile options */
+        jsx: false, // produce code which uses jsx-runtime instead of JSX syntax
+        jsxImportSource: "@meact", // Use './meact/jsx-runtime.js' for JSX processing
+        jsxRuntime: "automatic",
+        outputFormat: "program",
+        elementAttributeNameCase: "html",
+        stylePropertyNameCase: "css",
+      }),
+    ],
+    alias: meactLibAlias,
   });
 }
+
+async function buildMeactCsrClient() {
+  const entryPoint = join(MEACT_CSR_LIB_DIRECTORY, MEACT_CSR_CLIENT_FILE_NAME);
+  const outdir = join(BUILD_OUTPUT_DIRECTORY, MEACT_CSR_LIB_DIRECTORY_NAME);
+
+  await build({
+    entryPoints: [entryPoint],
+    outdir, // outdir is required when code splitting is active
+    globalName: MEACT_CSR_CLIENT_NAMESPACE, // Define a global name to access exported values from the compiled script
+    ...commonClientFacingBuildOptions,
+    ...jsxExtension,
+  });
+}
+
+async function buildClientSideGlobalNamespaces() {
+  const entryPoint = join(CONSTANTS_DIRECTORY, "globalNamespacesOnClient.js");
+  const outfile = join(BUILD_OUTPUT_DIRECTORY, "globals.js");
+
+  await build({
+    entryPoints: [entryPoint],
+    outfile,
+    globalName: "namespaces", // Define a global name to access exported values from the compiled script
+    ...commonClientFacingBuildOptions,
+  });
+}
+
+// async function buildServer() {
+//   await build({
+//     entryPoints: ["index.js"],
+//     outdir: BUILD_OUTPUT_DIRECTORY,
+//     bundle: true,
+//     // use "platform: 'node'" to resolve packages built into Node.js runtime e.g. fs, path etc
+//     platform: "node",
+//     format: "esm",
+//     write: true, // Write the result to the output file
+//     splitting: false, // Splitting currently only works with the "esm" format
+//     treeShaking: true,
+//     sourcemap: false,
+//     minify: true,
+//   });
+// }
 
 async function initBuild() {
   console.log("Build started...");
 
+  // Delete the dist directory if it exists
+  if (existsSync(BUILD_OUTPUT_DIRECTORY)) {
+    rmSync(BUILD_OUTPUT_DIRECTORY, { recursive: true, force: true });
+    console.log(`Deleted ${BUILD_OUTPUT_DIRECTORY}`);
+  }
+
+  console.log(`Populating ${BUILD_OUTPUT_DIRECTORY}`);
+  const appPagesDirectory = join(APP_DIRECTORY, PAGES_DIRECTORY_NAME);
   const pages = readdirSync(appPagesDirectory).filter((file) =>
     file.endsWith(".js")
   );
   await Promise.all(pages.map((item) => buildPage(item)));
   await buildStylesheets();
-  await buildServer();
+  await buildMeactCsrClient();
+  await buildClientSideGlobalNamespaces();
 
   console.log("Build completed...");
 }

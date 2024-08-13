@@ -3,9 +3,13 @@
   "version": "1.0.0",
   "type": "module",
   "main": "index.js",
+  "imports": {
+    "#meact-csr/server.js": "./meact-csr/server.js"
+  },
   "scripts": {
     "build": "node --env-file=.env esbuild.config.js",
-    "start": "node --env-file=.env dist/index.js",
+    "start": "node --env-file=.env index.js",
+    "serve": "npm run build && npm run start",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {

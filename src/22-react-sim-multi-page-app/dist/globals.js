@@ -1,4 +1,4 @@
-var home = (() => {
+var namespaces = (() => {
   var __defProp = Object.defineProperty;
   var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
   var __getOwnPropNames = Object.getOwnPropertyNames;
@@ -17,13 +17,11 @@ var home = (() => {
   };
   var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-  // app/pages/home.js
-  var home_exports = {};
-  __export(home_exports, {
-    default: () => Page
+  // constants/globalNamespacesOnClient.js
+  var globalNamespacesOnClient_exports = {};
+  __export(globalNamespacesOnClient_exports, {
+    MEACT_CSR_CLIENT_NAMESPACE: () => MEACT_CSR_CLIENT_NAMESPACE
   });
-  function Page() {
-    return /* @__PURE__ */ createElement("div", null, /* @__PURE__ */ createElement("h1", null, "This is the home page."));
-  }
-  return __toCommonJS(home_exports);
+  var MEACT_CSR_CLIENT_NAMESPACE = "meactCsrClient";
+  return __toCommonJS(globalNamespacesOnClient_exports);
 })();

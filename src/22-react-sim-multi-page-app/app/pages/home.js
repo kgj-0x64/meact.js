@@ -3,7 +3,7 @@
 
 // const todos = createTodos();
 
-export default function HomePage() {
+export default function Page() {
   return (
     <div>
       <h1>This is the home page.</h1>

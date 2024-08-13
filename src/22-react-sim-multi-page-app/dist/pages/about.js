@@ -20,9 +20,9 @@ var about = (() => {
   // app/pages/about.js
   var about_exports = {};
   __export(about_exports, {
-    default: () => AboutPage
+    default: () => Page
   });
-  function AboutPage() {
+  function Page() {
     return /* @__PURE__ */ createElement("div", null, /* @__PURE__ */ createElement("h1", null, "This is the about page."));
   }
   return __toCommonJS(about_exports);
