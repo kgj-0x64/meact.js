@@ -127,12 +127,6 @@ class MeactElement {
             setcontextProvidedByAncestor: (contextObjRef, newValue) => {
               const contextValues = this.contextManager?.values;
 
-              console.log(
-                "CONTEXT MANAGER contextValues",
-                this.id,
-                contextValues
-              );
-
               // does this component calls `useContext` hook with this exact `contextObjectRef` in argument
               if (
                 contextValues !== undefined &&

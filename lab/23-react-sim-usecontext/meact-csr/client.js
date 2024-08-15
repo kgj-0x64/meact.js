@@ -12,7 +12,7 @@ export function _initRender(PageComponent, pageProps) {
 
   // get the root node of Meact's render tree
   const renderTreeRootNode = (
-    <MyApp Page={PageComponent} pageProps={pageProps} />
+    <MyApp PageComponentFn={PageComponent} pageProps={pageProps} />
   );
 
   // display this render tree at the target node of browser DOM

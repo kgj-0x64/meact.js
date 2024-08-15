@@ -63,7 +63,7 @@ export class ReactElementTreeDebugger {
         const nodeAttributeSpan = document.createElement("span");
         nodeAttributeSpan.className = "meact-element-tree-node";
         nodeAttributeSpan.innerText = `${nestedLeftMargin}_${key}: ${JSON.stringify(
-          value
+          typeof value === "function" ? `${value.name} Function` : value
         )}`;
         this.treeContainer.appendChild(nodeAttributeSpan);
       }

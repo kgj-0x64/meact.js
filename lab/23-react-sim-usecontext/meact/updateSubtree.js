@@ -11,7 +11,7 @@ import {
 /**
  * call this to evaluate a subtree of the render tree on re-render (i.e. on state change)
  * since it propagates state change and rerender downwards
- * such that children, if not unmounted, should not be recreated and should reuse corresponding MeactElement object instead
+ * ! so that children, if not unmounted, should not be recreated via `createElement` and should reuse corresponding MeactElement object instead
  * that is, Create/Update/Delete MeactElement nodes in this sub-tree to reflect the state change in a given ReactComponent type MeactElement
  *
  * @param {MeactElement} existingSubtreeRootNode
@@ -29,11 +29,10 @@ export function updateSubtreeForExistingNode(
   let freshChildOfSubtreeRootAtThisPosition = upcomingChildNodeAtThisPosition;
 
   // handle function invocation if this subtree root node is a component
-  // ! but not for type Fragment which has multiple children from render props but no useful (component-like) return block
-  // ! since it's handled in createElement like MeactHtmlElement nodes
+  // ! only Fragment and MeactContextProviderFn type functions (components) send `upcomingChildNodeAtThisPosition`
   if (
-    existingSubtreeRootNode.type === "MeactComponent" &&
-    existingSubtreeRootNode.name !== "Fragment"
+    !upcomingChildNodeAtThisPosition &&
+    existingSubtreeRootNode.type === "MeactComponent"
   ) {
     const functionName = existingSubtreeRootNode.name;
 
@@ -158,9 +157,16 @@ export function updateSubtreeForExistingNode(
 
   // if the child element at this childPosition is a functional component
   // then it should be handled differently since it won't have children to recurse over
+
+  // ! especially for type Fragment and which are handled in the normal `createElement` flow like MeactHtmlElement nodes
+  // since Fragment has multiple children from render props but no useful (component-like) return block
+  const multiChildrenFnComponent =
+    existingChildOfSubtreeRootAtThisPosition.name === "Fragment" ||
+    existingChildOfSubtreeRootAtThisPosition.name === "MeactContextProviderFn";
+
   if (
     existingChildOfSubtreeRootAtThisPosition.type === "MeactComponent" &&
-    existingChildOfSubtreeRootAtThisPosition.name !== "Fragment"
+    !multiChildrenFnComponent
   ) {
     // children passed from the parent component via props might have refreshed on parent component's state update
 
@@ -279,12 +285,6 @@ function createElementDuringRerender(
   childPosition,
   { type, name, props, children }
 ) {
-  console.log(
-    "createElementDuringRerender",
-    subtreeRootNode.id,
-    childPosition,
-    children
-  );
   // pause the hijack and make createElement behave normally as it did during initial rendering
   rerenderMonitor.pauseHijackOfCreateElementFn();
 

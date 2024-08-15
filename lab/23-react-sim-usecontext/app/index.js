@@ -1,9 +1,9 @@
 import { Layout } from "./components/index.js";
 
-function MyApp({ Page, pageProps }) {
+function MyApp({ PageComponentFn, pageProps }) {
   return (
     <Layout>
-      <Page {...pageProps} />
+      <PageComponentFn {...pageProps} />
     </Layout>
   );
 }

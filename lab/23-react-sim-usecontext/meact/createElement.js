@@ -92,6 +92,13 @@ export function createElement(element, props, ...children) {
     // register this function into the global scope for direct access during re-rendering
     globalMeactComponentRegistry.set(element.name, element);
 
+    // call the component function with appropriate arguments
+    // to create args, add children, if any, into props
+    const functionArgs = {
+      ...propsObject,
+      children: childrenArray,
+    };
+
     // if is this a Fragment function
     if (element.name === "Fragment") {
       const returnedChildrenArray = element({ children: childrenArray }); // returns back this childrenArray
@@ -101,6 +108,13 @@ export function createElement(element, props, ...children) {
       );
 
       reactComponent.children = childrenElements;
+      return reactComponent;
+    }
+
+    // if this is a MeactContextProviderFn function
+    if (element.name === "MeactContextProviderFn") {
+      const returnedElement = element(functionArgs);
+      reactComponent.children = [returnedElement];
       return reactComponent;
     }
 
@@ -122,22 +136,9 @@ export function createElement(element, props, ...children) {
     // PUSH the current component to the stack before rendering
     // reactComponentStack.push(reactComponent);
 
-    // call the component function with appropriate arguments
-    // to create args, add children, if any, into props
-    const functionArgs = {
-      ...propsObject,
-      children: childrenArray,
-    };
-
     // call the function to get the evaluated MeactElement output through its return block
     // which could have however deeply nested `createElement` calls in its children
     const returnedElement = element(functionArgs);
-
-    // if (!(returnedElement instanceof MeactElement)) {
-    //   throw new Error(
-    //     `A component must return only one and a valid child element`
-    //   );
-    // }
 
     reactComponent.children = [returnedElement];
 
