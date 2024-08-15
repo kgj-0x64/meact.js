@@ -30,13 +30,13 @@ DOM manipulation allows you to not only target specific elements, but also chang
 
 #### Simple interactive UI examples
 
-- See [a dynamic shopping list using DOM manipulation](./src/shopping-list.html)
-- See [a simple form with input area and submit button using DOM manipulation](./src/form-handler.html)
+- See [a dynamic shopping list using DOM manipulation](./lab/0-objective/shopping-list.html)
+- See [a simple form with input area and submit button using DOM manipulation](./lab/0-objective/form-handler.html)
 
 #### Same examples using React.js
 
-- See [a dynamic shopping list using React.js](./src/shopping-list-react.html)
-- See [a simple form with input area and submit button using React.js](./src/form-handler-react.html)
+- See [a dynamic shopping list using React.js](./lab/0-objective/shopping-list-react.html)
+- See [a simple form with input area and submit button using React.js](./lab/0-objective/form-handler-react.html)
 
   - React is a JavaScript library for building interactive user interfaces.
   - Babel is a JavaScript compiler​. Browsers don't understand JSX out of the box, so most React users rely on a compiler like Babel or TypeScript to transform JSX code into regular JavaScript.

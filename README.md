@@ -123,7 +123,7 @@ Meact.js = My (implementation of) React.js
 
 ### [Scheduling Updates](https://github.com/acdlite/react-fiber-architecture?tab=readme-ov-file#scheduling)
 
-meact.js does synchronous state updates instead of batching them and applying them in an asynchronous manner like React.js, and its performance implication ("CPU fan noise") can be observed by running `.src/15-react-sim-sync-setstate-performance/index.html` where the UI implements a React Component which renders a colored circle following the mouse position, and another colored circle following first circle's position delayed by 100ms and so on (for total 5-6 circles).
+meact.js does synchronous state updates instead of batching them and applying them in an asynchronous manner like React.js, and its performance implication ("CPU fan noise") can be observed by running `./lab/15-react-sim-sync-setstate-performance/index.html` where the UI implements a React Component which renders a colored circle following the mouse position, and another colored circle following first circle's position delayed by 100ms and so on (for total 5-6 circles).
 
 [Why is `setState` in react.js Async instead of Sync?](https://github.com/acdlite/react-fiber-architecture?tab=readme-ov-file#scheduling)
 
