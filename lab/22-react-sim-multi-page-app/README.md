@@ -13,11 +13,11 @@ If two different bundles of "meact" library are being created via "meact-csr/cli
 ### Error Message
 
 ```text
-returnedElement instanceof MeactElement true ReactHtmlElement MeactElement {id: 'div-36', type: 'ReactHtmlElement', name: 'div', props: {…}, propChildrenSnapshot: undefined, …}
+returnedElement instanceof MeactElement true MeactHtmlElement MeactElement {id: 'div-36', type: 'MeactHtmlElement', name: 'div', props: {…}, propChildrenSnapshot: undefined, …}
 
-home.js:811 returnedElement instanceof MeactElement true ReactHtmlElement MeactElement {id: 'div-37', type: 'ReactHtmlElement', name: 'div', props: {…}, propChildrenSnapshot: undefined, …}
+home.js:811 returnedElement instanceof MeactElement true MeactHtmlElement MeactElement {id: 'div-37', type: 'MeactHtmlElement', name: 'div', props: {…}, propChildrenSnapshot: undefined, …}
 
-client.js:791 returnedElement instanceof MeactElement false ReactHtmlElement MeactElement {id: 'div-38', type: 'ReactHtmlElement', name: 'div', props: {…}, propChildrenSnapshot: undefined, …}
+client.js:791 returnedElement instanceof MeactElement false MeactHtmlElement MeactElement {id: 'div-38', type: 'MeactHtmlElement', name: 'div', props: {…}, propChildrenSnapshot: undefined, …}
 
 client.js:879 An error occurred in loading or executing app script: Error: A component must return only one and a valid child element
 at createElement2 (client.js:798:15)

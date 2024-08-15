@@ -108,7 +108,7 @@ const renderTree = {
  */
 class MeactElement {
   /**
-   * @param {"NullComponent" | "MeactComponent" | "ReactHtmlElement"} type
+   * @param {"NullComponent" | "MeactComponent" | "MeactHtmlElement"} type
    * @param {string} name
    * @param {object} props
    * @param {MeactElement[]} children
@@ -311,7 +311,7 @@ function createElement(element, props, ...children) {
   let type = element
     ? typeof element === "function"
       ? "MeactComponent"
-      : "ReactHtmlElement"
+      : "MeactHtmlElement"
     : "NullComponent";
   let name = element
     ? typeof element === "function"
@@ -365,9 +365,9 @@ function createElement(element, props, ...children) {
       childrenArray
     );
 
-    // if this is happening within a re-render, don't call the function just yet
-    // check whether it should be hijacked for just passing the arguments to
-    // `updateSubtreeForElement` for mount/unmount decisions and updated set of children
+    // if this `createElement` function call is happening within a re-render,
+    // then the corresponding component's function definition should be executed here for new mounting via `createElementDuringRerender` only
+    // while `updateSubtreeForElement` executes the function body in case of no unmounting
     if (rerenderMonitor.isCreateElementFunctionHijacked()) {
       return reactComponent;
     }

@@ -2,7 +2,7 @@
 
 Meact.js = My (implementation of) React.js
 
-## Implementation (in order)
+## Implementation
 
 - [x] Functional Components (i.e. reusable UI elements) built with "Template Literals" and global State & Event Handler Managers
 
@@ -24,6 +24,8 @@ Meact.js = My (implementation of) React.js
 - [x] `useMemo`
   - [x] `useCallback` (redundant after `useMemo`)
 - [x] `memo`
+
+- [x] `createContext` and `useContext`
 
 - [x] JSX Syntax
 - [x] Esbuild Bundler (to manually compile JSX into [`createElement` calls](https://esbuild.github.io/api/#jsx-factory))

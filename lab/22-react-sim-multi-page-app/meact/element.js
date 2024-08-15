@@ -8,7 +8,7 @@ import { ReactElementTreeDebugger } from "./render-tree/treeDebugger.js";
  */
 class MeactElement {
   /**
-   * @param {"NullComponent" | "MeactComponent" | "ReactHtmlElement"} type
+   * @param {"NullComponent" | "MeactComponent" | "MeactHtmlElement"} type
    * @param {string} name
    * @param {object} props
    * @param {MeactElement[]} children

@@ -89,23 +89,25 @@ export function createElement(element, props, ...children) {
       childrenArray
     );
 
-    // if this `createElement` function call is happening within a re-render,
-    // then the corresponding component's function definition should be executed here for new mounting via `createElementDuringRerender` only
-    // while `updateSubtreeForElement` executes the function body in case of no unmounting
-    if (rerenderMonitor.isCreateElementFunctionHijacked()) {
-      return reactComponent;
-    }
-
     // register this function into the global scope for direct access during re-rendering
     globalMeactComponentRegistry.set(element.name, element);
 
     // if is this a Fragment function
     if (element.name === "Fragment") {
       const returnedChildrenArray = element({ children: childrenArray }); // returns back this childrenArray
+
       const childrenElements = createChildrenElementsHelper(
         returnedChildrenArray
       );
+
       reactComponent.children = childrenElements;
+      return reactComponent;
+    }
+
+    // ! if this `createElement` function call is happening within a re-render,
+    // then the corresponding component's function definition should be executed here for new mounting via `createElementDuringRerender` only
+    // while `updateSubtreeForElement` executes the function body in case of no unmounting
+    if (rerenderMonitor.isCreateElementFunctionHijacked()) {
       return reactComponent;
     }
 
@@ -159,7 +161,7 @@ export function createElement(element, props, ...children) {
 }
 
 /**
- *
+ * call this to create children elements
  * @param {Array} childrenArray
  * @returns {Array}
  */
