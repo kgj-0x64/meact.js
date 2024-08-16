@@ -174,9 +174,9 @@ function createChildrenElementsHelper(childrenArray) {
 
       // child is either `createElement()` call or text content
       const childElement =
-        child instanceof MeactElement
-          ? child
-          : createElement("text", { content: child });
+        typeof child === "string" || typeof child === "number"
+          ? createElement("text", { content: child })
+          : child;
 
       childrenElements.push(childElement);
     }

@@ -1,6 +1,8 @@
 import { join } from "path";
 import { __dirname } from "../config.js";
 
+export const ROOT_DIRECTORY = __dirname;
+
 // absolute path of constants directory
 const CONSTANTS_DIRECTORY_NAME = "constants";
 export const CONSTANTS_DIRECTORY = join(__dirname, CONSTANTS_DIRECTORY_NAME);

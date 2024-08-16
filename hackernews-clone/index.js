@@ -3,13 +3,11 @@ import { readFileSync, existsSync } from "fs";
 import { join } from "path";
 import {
   BUILD_OUTPUT_DIRECTORY,
-  MEACT_CSR_LIB_DIRECTORY,
   MEACT_CSR_INDEX_HTML_FILE_NAME,
-  GLOBAL_STYLES_FILE_NAME,
-  STYLES_DIRECTORY_NAME,
   PAGES_DIRECTORY_NAME,
   APP_DIRECTORY_NAME,
   PUBLIC_ASSETS_DIRECTORY_NAME,
+  ROOT_DIRECTORY,
 } from "./constants/fileAndDirectoryNameAndPaths.js";
 import { prepareHtmlForPageRequest } from "#meact-csr/server.js";
 
@@ -25,7 +23,7 @@ app.use(express.static(PUBLIC_ASSETS_DIRECTORY_NAME));
 
 // Serve static index.html
 const indexHtmlContent = readFileSync(
-  join(MEACT_CSR_LIB_DIRECTORY, MEACT_CSR_INDEX_HTML_FILE_NAME),
+  join(ROOT_DIRECTORY, MEACT_CSR_INDEX_HTML_FILE_NAME),
   "utf-8"
 );
 
@@ -44,12 +42,14 @@ app.get("/:page", (req, res) => {
   );
 
   // Check if both the JS and CSS files for the requested page exist
-  if (existsSync(jsBundlePath) && existsSync(stylesheetBundlePath)) {
+  if (existsSync(jsBundlePath)) {
     // Inject the correct JS and CSS files into the index.html content
     const responseHtmlContent = prepareHtmlForPageRequest(
       indexHtmlContent,
-      stylesheetBundleRelativePath,
-      scriptBundleRelativePath
+      scriptBundleRelativePath,
+      existsSync(stylesheetBundleRelativePath)
+        ? stylesheetBundleRelativePath
+        : null
     );
 
     // Send the modified HTML as the response

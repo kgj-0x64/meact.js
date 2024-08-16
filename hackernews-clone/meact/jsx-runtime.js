@@ -1,6 +1,4 @@
-import Meact from "@meact";
-
-const { createElement } = Meact;
+import { createElement } from "./createElement";
 
 // Fragment allows grouping elements without adding extra DOM nodes
 export function Fragment(props) {

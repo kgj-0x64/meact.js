@@ -30,7 +30,12 @@ export async function hydrate() {
 
     const { currentPageModule } = window;
 
-    generateMetaTags(currentPageModule.meta());
+    if (
+      currentPageModule.meta &&
+      typeof currentPageModule.meta === "function"
+    ) {
+      generateMetaTags(currentPageModule.meta());
+    }
 
     const PageComponent = currentPageModule.default;
     // mount the Meact Render Tree at the target HTML node

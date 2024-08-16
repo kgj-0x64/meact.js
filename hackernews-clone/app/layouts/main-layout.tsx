@@ -36,7 +36,7 @@ export function MainLayout(props: IMainLayoutProps): MeactElement {
         <tbody>
           <Header isNavVisible={!!isNavVisible} title={title!} />
           <tr style={{ height: "10px" }} />
-          {children}
+          {...children}
           {isFooterVisible && <Footer />}
         </tbody>
       </table>

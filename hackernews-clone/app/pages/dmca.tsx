@@ -1,6 +1,6 @@
 import { MeactElement } from "@meact";
 import { MeactMeta } from "@meact-csr";
-import { BlankLayout } from "../layouts";
+import { BlankLayout } from "../layouts/blank-layout";
 import dmcaCss from "../styles/dmca.css";
 
 const spanStyle = {
