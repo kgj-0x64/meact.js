@@ -24,7 +24,7 @@ export const browserDomWriter = {
     renderTree.setRootNode(meactElement);
 
     // trigger the middleware handler before DOM is evaluated
-    renderTree.postRecociliationMiddleware();
+    renderTree.postRecociliationMiddleware(meactElement);
 
     // for visual debugging, plot the render tree at the bottom of browser DOM
     meactElement.plotRenderTree();
@@ -45,6 +45,7 @@ export const browserDomWriter = {
 
   /**
    * call this to update existing DOM's copy based on render tree's diff
+   * ! calling this before calling `this.render()` will fail rightly because parent DOM nodes will be unknown
    * @param {MeactElement} rootReactElement root node of the render tree which is already rendered in browser DOM
    */
   rerenderTheDiff(rootReactElement) {

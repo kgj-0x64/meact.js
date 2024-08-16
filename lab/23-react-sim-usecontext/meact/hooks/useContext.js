@@ -81,6 +81,11 @@ export const meactContextManager = {
       );
     }
 
+    // this target node has been handled w.r.t. forwarding of Provider values
+    if (this.contextForwarderChildrenMap.has(targetNode.id)) {
+      this.contextForwarderChildrenMap.delete(targetNode);
+    }
+
     // recusrively do the same for children
     targetNode.children.forEach((child) => {
       this.scanRenderTreeForProviderConsumer(
@@ -90,11 +95,11 @@ export const meactContextManager = {
     });
   },
 
-  flushContextProviderValuesToConsumers() {
-    this.scanRenderTreeForProviderConsumer(renderTree.rootNode, null);
-
-    // reset it
-    this.contextForwarderChildrenMap = new Map();
+  flushContextProviderValuesToConsumers(reactSubtree) {
+    this.scanRenderTreeForProviderConsumer(
+      reactSubtree,
+      reactSubtree.contextManager.values
+    );
   },
 };
 

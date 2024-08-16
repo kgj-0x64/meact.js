@@ -136,38 +136,22 @@ class MeactElement {
                 // does this component calls `useContext` hook with this exact `contextObjectRef` in argument
                 if (!contextValues.has(contextObjRef)) continue;
 
-                console.log("useContext HOOK HAI!!!", this.id, contextObjRef);
-
                 const oldValue = contextValues.get(contextObjRef);
-                console.log(
-                  "CONTEXT MANAGER oldValue",
-                  this.id,
-                  oldValue,
-                  newValue
-                );
 
                 // update the value
                 contextValues.set(contextObjRef, newValue);
 
                 /**
-                 * When should this component be re-rendered due to a change in this context value?
+                 * ! When should this component be re-rendered due to a change in this context value?
                  *
-                 * During initial render:
-                 * this child component (i.e. this MeactElement object) is firstly created with the default value,
-                 * and then context provided value is set in post reconciliation middleware before DOM is updated
-                 *
-                 * During re-rendering:
-                 * one of its ancestors must have triggered state update for it to be getting a new value
-                 * so this child component will also be evaluated during the same re-rendering reconciliation anyway
-                 * except that we need to handle the case of this being a memoized component separately
+                 * this child component (i.e. this MeactElement object) is firstly created with the existing hook value,
+                 * and then context values provided by ancestors are set in "post reconciliation middleware" before DOM is updated
                  */
                 const hasValueChanged = oldValue !== newValue;
-                console.log("hasValueChanged", hasValueChanged);
+
                 if (!hasValueChanged) return;
 
-                if (memoizedFunctionsMap.has(this.name)) {
-                  this.this.reEvaluateSubtreeFromThisComponent();
-                }
+                this.reEvaluateSubtreeFromThisComponent();
               }
             },
           }

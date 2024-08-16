@@ -13,7 +13,7 @@ export function List() {
   ));
 
   return (
-    <HideImageContext.Provider value={showImage}>
+    <HideImageContext.Provider value={!showImage}>
       <label>
         <input
           type="checkbox"

@@ -86,11 +86,15 @@ const renderTree = {
   /**
    * call this to do required tasks between initial render or reconciliation and DOM updates
    * such as flushing of updated Context Provider values
+   * @param {MeactElement} reactSubtree
    */
-  postRecociliationMiddleware() {
-    console.log("Post reconciliation middleware has been called...");
+  postRecociliationMiddleware(reactSubtree) {
+    console.log(
+      "Post reconciliation middleware has been called from this subtree root node",
+      reactSubtree
+    );
     // flush context provider values to consumer children
-    meactContextManager.flushContextProviderValuesToConsumers();
+    meactContextManager.flushContextProviderValuesToConsumers(reactSubtree);
   },
 
   /**
@@ -101,7 +105,7 @@ const renderTree = {
     console.log("Re-render from this subtree root node", reactSubtree.id);
 
     // middleware to handle tasks before DOM is updated using the DIFF
-    this.postRecociliationMiddleware();
+    this.postRecociliationMiddleware(reactSubtree);
 
     // re-paint the DOM using DIFF from reconciliation
     browserDomWriter.rerenderTheDiff(reactSubtree);
