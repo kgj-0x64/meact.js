@@ -1,0 +1,33 @@
+{
+  "name": "hackernews-clone",
+  "version": "0.1.0",
+  "description": "A Hacker News clone built to demonstrate Meact.js (React.js clone) for production ready websites.",
+  "author": "Kumar Gaurav",
+  "license": "MIT",
+  "keywords": [
+    "hacker-news",
+    "clone",
+    "meact",
+    "react"
+  ],
+  "type": "module",
+  "imports": {
+    "#meact-csr/server.js": "./meact-csr/server.js"
+  },
+  "main": "index.js",
+  "scripts": {
+    "build": "node --env-file=.env esbuild.config.js",
+    "start": "node --env-file=.env index.js",
+    "serve": "npm run build && npm run start",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "hackernews-clone": "file:"
+  },
+  "devDependencies": {
+    "@mdx-js/esbuild": "^3.0.1",
+    "esbuild": "^0.23.0",
+    "typescript": "^5.5.4"
+  }
+}
