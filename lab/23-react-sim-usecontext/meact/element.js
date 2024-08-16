@@ -129,6 +129,8 @@ class MeactElement {
             ) => {
               const contextValues = this.contextManager.values;
 
+              let hasValueChanged = false;
+
               for (const [
                 contextObjRef,
                 newValue,
@@ -141,18 +143,18 @@ class MeactElement {
                 // update the value
                 contextValues.set(contextObjRef, newValue);
 
-                /**
-                 * ! When should this component be re-rendered due to a change in this context value?
-                 *
-                 * this child component (i.e. this MeactElement object) is firstly created with the existing hook value,
-                 * and then context values provided by ancestors are set in "post reconciliation middleware" before DOM is updated
-                 */
-                const hasValueChanged = oldValue !== newValue;
-
-                if (!hasValueChanged) return;
-
-                this.reEvaluateSubtreeFromThisComponent();
+                hasValueChanged = oldValue !== newValue;
               }
+
+              /**
+               * ! When should this component be re-rendered due to a change in this context value?
+               *
+               * this child component (i.e. this MeactElement object) is firstly created with the existing hook value,
+               * and then context values provided by ancestors are set in "post reconciliation middleware" before DOM is updated
+               */
+              if (!hasValueChanged) return;
+
+              this.reEvaluateSubtreeFromThisComponent();
             },
           }
         : undefined;
