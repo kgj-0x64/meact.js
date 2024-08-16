@@ -1,4 +1,4 @@
-import renderTree from "@meact/render-tree";
+import renderTree from "./render-tree/index.js";
 import { createElement } from "./createElement.js";
 import { currActiveComponentForHooks } from "./hooks/global.js";
 import { memoizedFunctionsMap } from "./memo.js";

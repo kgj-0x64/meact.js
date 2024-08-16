@@ -1,5 +1,6 @@
 import { browserDomWriter } from "@meact-dom";
 import { resetHooksCallCounters } from "../hooks/hookHelpers.js";
+import { meactContextManager } from "../hooks/useContext.js";
 
 /**
  * A "render tree" is a tree of objects which is created as the store of all info needed
@@ -42,7 +43,7 @@ const renderTree = {
   },
 
   // queue of all useEffect calls whose dependencies had changed in the last re-render
-  effectHooksForPostRenderHandling: {
+  effectHooksForPostDomRenderHandling: {
     queue: [], // {{component: MeactElement, index: number}[]}
     /**
      * @param {{component: MeactElement, index: number}} effectObject
@@ -68,7 +69,7 @@ const renderTree = {
   /**
    * call this for housekeeping after every render and re-render activity on the browser DOM
    */
-  postRenderHandler() {
+  postDomRenderHandler() {
     console.log("Post Render Cleanup Initiated...");
 
     this.domRefreshCounter += 1;
@@ -77,9 +78,19 @@ const renderTree = {
     // reset the queue of re-render diff
     this.rerenderDiffForDomHandler.reset();
     // run useEffect calls from the queue and then reset
-    this.effectHooksForPostRenderHandling.processQueue();
+    this.effectHooksForPostDomRenderHandling.processQueue();
 
     console.log("Post Render Cleanup Done!");
+  },
+
+  /**
+   * call this to do required tasks between initial render or reconciliation and DOM updates
+   * such as flushing of updated Context Provider values
+   */
+  postRecociliationMiddleware() {
+    console.log("Post reconciliation middleware has been called...");
+    // flush context provider values to consumer children
+    meactContextManager.flushContextProviderValuesToConsumers();
   },
 
   /**
@@ -88,6 +99,11 @@ const renderTree = {
    */
   reRender(reactSubtree) {
     console.log("Re-render from this subtree root node", reactSubtree.id);
+
+    // middleware to handle tasks before DOM is updated using the DIFF
+    this.postRecociliationMiddleware();
+
+    // re-paint the DOM using DIFF from reconciliation
     browserDomWriter.rerenderTheDiff(reactSubtree);
   },
 };

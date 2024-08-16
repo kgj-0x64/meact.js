@@ -1,5 +1,4 @@
 export function Layout({ children }) {
-  console.log("LAYOUT children", children);
   return (
     <div>
       <nav>

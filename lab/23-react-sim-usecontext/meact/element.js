@@ -1,4 +1,4 @@
-import renderTree from "@meact/render-tree";
+import renderTree from "./render-tree/index.js";
 import { getNewElementId } from "./utils.js";
 import { updateSubtreeForExistingNode } from "./updateSubtree.js";
 import { ReactElementTreeDebugger } from "./render-tree/treeDebugger.js";
@@ -122,72 +122,51 @@ class MeactElement {
       type === "MeactComponent"
         ? {
             // a Map of context object reference to current value of this component
-            values: new Map(), // contextObjectRef -> {value: any, setByClosestParent: boolean, setByClosestParentDuringRenderCount: number}
+            values: new Map(), // {object} contextObjectRef -> {any} value
 
-            setcontextProvidedByAncestor: (contextObjRef, newValue) => {
-              const contextValues = this.contextManager?.values;
+            setAllContextsProvidedByAncestors: (
+              providedContextRefsAndValuesMapFromParent
+            ) => {
+              const contextValues = this.contextManager.values;
 
-              // does this component calls `useContext` hook with this exact `contextObjectRef` in argument
-              if (
-                contextValues !== undefined &&
-                contextValues.has(contextObjRef)
-              ) {
+              for (const [
+                contextObjRef,
+                newValue,
+              ] of providedContextRefsAndValuesMapFromParent) {
+                // does this component calls `useContext` hook with this exact `contextObjectRef` in argument
+                if (!contextValues.has(contextObjRef)) continue;
+
+                console.log("useContext HOOK HAI!!!", this.id, contextObjRef);
+
                 const oldValue = contextValues.get(contextObjRef);
-                console.log("CONTEXT MANAGER oldValue", this.id, oldValue);
+                console.log(
+                  "CONTEXT MANAGER oldValue",
+                  this.id,
+                  oldValue,
+                  newValue
+                );
+
+                // update the value
+                contextValues.set(contextObjRef, newValue);
 
                 /**
-                 * During a render of a Provider ancestor:
-                 * ignore if the context value is already set by a closer Provider ancestor
-                 * else, update the value
+                 * When should this component be re-rendered due to a change in this context value?
                  *
-                 * During a re-render of any Provider ancestor:
-                 * accept new value from the (potentially new) closest Provider parent
-                 * else ignore the value
+                 * During initial render:
+                 * this child component (i.e. this MeactElement object) is firstly created with the default value,
+                 * and then context provided value is set in post reconciliation middleware before DOM is updated
+                 *
+                 * During re-rendering:
+                 * one of its ancestors must have triggered state update for it to be getting a new value
+                 * so this child component will also be evaluated during the same re-rendering reconciliation anyway
+                 * except that we need to handle the case of this being a memoized component separately
                  */
-                if (
-                  !oldValue.setByClosestParent ||
-                  oldValue.setByClosestParent < renderTree.domRefreshCounter
-                ) {
-                  console.log(
-                    "setByClosestParent",
-                    this.id,
-                    this.name,
-                    newValue
-                  );
+                const hasValueChanged = oldValue !== newValue;
+                console.log("hasValueChanged", hasValueChanged);
+                if (!hasValueChanged) return;
 
-                  // update the value
-                  contextValues.set(contextObjRef, {
-                    value: newValue,
-                    setByClosestParent: true,
-                    setByClosestParentDuringRenderCount:
-                      renderTree.domRefreshCounter,
-                  });
-
-                  /**
-                   * When should this component be re-rendered due to a change in this context value?
-                   * During initial render:
-                   * this child component (i.e. this MeactElement object) is firstly created with the default value,
-                   * so we need to re-evaluate this subtree if parent MeactElement object is setting a different context value in its initial render itself
-                   * but we must not re-evaluate the DOM right now (because it is non-existent right now)
-                   *
-                   * During re-rendering:
-                   * any ancestor's re-rendering will update its subtree and thus re-render this child component anyway
-                   * except that we need to handle the case of this being a memoized component separately
-                   */
-                  const hasValueChanged = oldValue !== newValue;
-                  if (!hasValueChanged) return;
-
-                  // during initial render
-                  if (renderTree.domRefreshCounter === 0) {
-                    this.reEvaluateSubtreeFromThisComponent();
-                    return;
-                  }
-
-                  // during re-render
-                  if (memoizedFunctionsMap.has(this.name)) {
-                    // re-render the subtree rooted at this component
-                    this.rerenderSubtreeFromThisComponent();
-                  }
+                if (memoizedFunctionsMap.has(this.name)) {
+                  this.this.reEvaluateSubtreeFromThisComponent();
                 }
               }
             },

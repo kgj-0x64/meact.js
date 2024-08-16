@@ -1,4 +1,4 @@
-import renderTree from "@meact/render-tree";
+import renderTree from "./render-tree/index.js";
 
 /**
  * call this to get a unique ID for a MeactElement

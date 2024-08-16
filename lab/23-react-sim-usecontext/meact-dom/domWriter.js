@@ -23,6 +23,9 @@ export const browserDomWriter = {
     // set this as the root node of the render tree
     renderTree.setRootNode(meactElement);
 
+    // trigger the middleware handler before DOM is evaluated
+    renderTree.postRecociliationMiddleware();
+
     // for visual debugging, plot the render tree at the bottom of browser DOM
     meactElement.plotRenderTree();
 
@@ -37,7 +40,7 @@ export const browserDomWriter = {
     this.targetNodeInBrowserDom.appendChild(browserDom);
 
     // post render housekeeping
-    renderTree.postRenderHandler();
+    renderTree.postDomRenderHandler();
   },
 
   /**
@@ -57,6 +60,6 @@ export const browserDomWriter = {
     }
 
     // post re-render housekeeping
-    renderTree.postRenderHandler();
+    renderTree.postDomRenderHandler();
   },
 };

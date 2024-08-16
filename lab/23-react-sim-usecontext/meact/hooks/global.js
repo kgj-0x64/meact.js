@@ -1,6 +1,8 @@
-// 1.
 export const currActiveComponentForHooks = {
+  // 1.
   referenceValue: null,
+  // or, 2. use a global stack to keep track of current ReactComponent being rendered
+  //  referenceValue: [],
   /**
    * @returns {MeactElement | null}
    */
@@ -14,6 +16,3 @@ export const currActiveComponentForHooks = {
     this.referenceValue = newReferenceValue;
   },
 };
-
-// or, 2. use a global stack to keep track of current ReactComponent being rendered
-// let reactComponentStack = [];

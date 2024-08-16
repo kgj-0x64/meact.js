@@ -58,7 +58,7 @@ export default function useEffect(setup, dependencies) {
 
   // queue this for execution after DOM is rendered
   if (shouldQueue) {
-    renderTree.effectHooksForPostRenderHandling.enqueue({
+    renderTree.effectHooksForPostDomRenderHandling.enqueue({
       component: targetComponentForThisHook,
       index: thisHookCallCount,
     });
