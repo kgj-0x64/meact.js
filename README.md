@@ -25,7 +25,7 @@ Meact.js = My (implementation of) React.js
   - [x] `useCallback` (redundant after `useMemo`)
 - [x] `memo`
 
-- [x] `createContext` and `useContext`
+- [x] `createContext` and `useContext` (! Scope for improvement)
 
 - [x] JSX Syntax
 - [x] Esbuild Bundler (to manually compile JSX into [`createElement` calls](https://esbuild.github.io/api/#jsx-factory))
@@ -41,6 +41,8 @@ Meact.js = My (implementation of) React.js
 - [x] Client-Side Rendering (CSR)
 - [x] [Tree Shaking](https://github.com/evanw/esbuild/blob/main/docs/architecture.md#tree-shaking) (by routes)
 - [x] [Code splitting](https://github.com/evanw/esbuild/blob/main/docs/architecture.md#code-splitting) (chunks shared between routes)
+
+- [x] Meta Tags (Client side rehydration)
 
 ### Constraints
 
