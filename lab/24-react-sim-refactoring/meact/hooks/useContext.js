@@ -1,5 +1,5 @@
 import { updateAncestralContextOfReturnedChildrenElements } from "../createElement.js";
-import { componentFnCallStack } from "../callStack.js";
+import { componentFnCallStack } from "../executionContext.js";
 import { badHookCall } from "./hookHelpers.js";
 
 /**
@@ -20,8 +20,9 @@ export function createContext(defaultValue) {
     const targetComponentForThisProvider =
       componentFnCallStack.getComponentFnCurrInExecutionContext();
 
-    targetComponentForThisProvider.contextManager.mergeContextValuesProvidedByAncestors(
-      new Map([[contextObjectReference, value]])
+    targetComponentForThisProvider.contextManager.setValueForProviderComponent(
+      contextObjectReference,
+      value
     );
 
     // recursively update Provided Context of its render props children (within the same return block of encapsulating component's function)

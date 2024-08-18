@@ -1,91 +1,104 @@
 import renderTree from "./render-tree.js";
-import { createElement } from "./createElement.js";
-import { componentFnCallStack } from "./executionContext.js";
-import { memoizedFunctionsMap } from "./memo.js";
+import MeactElement from "./element.js";
 import {
-  arePropsEqual,
-  globalMeactComponentRegistry,
-  rerenderMonitor,
-} from "./utils.js";
+  createElement,
+  handleComponentFunctionExecution,
+} from "./createElement.js";
+import { bypassMemoization, memoizedFunctionsMap } from "./memo.js";
+import { arePropsEqual, globalMeactComponentRegistry } from "./utils.js";
 
 /**
- * call this to evaluate a subtree of the render tree on re-render (i.e. on state change)
- * since it propagates state change and rerender downwards
+ * call this to re-evaluate a subtree of the "Render Tree" on re-render (i.e. on state change)
+ * since it propagates state change and re-render downwards
  * ! so that children, if not unmounted, should not be recreated via `createElement` and should reuse corresponding MeactElement object instead
  * that is, Create/Update/Delete MeactElement nodes in this sub-tree to reflect the state change in a given ReactComponent type MeactElement
  *
  * @param {MeactElement} existingSubtreeRootNode
  * @param {number} childPosition in the range of [0, existingSubtreeRootNode.children.length)
- * @param {null | MeactElement | RerenderTreeNodeRepr} upcomingChildNodeAtThisPosition upcoming child subtree object found on re-evaluation
- * @param {boolean} bypassMemoizationOfThisComponent
- * of the parent component enclosing this subtree root node
+ * @param {null | MeactElement | RerenderTreeNodeRepr} upcomingChildNodeAtThisPosition
+ * ^ upcoming child subtree object found on re-evaluation of the existingSubtreeRootNode
  */
 export function updateSubtreeForExistingNode(
   existingSubtreeRootNode,
   childPosition,
-  upcomingChildNodeAtThisPosition,
-  bypassMemoizationOfThisComponent
+  upcomingChildNodeAtThisPosition
 ) {
+  // check if this is a memoized function which is not explicitly asked to be ignored
+  if (
+    existingSubtreeRootNode.type === "MeactComponent" &&
+    !bypassMemoization.isThisSubtreeBypassed(existingSubtreeRootNode) &&
+    memoizedFunctionsMap.has(existingSubtreeRootNode.name)
+  ) {
+    // check if props has changed versus last render
+    const memoizedFunctionInstance = memoizedFunctionsMap.get(
+      existingSubtreeRootNode.name
+    );
+
+    // update the value of lastProps property on this MemoizedFunction instance
+    const newPropsOfThisMemoizedFn = existingSubtreeRootNode.props;
+    const arePropsSameForThisMemoizedFn = memoizedFunctionInstance.setLastProps(
+      newPropsOfThisMemoizedFn
+    );
+
+    // don't do anything for the subtree rooted at this node
+    if (arePropsSameForThisMemoizedFn) {
+      return;
+    }
+  }
+
+  /// ! argument `childPosition` is bound to be in the range of [0, existingSubtreeRootNode.children.length)
+  // so, a child exists at this position of the given subtree root node
+  const existingChildOfSubtreeRootAtThisPosition =
+    existingSubtreeRootNode.children[childPosition];
+
   let freshChildOfSubtreeRootAtThisPosition = upcomingChildNodeAtThisPosition;
 
-  // handle function invocation if this subtree root node is a component
-  // ! only Fragment and MeactContextProviderFn type functions (components) send `upcomingChildNodeAtThisPosition`
+  // handle function invocation if this subtree root node is of type MeactComponent
+
+  // if upcomingChildNodeAtThisPosition is not null,
+  // it means "Fragment" | "MeactContextProvider" functions were already called and their children are being handled now
   if (
     !upcomingChildNodeAtThisPosition &&
     existingSubtreeRootNode.type === "MeactComponent"
   ) {
-    const functionName = existingSubtreeRootNode.name;
-
-    // access component's function reference from the global namespace
-    const functionRef = globalMeactComponentRegistry.get(functionName);
-
-    if (typeof functionRef !== "function") {
-      console.error(`${functionName} is not a function`);
-      return;
-    }
-
-    // call the function with props saved from last render
-    const functionArgs = {
-      ...existingSubtreeRootNode.props,
-      children: existingSubtreeRootNode.propChildrenSnapshot,
-    };
-
-    // check if this is a memoized function if it's not the root of state change itself
-    if (
-      bypassMemoizationOfThisComponent &&
-      memoizedFunctionsMap.has(functionName)
-    ) {
-      // check if props has changed versus last render
-      const memoizedFunctionInstance = memoizedFunctionsMap.get(functionName);
-
-      // update the value of lastProps property on this MemoizedFunction instance
-      const newPropsOfThisMemoizedFn = existingSubtreeRootNode.props;
-      const arePropsSameForThisMemoizedFn =
-        memoizedFunctionInstance.setLastProps(newPropsOfThisMemoizedFn);
-
-      // don't do anything for the subtree rooted at this node
-      if (arePropsSameForThisMemoizedFn) {
-        return;
-      }
-    }
-
-    // set this component as the context for handling hooks
-    componentFnCallStack.setComponentFnInExecutionContext(
-      existingSubtreeRootNode
+    // pass a new copy object, else the original object reference will be modified in place
+    const copyOfExistingSubtreeRootNode = new MeactElement(
+      existingSubtreeRootNode.type,
+      existingSubtreeRootNode.name,
+      existingSubtreeRootNode.props,
+      [],
+      // snapshot of children elements passed by the parent component via props (i.e. render props)
+      existingSubtreeRootNode.propChildrenSnapshot
     );
 
     // call this function to execute the component definition
-    freshChildOfSubtreeRootAtThisPosition = functionRef.call(
-      null,
-      functionArgs
+    // while using the existing MeactElement object reference for identifying the right component object hooks correspond to
+    handleComponentFunctionExecution(
+      copyOfExistingSubtreeRootNode,
+      existingSubtreeRootNode
     );
+
+    // handle Fragment and MeactContextProvider functions separately
+    // since they return multiple children unlike typical user-defined "MeactComponent" type function
+    if (
+      existingSubtreeRootNode.name === "Fragment" ||
+      existingSubtreeRootNode.name === "MeactContextProvider"
+    ) {
+      // recursively update the subtrees of children nodes
+      updateSubtreeOfChildrenElementsHelper(
+        existingSubtreeRootNode,
+        copyOfExistingSubtreeRootNode
+      );
+
+      return;
+    }
+
+    // else, set first and only child returned from running this component's function as reconciliation target
+    freshChildOfSubtreeRootAtThisPosition =
+      copyOfExistingSubtreeRootNode.children[0];
   }
 
-  /// ! argument `childPosition` is bound to be in the range of [0, existingSubtreeRootNode.children.length)
-
-  // so, a child exists at this position of the given subtree root node
-  const existingChildOfSubtreeRootAtThisPosition =
-    existingSubtreeRootNode.children[childPosition];
+  /// reconcile this child position of this existing (persisted) node...
 
   // is that child same type of element as the recalculated child at this position
   const shouldUpdateExistingChildOfSubtreeRootNode =
@@ -122,7 +135,8 @@ export function updateSubtreeForExistingNode(
 
   /// should DOM element corresponding to this MeactElement be updated or not
 
-  if (existingChildOfSubtreeRootAtThisPosition.type === "MeactHtmlElement") {
+  // if the child element at this childPosition is not a functional component
+  if (existingChildOfSubtreeRootAtThisPosition.type !== "MeactComponent") {
     const isPropsSameAcrossRerender = arePropsEqual(lastProps, newProps);
 
     if (!isPropsSameAcrossRerender) {
@@ -136,19 +150,9 @@ export function updateSubtreeForExistingNode(
     }
   }
 
-  // if the child element at this childPosition is a functional component
-  // then it should be handled differently since it won't have children to recurse over
+  // else, it should be handled differently
 
-  // ! especially for type Fragment and which are handled in the normal `createElement` flow like MeactHtmlElement nodes
-  // since Fragment has multiple children from render props but no useful (component-like) return block
-  const multiChildrenFnComponent =
-    existingChildOfSubtreeRootAtThisPosition.name === "Fragment" ||
-    existingChildOfSubtreeRootAtThisPosition.name === "MeactContextProviderFn";
-
-  if (
-    existingChildOfSubtreeRootAtThisPosition.type === "MeactComponent" &&
-    !multiChildrenFnComponent
-  ) {
+  if (existingChildOfSubtreeRootAtThisPosition.type === "MeactComponent") {
     // children passed from the parent component via props might have refreshed on parent component's state update
 
     existingChildOfSubtreeRootAtThisPosition.propChildrenSnapshot =
@@ -158,15 +162,15 @@ export function updateSubtreeForExistingNode(
     updateSubtreeForExistingNode(
       existingChildOfSubtreeRootAtThisPosition,
       0,
-      null,
-      false
+      null
     );
 
     return;
   }
 
   // else, existingChildOfSubtreeRootNode is a non-functional element i.e. a HTML or Null element
-  // recursively update the rendering of children nodes
+  // we have already updates its props
+  // now, recursively update the subtrees of its children nodes
   updateSubtreeOfChildrenElementsHelper(
     existingChildOfSubtreeRootAtThisPosition,
     freshChildOfSubtreeRootAtThisPosition
@@ -200,8 +204,7 @@ function updateSubtreeOfChildrenElementsHelper(
       updateSubtreeForExistingNode(
         existingSubtreeChildNode,
         i,
-        freshSubtreeGrandchildNode,
-        false
+        freshSubtreeGrandchildNode
       );
     }
 
@@ -264,17 +267,16 @@ function updateSubtreeOfChildrenElementsHelper(
 function createElementDuringRerender(
   subtreeRootNode,
   childPosition,
-  { type, name, props, children }
+  { name, props, children }
 ) {
-  // pause the hijack and make createElement behave normally as it did during initial rendering
-  rerenderMonitor.pauseHijackOfCreateElementFn();
-
-  if (type === "MeactComponent") {
-    name = window[name];
-  }
+  const thisFunctionRef = globalMeactComponentRegistry.get(name);
 
   // create a fresh new MeactElement object/subtree
-  const mountNewChildSubtree = createElement(name, props, ...children);
+  const mountNewChildSubtree = createElement(
+    thisFunctionRef,
+    props,
+    ...children
+  );
 
   // update the render tree
   subtreeRootNode.children[childPosition] = mountNewChildSubtree;
@@ -286,7 +288,4 @@ function createElementDuringRerender(
     childPosition,
     targetElement: mountNewChildSubtree,
   });
-
-  // resume the hijack and make createElement behave differently during this re-rendering
-  rerenderMonitor.resumeHijackOfCreateElementFn();
 }

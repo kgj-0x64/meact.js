@@ -1,6 +1,7 @@
 import renderTree from "./render-tree.js";
 import { getNewElementId } from "./utils.js";
-import { updateSubtreeForExistingNode } from "./updateSubtree.js";
+import { updateSubtreeForExistingNode } from "./reconcile.js";
+import { bypassMemoization } from "./memo.js";
 
 /**
  * A MeactElement object is a node in our "render tree"
@@ -134,17 +135,22 @@ class MeactElement {
           this.contextManager.values.set(key, value);
         }
       },
-    };
-  }
 
-  /**
-   * call to re-evaluate the subtree rooted at this component even if this component is memoized
-   * but DOM should not be touched here
-   */
-  reEvaluateSubtreeFromThisComponent() {
-    // re-evaluate the subtree of the render tree which is rooted at this element
-    updateSubtreeForExistingNode(this, 0, null, true);
-    // but don't repaint the browser DOM
+      setValueForProviderComponent: (contextObjectReference, newValue) => {
+        let oldValue = null;
+        if (this.contextManager.values.has(contextObjectReference)) {
+          oldValue = this.contextManager.values.get(contextObjectReference);
+        }
+
+        // update the values map
+        this.contextManager.values.set(contextObjectReference, newValue);
+
+        if (oldValue !== newValue) {
+          // memoization should be ignored while re-rendering the subtree from this node
+          bypassMemoization.setSubtreeAsBypassed(this);
+        }
+      },
+    };
   }
 
   /**
@@ -152,7 +158,7 @@ class MeactElement {
    */
   rerenderSubtreeFromThisComponent() {
     // re-evaluate the subtree of the render tree which is rooted at this element
-    updateSubtreeForExistingNode(this, 0, null, true);
+    updateSubtreeForExistingNode(this, 0, null);
     // repaint the browser DOM
     renderTree.reRender(this);
   }

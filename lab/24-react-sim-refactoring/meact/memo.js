@@ -1,3 +1,4 @@
+import MeactElement from "./element.js";
 import { arePropsEqual } from "./utils.js";
 
 // a map of memoized function names to their MemoizedFunction instances
@@ -68,3 +69,31 @@ export function memo(componentFn, arePropsEqualFn) {
 
   return memoizedFunctionInstance;
 }
+
+export const bypassMemoization = {
+  subtreeRootNodes: new Map(),
+
+  /**
+   * call this to check if this children of this node should be bypassed on memo check or not
+   * @param {MeactElement} subtreeRootNode
+   * @returns {boolean}
+   */
+  isThisSubtreeBypassed(subtreeRootNode) {
+    return this.subtreeRootNodes.has(subtreeRootNode);
+  },
+
+  /**
+   * call this to set a subtree should not be check for memoization
+   * @param {MeactElement} subtreeRootNode
+   */
+  setSubtreeAsBypassed(subtreeRootNode) {
+    this.subtreeRootNodes.set(subtreeRootNode, true);
+  },
+
+  /**
+   * call this to reset the map after every render
+   */
+  reset() {
+    this.subtreeRootNodes = new Map();
+  },
+};

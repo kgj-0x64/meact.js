@@ -1,5 +1,7 @@
 import { resetHooksCallCounters } from "./hooks/hookHelpers.js";
 import meactRendererBridge from "./bridge.js";
+import MeactElement from "./element.js";
+import { bypassMemoization } from "./memo.js";
 
 /**
  * A "render tree" is a tree of objects which is created as the store of all info needed
@@ -13,9 +15,18 @@ const renderTree = {
 
   /**
    * call this to get the root node
+   * @returns {null | MeactElement}
    */
   getRootNode() {
     return this.rootNode;
+  },
+
+  /**
+   * call this to get the count of renders already done
+   * @returns {number}
+   */
+  getDomRefreshCounter() {
+    return this.domRefreshCounter;
   },
 
   /**
@@ -75,12 +86,14 @@ const renderTree = {
   /**
    * call this for housekeeping after every render and re-render activity on the browser DOM
    */
-  postDomRenderHandler() {
+  postScreenRenderHandler() {
     console.log("Post Render Cleanup Initiated...");
 
     this.domRefreshCounter += 1;
     // reset the hooks counter for all meact elements in the render tree
     resetHooksCallCounters(this.rootNode);
+    // reset the record of changes in context provider values
+    bypassMemoization.reset();
     // reset the queue of re-render diff
     this.rerenderDiffForDomHandler.reset();
     // run useEffect calls from the queue and then reset

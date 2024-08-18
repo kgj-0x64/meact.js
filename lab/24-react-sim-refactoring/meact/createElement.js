@@ -2,6 +2,7 @@ import MeactElement from "./element.js";
 import { componentFnCallStack } from "./executionContext.js";
 import { globalMeactComponentRegistry } from "./utils.js";
 import { MemoizedFunction } from "./memo.js";
+import renderTree from "./render-tree.js";
 
 /**
  * call this function to recusrively create a render sub-tree of MeactElement objects
@@ -153,31 +154,37 @@ function createChildrenElementsHelper(childrenArray) {
   return childrenElements;
 }
 
-// handle the execution of this component's function and how nested createElement calls should be handled from within its return block
-// send this MeactElement to createComponent function for locally scoped top-down handling
-// where a child component is not created until its encapsulating parent component's function's return block is fully executed
-// so that the child component gets current dynamic values from their parent element within the return block
 /**
- * call this to fully create a skeleton MeactElement object
+ * call this to fully create a skeleton MeactComponent object
+ * it handles the execution of this component's function and how nested createElement calls should be handled from within its return block
+ * where a child component's function is not called until its encapsulating parent component's function's return block is fully executed
+ * so that the children elements in the return block get current dynamic (Context) values from their respective parent element within the return block
+ *
  * @param {MeactElement} meactComponentObjectReference
+ * @param {undefined | MeactElement} usingHookContextOfComponentObjectReference
  * @returns updates the MeactElement object in place
  */
-function handleComponentFunctionExecution(meactComponentObjectReference) {
+export function handleComponentFunctionExecution(
+  meactComponentObjectReference,
+  usingHookContextOfComponentObjectReference
+) {
   // ! SET this component as the context for handling hooks
   // hooks are initialized when a component's function definition is executed
   // so, if a hook is called right now then it must be corresponding to this component only
   componentFnCallStack.setComponentFnInExecutionContext(
-    meactComponentObjectReference
+    usingHookContextOfComponentObjectReference === undefined
+      ? meactComponentObjectReference
+      : usingHookContextOfComponentObjectReference
   );
 
+  // access component's function reference from the global namespace
   const thisFunctionRef = globalMeactComponentRegistry.get(
     meactComponentObjectReference.name
   );
 
-  // call the function to get the evaluated MeactElement output through its return block
+  // call the component's function with appropriate arguments
+  // to get the evaluated MeactElement output through its return block
   // which could have however deeply nested `createElement` calls in its children
-  // call the component function with appropriate arguments
-  // to create args, add children, if any, into props
   const functionArgs = {
     ...meactComponentObjectReference.props,
     children: meactComponentObjectReference.propChildrenSnapshot,
@@ -214,8 +221,12 @@ function handleComponentFunctionExecution(meactComponentObjectReference) {
     meactComponentObjectReference
   );
 
-  // recursively call functions for children components after the return block of this component is executed
-  handleComponentFnExecutionOfReturnedElements(meactComponentObjectReference);
+  /// if this is a re-render, don't call functions of nested children components from the return block just yet
+  /// else
+  if (renderTree.getDomRefreshCounter() === 0) {
+    // recursively call functions for children components after the return block of this component is executed
+    handleComponentFnExecutionOfReturnedElements(meactComponentObjectReference);
+  }
 }
 
 /**

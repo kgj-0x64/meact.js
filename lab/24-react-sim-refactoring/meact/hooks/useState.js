@@ -1,4 +1,4 @@
-import { componentFnCallStack } from "../callStack.js";
+import { componentFnCallStack } from "../executionContext.js";
 import { badHookCall, getHookCallCount } from "./hookHelpers.js";
 
 /**
