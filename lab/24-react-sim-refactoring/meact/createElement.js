@@ -1,6 +1,6 @@
 import MeactElement from "./element.js";
-import { componentFnCallStack } from "./callStack.js";
-import { globalMeactComponentRegistry, rerenderMonitor } from "./utils.js";
+import { componentFnCallStack } from "./executionContext.js";
+import { globalMeactComponentRegistry } from "./utils.js";
 import { MemoizedFunction } from "./memo.js";
 
 /**
@@ -94,7 +94,7 @@ export function createElement(element, props, ...children) {
 
     // creating its Render Tree node beforehand to get its ID for handling hooks in its context
     // also, must preserve whole of its argument to reuse in case of its re-rendering
-    const reactComponent = new MeactElement(
+    const meactComponent = new MeactElement(
       type,
       name,
       propsObject,
@@ -108,13 +108,13 @@ export function createElement(element, props, ...children) {
     const currComponentInExecution =
       componentFnCallStack.getComponentFnCurrInExecutionContext();
     if (currComponentInExecution && currComponentInExecution.name !== name) {
-      return reactComponent;
+      return meactComponent;
     }
 
     // ! else, handle the execution of this component's function and how nested createElement calls should be handled from within its return block
-    handleComponentFunctionExecution(reactComponent);
+    handleComponentFunctionExecution(meactComponent);
 
-    return reactComponent;
+    return meactComponent;
   }
 
   /// else
@@ -159,49 +159,50 @@ function createChildrenElementsHelper(childrenArray) {
 // so that the child component gets current dynamic values from their parent element within the return block
 /**
  * call this to fully create a skeleton MeactElement object
- * @param {MeactElement} reactComponentObjectReference
+ * @param {MeactElement} meactComponentObjectReference
  * @returns updates the MeactElement object in place
  */
-function handleComponentFunctionExecution(reactComponentObjectReference) {
+function handleComponentFunctionExecution(meactComponentObjectReference) {
   // ! SET this component as the context for handling hooks
-  // hooks are initialized when a ReactComponent's function definition is executed
+  // hooks are initialized when a component's function definition is executed
   // so, if a hook is called right now then it must be corresponding to this component only
   componentFnCallStack.setComponentFnInExecutionContext(
-    reactComponentObjectReference
+    meactComponentObjectReference
   );
 
   const thisFunctionRef = globalMeactComponentRegistry.get(
-    reactComponentObjectReference.name
+    meactComponentObjectReference.name
   );
 
-  // if is this a Fragment function
-  if (reactComponentObjectReference.name === "Fragment") {
-    const returnedChildrenArray = thisFunctionRef.call(null, {
-      children: childrenArray,
-    }); // returns back this childrenArray
+  // call the function to get the evaluated MeactElement output through its return block
+  // which could have however deeply nested `createElement` calls in its children
+  // call the component function with appropriate arguments
+  // to create args, add children, if any, into props
+  const functionArgs = {
+    ...meactComponentObjectReference.props,
+    children: meactComponentObjectReference.propChildrenSnapshot,
+  };
+
+  // if is this a Fragment function or a Provider function
+  if (
+    meactComponentObjectReference.name === "Fragment" ||
+    meactComponentObjectReference.name === "MeactContextProvider"
+  ) {
+    const returnedChildrenArray = thisFunctionRef.call(null, functionArgs); // returns back this childrenArray itself
 
     const childrenElements = createChildrenElementsHelper(
       returnedChildrenArray
     );
 
     // now update the children elements
-    reactComponentObjectReference.children = childrenElements;
+    meactComponentObjectReference.children = childrenElements;
   } else {
-    // call the function to get the evaluated MeactElement output through its return block
-    // which could have however deeply nested `createElement` calls in its children
-    // call the component function with appropriate arguments
-    // to create args, add children, if any, into props
-    const functionArgs = {
-      ...reactComponentObjectReference.props,
-      children: reactComponentObjectReference.propChildrenSnapshot,
-    };
-
     // execution this component's function calls `createElement` recursively from inside its return block
     // MeactComponent type children returned by `createElement` call here are currently partially created
     const returnedElement = thisFunctionRef.call(null, functionArgs);
 
     // now update the children elements
-    reactComponentObjectReference.children = [returnedElement];
+    meactComponentObjectReference.children = [returnedElement];
   }
 
   // `return` block has been fully executed by now
@@ -210,13 +211,28 @@ function handleComponentFunctionExecution(reactComponentObjectReference) {
 
   // so, let's transfer the dynamic values from Context Provider
   updateAncestralContextOfReturnedChildrenElements(
-    reactComponentObjectReference
+    meactComponentObjectReference
   );
 
   // recursively call functions for children components after the return block of this component is executed
-  reactComponentObjectReference.children.forEach((childElement) => {
+  handleComponentFnExecutionOfReturnedElements(meactComponentObjectReference);
+}
+
+/**
+ *
+ * @param {MeactElement} meactElementObjectReference
+ */
+function handleComponentFnExecutionOfReturnedElements(
+  meactElementObjectReference
+) {
+  meactElementObjectReference.children.forEach((childElement) => {
+    // if this is a MeactComponent, then send this component for its function calling
     if (childElement.type === "MeactComponent") {
       handleComponentFunctionExecution(childElement);
+    }
+    // else move on to recursively handle nested children of this element
+    else {
+      handleComponentFnExecutionOfReturnedElements(childElement);
     }
   });
 }
@@ -225,11 +241,16 @@ function handleComponentFunctionExecution(reactComponentObjectReference) {
  * call this to update the Context provided by all the ancestors for children elements got from running a component's function
  * @param {MeactElement} parentElement
  */
-function updateAncestralContextOfReturnedChildrenElements(parentElement) {
+export function updateAncestralContextOfReturnedChildrenElements(
+  parentElement
+) {
   // recursively update the context from ancestors for all children
   parentElement.children.forEach((childElement) => {
-    childElement.contextManager.setAllContextsProvidedByAncestors(
+    childElement.contextManager.mergeContextValuesProvidedByAncestors(
       parentElement.contextManager.values
     );
+
+    // recursively update context of all elements constructed in one return block
+    updateAncestralContextOfReturnedChildrenElements(childElement);
   });
 }

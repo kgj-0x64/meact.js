@@ -1,6 +1,6 @@
 import renderTree from "./render-tree.js";
 import { createElement } from "./createElement.js";
-import { componentFnCallStack } from "./callStack.js";
+import { componentFnCallStack } from "./executionContext.js";
 import { memoizedFunctionsMap } from "./memo.js";
 import {
   arePropsEqual,

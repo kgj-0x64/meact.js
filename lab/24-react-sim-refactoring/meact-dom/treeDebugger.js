@@ -69,6 +69,18 @@ export class MeactElementTreeDebugger {
       }
     }
 
+    // node's context
+    const nodeContextSpan = document.createElement("span");
+    nodeContextSpan.className = "meact-element-tree-node";
+    let contextValues = [];
+    for (const [_, value] of node.contextManager.values) {
+      contextValues.push(value);
+    }
+    nodeContextSpan.innerText = `${nestedLeftMargin}_Context: ${JSON.stringify(
+      contextValues
+    )}`;
+    this.treeContainer.appendChild(nodeContextSpan);
+
     // node's children
     if (node.children && node.children.length > 0) {
       node.children.forEach((child) => {

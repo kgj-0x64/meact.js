@@ -1,5 +1,4 @@
-import { Fragment } from "@meact/jsx-runtime";
-import { createElement } from "../createElement.js";
+import { updateAncestralContextOfReturnedChildrenElements } from "../createElement.js";
 import { componentFnCallStack } from "../callStack.js";
 import { badHookCall } from "./hookHelpers.js";
 
@@ -17,22 +16,24 @@ export function createContext(defaultValue) {
     defaultValue: defaultValue !== undefined ? defaultValue : null,
   };
 
-  function MeactContextProviderFn({ value, children }) {
+  function MeactContextProvider({ value, children }) {
     const targetComponentForThisProvider =
       componentFnCallStack.getComponentFnCurrInExecutionContext();
 
-    if (targetComponentForThisProvider) {
-      targetComponentForThisProvider.contextManager.mergeWithContextsProvidedByAncestors(
-        contextObjectReference,
-        value
-      );
-    }
+    targetComponentForThisProvider.contextManager.mergeContextValuesProvidedByAncestors(
+      new Map([[contextObjectReference, value]])
+    );
+
+    // recursively update Provided Context of its render props children (within the same return block of encapsulating component's function)
+    updateAncestralContextOfReturnedChildrenElements(
+      targetComponentForThisProvider
+    );
 
     // since this is used inside the return block of a component
-    return createElement(Fragment, null, ...children);
+    return children; // like Fragment function
   }
 
-  contextObjectReference["Provider"] = MeactContextProviderFn;
+  contextObjectReference["Provider"] = MeactContextProvider;
 
   return contextObjectReference;
 }

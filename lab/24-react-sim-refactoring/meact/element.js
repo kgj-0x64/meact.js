@@ -124,22 +124,15 @@ class MeactElement {
       values: new Map(), // {object} contextObjectRef -> {any} value
 
       /**
-       * call this to set context values provided by all ancestors during a render pass/scan
-       * @param {ContextManagerValuesMap} providedContextRefsAndValuesMapFromParent
+       * call this to merge an updated Map object with the existing values Map
+       * @param {ContextManagerValuesMap} updatedContextValuesProvidedByAncestors
        */
-      setAllContextsProvidedByAncestors: (
-        providedContextRefsAndValuesMapFromParent
+      mergeContextValuesProvidedByAncestors: (
+        updatedContextValuesProvidedByAncestors
       ) => {
-        this.contextManager.values = providedContextRefsAndValuesMapFromParent;
-      },
-
-      /**
-       * call this to set a particular Map key
-       * @param {object} contextObjectReference
-       * @param {any} value
-       */
-      mergeWithContextsProvidedByAncestors: (contextObjectReference, value) => {
-        existingMap.set(contextObjectReference, value);
+        for (const [key, value] of updatedContextValuesProvidedByAncestors) {
+          this.contextManager.values.set(key, value);
+        }
       },
     };
   }

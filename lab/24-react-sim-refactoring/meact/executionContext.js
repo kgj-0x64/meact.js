@@ -40,9 +40,7 @@ export const componentFnCallStack = {
    * @param {MeactElement} componentObjectRef
    */
   setComponentFnInExecutionContext(componentObjectRef) {
-    console.log("setComponentFnInExecutionContext", componentObjectRef);
     this.stack.push(componentObjectRef);
-    console.log("setComponentFnInExecutionContext", this.stack);
   },
 
   /**
