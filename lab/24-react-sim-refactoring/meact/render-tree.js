@@ -1,5 +1,5 @@
 import { resetHooksCallCounters } from "./hooks/hookHelpers.js";
-import { meactRendererBridge } from "./bridge.js";
+import meactRendererBridge from "./bridge.js";
 
 /**
  * A "render tree" is a tree of objects which is created as the store of all info needed

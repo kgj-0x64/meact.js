@@ -1,6 +1,6 @@
-import renderTree from "./render-tree/index.js";
+import renderTree from "./render-tree.js";
 import { createElement } from "./createElement.js";
-import { currActiveComponentForHooks } from "./callStack.js";
+import { componentFnCallStack } from "./callStack.js";
 import { memoizedFunctionsMap } from "./memo.js";
 import {
   arePropsEqual,
@@ -56,33 +56,12 @@ export function updateSubtreeForExistingNode(
       memoizedFunctionsMap.has(functionName)
     ) {
       // check if props has changed versus last render
-      const memoizedFunctionMappedValues =
-        memoizedFunctionsMap.get(functionName);
+      const memoizedFunctionInstance = memoizedFunctionsMap.get(functionName);
 
-      const customArePropsEqualFn =
-        memoizedFunctionMappedValues.arePropsEqualFn;
-
-      const lastPropsOfThisMemoizedFn = memoizedFunctionMappedValues.lastProps;
+      // update the value of lastProps property on this MemoizedFunction instance
       const newPropsOfThisMemoizedFn = existingSubtreeRootNode.props;
-
-      let arePropsSameForThisMemoizedFn = false;
-      if (customArePropsEqualFn !== undefined) {
-        arePropsSameForThisMemoizedFn = customArePropsEqualFn(
-          lastPropsOfThisMemoizedFn,
-          newPropsOfThisMemoizedFn
-        );
-      } else {
-        arePropsSameForThisMemoizedFn = arePropsEqual(
-          lastPropsOfThisMemoizedFn,
-          newPropsOfThisMemoizedFn
-        );
-      }
-
-      // update its mapping to latest props
-      memoizedFunctionsMap.set(functionName, {
-        ...memoizedFunctionsMap.get(functionName),
-        lastProps: existingSubtreeRootNode.props,
-      });
+      const arePropsSameForThisMemoizedFn =
+        memoizedFunctionInstance.setLastProps(newPropsOfThisMemoizedFn);
 
       // don't do anything for the subtree rooted at this node
       if (arePropsSameForThisMemoizedFn) {
@@ -91,7 +70,9 @@ export function updateSubtreeForExistingNode(
     }
 
     // set this component as the context for handling hooks
-    currActiveComponentForHooks.set(existingSubtreeRootNode);
+    componentFnCallStack.setComponentFnInExecutionContext(
+      existingSubtreeRootNode
+    );
 
     // call this function to execute the component definition
     freshChildOfSubtreeRootAtThisPosition = functionRef.call(

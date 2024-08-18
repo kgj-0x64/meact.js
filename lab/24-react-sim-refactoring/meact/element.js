@@ -1,4 +1,4 @@
-import renderTree from "./render-tree/index.js";
+import renderTree from "./render-tree.js";
 import { getNewElementId } from "./utils.js";
 import { updateSubtreeForExistingNode } from "./updateSubtree.js";
 
@@ -7,7 +7,7 @@ import { updateSubtreeForExistingNode } from "./updateSubtree.js";
  */
 class MeactElement {
   /**
-   * @param {"NullComponent" | "MeactComponent" | "MeactHtmlElement"} type
+   * @param {"MeactHtmlElement" | "MeactTextElement" | "MeactComponent" | "NullComponent"} type
    * @param {string} name
    * @param {object} props
    * @param {MeactElement[]} children
@@ -118,39 +118,28 @@ class MeactElement {
     // useContext manager useful for an element of type "MeactComponent"
     this.contextManager = {
       // a Map of context object reference to current value of this component
+
+      /** @typedef {Map<{defaultValue: any; Provider: Function}, any>} ContextManagerValuesMap */
+      /** @type {ContextManagerValuesMap} values */
       values: new Map(), // {object} contextObjectRef -> {any} value
 
+      /**
+       * call this to set context values provided by all ancestors during a render pass/scan
+       * @param {ContextManagerValuesMap} providedContextRefsAndValuesMapFromParent
+       */
       setAllContextsProvidedByAncestors: (
         providedContextRefsAndValuesMapFromParent
       ) => {
-        const contextValues = this.contextManager.values;
+        this.contextManager.values = providedContextRefsAndValuesMapFromParent;
+      },
 
-        let hasValueChanged = false;
-
-        for (const [
-          contextObjRef,
-          newValue,
-        ] of providedContextRefsAndValuesMapFromParent) {
-          // does this component calls `useContext` hook with this exact `contextObjectRef` in argument
-          if (!contextValues.has(contextObjRef)) continue;
-
-          const oldValue = contextValues.get(contextObjRef);
-
-          // update the value
-          contextValues.set(contextObjRef, newValue);
-
-          hasValueChanged = oldValue !== newValue;
-        }
-
-        /**
-         * ! When should this component be re-rendered due to a change in this context value?
-         *
-         * this child component (i.e. this MeactElement object) is firstly created with the existing hook value,
-         * and then context values provided by ancestors are set in "post reconciliation middleware" before DOM is updated
-         */
-        if (!hasValueChanged) return;
-
-        this.reEvaluateSubtreeFromThisComponent();
+      /**
+       * call this to set a particular Map key
+       * @param {object} contextObjectReference
+       * @param {any} value
+       */
+      mergeWithContextsProvidedByAncestors: (contextObjectReference, value) => {
+        existingMap.set(contextObjectReference, value);
       },
     };
   }

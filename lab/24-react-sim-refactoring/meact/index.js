@@ -8,6 +8,7 @@ import {
   createContext,
 } from "./hooks/index.js";
 import { memo } from "./memo.js";
+import meactRendererBridge from "./bridge.js";
 
 const Meact = {
   createElement,
@@ -22,5 +23,7 @@ export {
   useContext,
   createContext,
 };
+
+export { meactRendererBridge };
 
 export default Meact;

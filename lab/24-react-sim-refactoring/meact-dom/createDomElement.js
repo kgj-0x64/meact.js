@@ -16,6 +16,18 @@ export function createBrowserDomForMeactElement(
 ) {
   /// render tree nodes which is not meant for browser DOM
 
+  if (meactElement.type === "MeactTextElement") {
+    // ! BUG: when overwriting `innerHTML` so as to handle both Unicode characters and HTML entities
+    // ```createElement("b", null, "Note: ", createElement("code", null, "filterTodos"), " is artificially slowed down!")```
+    // will produce ```<b data-render-id="b-10"> is artificially slowed down!</b>```
+
+    // Solution: https://stackoverflow.com/questions/20941956/how-to-insert-html-entities-with-createtextnode
+    // You can't create nodes with HTML entities. Use unicode values instead.
+
+    const textContent = meactElement.props.content;
+    return document.createTextNode(textContent);
+  }
+
   if (meactElement.type === "NullComponent") {
     // let's add it to the browser DOM and let it hold a child position there as well
     const nullElement = document.createElement("div");
@@ -63,18 +75,6 @@ export function createBrowserDomForMeactElement(
     }
 
     return placeholderElement;
-  }
-
-  if (meactElement.name === "text") {
-    // ! BUG: when overwriting `innerHTML` so as to handle both Unicode characters and HTML entities
-    // ```createElement("b", null, "Note: ", createElement("code", null, "filterTodos"), " is artificially slowed down!")```
-    // will produce ```<b data-render-id="b-10"> is artificially slowed down!</b>```
-
-    // Solution: https://stackoverflow.com/questions/20941956/how-to-insert-html-entities-with-createtextnode
-    // You can't create nodes with HTML entities. Use unicode values instead.
-
-    const textContent = meactElement.props.content;
-    return document.createTextNode(textContent);
   }
 
   // show these in the browser DOM

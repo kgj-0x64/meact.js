@@ -1,4 +1,4 @@
-import { meactRendererBridge } from "@meact/bridge.js";
+import { meactRendererBridge } from "@meact";
 import { createBrowserDomForMeactElement } from "./createDomElement.js";
 import { MeactElementTreeDebugger } from "./treeDebugger.js";
 import { upsertBrowserDomForRerenderDiffItem } from "./upsertDomElement.js";

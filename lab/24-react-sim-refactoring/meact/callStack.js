@@ -20,7 +20,7 @@ import MeactElement from "./element";
 //   },
 // };
 
-// or, 2. use a global stack to keep track of current ReactComponent being rendered
+// or, 2. use a global stack to keep track of MeactComponent whose function is being executed
 
 // this should mimic the function call stack top-down
 export const componentFnCallStack = {
@@ -28,9 +28,10 @@ export const componentFnCallStack = {
 
   /**
    * call this to get component function definition being executed currently
+   * @returns {null | MeactElement}
    */
   getComponentFnCurrInExecutionContext() {
-    this.stack[this.stack.length - 1];
+    return this.stack.length === 0 ? null : this.stack[this.stack.length - 1];
   },
 
   /**
@@ -39,7 +40,9 @@ export const componentFnCallStack = {
    * @param {MeactElement} componentObjectRef
    */
   setComponentFnInExecutionContext(componentObjectRef) {
+    console.log("setComponentFnInExecutionContext", componentObjectRef);
     this.stack.push(componentObjectRef);
+    console.log("setComponentFnInExecutionContext", this.stack);
   },
 
   /**

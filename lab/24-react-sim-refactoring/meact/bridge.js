@@ -4,7 +4,7 @@
 
 import renderTree from "./render-tree";
 
-export const meactRendererBridge = {
+const meactRendererBridge = {
   // renderer set to use and paint the "Render Tree"
   renderer: null,
   TreeDebugger: null,
@@ -42,3 +42,5 @@ export const meactRendererBridge = {
     }
   },
 };
+
+export default meactRendererBridge;
