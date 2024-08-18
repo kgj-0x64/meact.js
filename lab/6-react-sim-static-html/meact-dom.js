@@ -13,14 +13,14 @@ class BrowserDomWriter {
   // and take over managing the DOM inside it
   render(meactElement) {
     this.rootNodeInBrowserDom.innerHTML = ""; // Clear any existing content
-    const browserDom = createBrowserDomForReactElement(meactElement);
+    const browserDom = createBrowserDomForMeactElement(meactElement);
     this.rootNodeInBrowserDom.appendChild(browserDom);
   }
 
   destroy() {}
 }
 
-function createBrowserDomForReactElement(meactElement) {
+function createBrowserDomForMeactElement(meactElement) {
   if (meactElement.name === "text") {
     const textContent = meactElement.props.content;
     return document.createTextNode(textContent);
@@ -38,7 +38,7 @@ function createBrowserDomForReactElement(meactElement) {
   // If the node has children, create and append child nodes
   if (meactElement.children && meactElement.children.length > 0) {
     meactElement.children.forEach((child) => {
-      htmlElement.appendChild(createBrowserDomForReactElement(child));
+      htmlElement.appendChild(createBrowserDomForMeactElement(child));
     });
   }
 

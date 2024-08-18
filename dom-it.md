@@ -1,5 +1,9 @@
 # DOM
 
+> We write HTML (plus CSS and JS); and the browser parses this code to construct and manipulate a DOM tree.
+
+**When you load a webpage constructed using HTML and CSS, the browser parses the HTML to create the Document Object Model (DOM) tree and parses the CSS to create the CSS Object Model (CSSOM) tree. These two trees are combined to form the "Render Tree", which the browser's rendering engine (like Blink in Chrome, WebKit in Safari) uses to determine the layout and appearance of the webpage. JavaScript can manipulate these trees directly, resulting in changes to the page’s content, structure, and style.**
+
 ## Node vs Element
 
 DOM nodes are regular JavaScript objects. We can alter them.

@@ -37,7 +37,7 @@ const browserDomWriter = {
     meactElement.plotRenderTree();
 
     this.targetNodeInBrowserDom.innerHTML = ""; // clear any existing content
-    const browserDom = createBrowserDomForReactElement(
+    const browserDom = createBrowserDomForMeactElement(
       meactElement,
       this.targetNodeInBrowserDom.id,
       0
@@ -52,11 +52,11 @@ const browserDomWriter = {
 
   /**
    * call this to update existing DOM's copy based on render tree's diff
-   * @param {MeactElement} rootReactElement root node of the render tree which is already rendered in browser DOM
+   * @param {MeactElement} rootMeactElement root node of the render tree which is already rendered in browser DOM
    */
-  rerenderTheDiff(rootReactElement) {
+  rerenderTheDiff(rootMeactElement) {
     // for visual debugging, plot the render tree at the bottom of browser DOM
-    rootReactElement.plotRenderTree();
+    rootMeactElement.plotRenderTree();
 
     // using reconciliatoin to modify browser DOM from renderTree's diff only
     const rerenderDiffQueue = renderTree.rerenderDiffForDomHandler.getQueue();
@@ -104,7 +104,7 @@ const domVirtualNodeHelper = {
  * @param {number} insertAtChildPosition
  * @returns {HTMLElement}
  */
-function createBrowserDomForReactElement(
+function createBrowserDomForMeactElement(
   meactElement,
   parentDomElementId,
   insertAtChildPosition
@@ -146,7 +146,7 @@ function createBrowserDomForReactElement(
 
     if (meactElement.children && meactElement.children.length > 0) {
       meactElement.children.forEach((child, index) => {
-        const childElementAtThisIndex = createBrowserDomForReactElement(
+        const childElementAtThisIndex = createBrowserDomForMeactElement(
           child,
           // actual parent node in the DOM is unchanged for this fragment's children
           parentDomElementId,
@@ -179,7 +179,7 @@ function createBrowserDomForReactElement(
   // If the node has children, create and append child nodes
   if (meactElement.children && meactElement.children.length > 0) {
     meactElement.children.forEach((child, index) => {
-      const childElementAtThisIndex = createBrowserDomForReactElement(
+      const childElementAtThisIndex = createBrowserDomForMeactElement(
         child,
         meactElement.id,
         index
@@ -215,7 +215,7 @@ function upsertBrowserDomForRerenderDiffItem(rerenderDiffItem) {
   const childPositionInBrowserDom = parentInfoFromBrowserDom.childPositionInDom;
 
   if (action === "created") {
-    const targetDomSubtree = createBrowserDomForReactElement(targetElement);
+    const targetDomSubtree = createBrowserDomForMeactElement(targetElement);
 
     // overwrite the element at the specified child position or append if it's available
     if (

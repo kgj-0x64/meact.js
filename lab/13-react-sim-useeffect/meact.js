@@ -247,7 +247,7 @@ class MeactElement {
    * call this to pretty-plot the render tree beginning from this node in browser for visual debugging
    */
   plotRenderTree() {
-    new ReactElementTreeDebugger(this).renderTreeInHtmlDocument();
+    new MeactElementTreeDebugger(this).renderTreeInHtmlDocument();
   }
 }
 
@@ -816,7 +816,7 @@ function executeUseEffectQueue() {
 /**
  * Helper class to pretty-plot a render tree rooted at the given `meactElement` node
  */
-class ReactElementTreeDebugger {
+class MeactElementTreeDebugger {
   /**
    * @param {MeactElement} meactElement
    */

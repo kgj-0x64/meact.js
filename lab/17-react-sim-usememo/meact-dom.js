@@ -37,7 +37,7 @@ const browserDomWriter = {
     meactElement.plotRenderTree();
 
     this.targetNodeInBrowserDom.innerHTML = ""; // clear any existing content
-    const browserDom = createBrowserDomForReactElement(meactElement);
+    const browserDom = createBrowserDomForMeactElement(meactElement);
     // view the all properties and methods of a document object
     console.dir(browserDom);
     this.targetNodeInBrowserDom.appendChild(browserDom);
@@ -48,11 +48,11 @@ const browserDomWriter = {
 
   /**
    * call this to update existing DOM's copy based on render tree's diff
-   * @param {MeactElement} rootReactElement root node of the render tree which is already rendered in browser DOM
+   * @param {MeactElement} rootMeactElement root node of the render tree which is already rendered in browser DOM
    */
-  rerenderTheDiff(rootReactElement) {
+  rerenderTheDiff(rootMeactElement) {
     // for visual debugging, plot the render tree at the bottom of browser DOM
-    rootReactElement.plotRenderTree();
+    rootMeactElement.plotRenderTree();
 
     // using reconciliatoin to modify browser DOM from renderTree's diff only
     const rerenderDiffQueue = renderTree.rerenderDiffForDomHandler.getQueue();
@@ -72,7 +72,7 @@ const browserDomWriter = {
  * @param {MeactElement} meactElement
  * @returns {HTMLElement}
  */
-function createBrowserDomForReactElement(meactElement) {
+function createBrowserDomForMeactElement(meactElement) {
   /// render tree nodes which is not meant for browser DOM
 
   if (meactElement.type === "NullComponent") {
@@ -93,7 +93,7 @@ function createBrowserDomForReactElement(meactElement) {
     placeholderElement.style.display = "contents";
 
     // browser DOM cares for DOM element from its return block only
-    const domSubtreeOfThisComponent = createBrowserDomForReactElement(
+    const domSubtreeOfThisComponent = createBrowserDomForMeactElement(
       meactElement.children[0]
     );
     placeholderElement.appendChild(domSubtreeOfThisComponent);
@@ -123,7 +123,7 @@ function createBrowserDomForReactElement(meactElement) {
         // You can't create nodes with HTML entities. Use unicode values instead.
         htmlElement.appendChild(document.createTextNode(textContent));
       } else {
-        htmlElement.appendChild(createBrowserDomForReactElement(child));
+        htmlElement.appendChild(createBrowserDomForMeactElement(child));
       }
     });
   }
@@ -153,7 +153,7 @@ function upsertBrowserDomForRerenderDiffItem(rerenderDiffItem) {
   }
 
   if (action === "created") {
-    const targetDomSubtree = createBrowserDomForReactElement(targetElement);
+    const targetDomSubtree = createBrowserDomForMeactElement(targetElement);
 
     // overwrite the element at the specified childPosition or append if childPosition is out of bounds
     if (

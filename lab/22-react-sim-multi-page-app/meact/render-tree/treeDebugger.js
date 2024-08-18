@@ -1,7 +1,7 @@
 /**
  * Helper class to pretty-plot a render tree rooted at the given `meactElement` node
  */
-export class ReactElementTreeDebugger {
+export class MeactElementTreeDebugger {
   /**
    * @param {MeactElement} meactElement
    */

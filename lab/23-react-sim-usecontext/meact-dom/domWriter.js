@@ -1,5 +1,5 @@
 import renderTree from "@meact/render-tree";
-import { createBrowserDomForReactElement } from "./createDomElement.js";
+import { createBrowserDomForMeactElement } from "./createDomElement.js";
 import { upsertBrowserDomForRerenderDiffItem } from "./upsertDomElement.js";
 
 /**
@@ -30,7 +30,7 @@ export const browserDomWriter = {
     meactElement.plotRenderTree();
 
     this.targetNodeInBrowserDom.innerHTML = ""; // clear any existing content
-    const browserDom = createBrowserDomForReactElement(
+    const browserDom = createBrowserDomForMeactElement(
       meactElement,
       this.targetNodeInBrowserDom.id,
       0
@@ -46,11 +46,11 @@ export const browserDomWriter = {
   /**
    * call this to update existing DOM's copy based on render tree's diff
    * ! calling this before calling `this.render()` will fail rightly because parent DOM nodes will be unknown
-   * @param {MeactElement} rootReactElement root node of the render tree which is already rendered in browser DOM
+   * @param {MeactElement} rootMeactElement root node of the render tree which is already rendered in browser DOM
    */
-  rerenderTheDiff(rootReactElement) {
+  rerenderTheDiff(rootMeactElement) {
     // for visual debugging, plot the render tree at the bottom of browser DOM
-    rootReactElement.plotRenderTree();
+    rootMeactElement.plotRenderTree();
 
     // using reconciliatoin to modify browser DOM from renderTree's diff only
     const rerenderDiffQueue = renderTree.rerenderDiffForDomHandler.getQueue();

@@ -1,7 +1,7 @@
 import renderTree from "@meact/render-tree";
 import { getNewElementId } from "./utils.js";
 import { updateSubtreeForElement } from "./updateSubtree.js";
-import { ReactElementTreeDebugger } from "./render-tree/treeDebugger.js";
+import { MeactElementTreeDebugger } from "./render-tree/treeDebugger.js";
 
 /**
  * A MeactElement object is a node in our "render tree"
@@ -175,7 +175,7 @@ class MeactElement {
    * call this to pretty-plot the render tree beginning from this node in browser for visual debugging
    */
   plotRenderTree() {
-    new ReactElementTreeDebugger(this).renderTreeInHtmlDocument();
+    new MeactElementTreeDebugger(this).renderTreeInHtmlDocument();
   }
 }
 

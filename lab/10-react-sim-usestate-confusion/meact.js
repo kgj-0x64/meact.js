@@ -30,7 +30,7 @@ class MeactElement {
 
   // plot render tree beginning from this node for visual debugging
   plotRenderTree() {
-    new ReactElementTreeDebugger(this).renderTreeInHtmlDocument();
+    new MeactElementTreeDebugger(this).renderTreeInHtmlDocument();
   }
 }
 
@@ -170,7 +170,7 @@ function useState(initialValue) {
   return [stateValue, setStateValue];
 }
 
-class ReactElementTreeDebugger {
+class MeactElementTreeDebugger {
   constructor(meactElement) {
     this.node = meactElement;
     this.treeContainer = document.getElementById("meact-element-tree");
