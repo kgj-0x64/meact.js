@@ -20,7 +20,9 @@ For a component (i.e. a reusable element), the `createElement` function needs to
 
 Hooks are the library APIs which make the management of a component's local context (that is, data of an object of `MeactElement` class) very convenient for library users (i.e. component's function writers). Hooks are discovered by the library runtime when it is executing a component's function, so it needs to remember which component's function it is currently running.
 
-- I just needed to be careful with the "Closure" while creating the inner `setState` function because the inner function gets a reference in a Closure and not the copy of the variable/reference from the outer scope. So, I needed to explictly make a copy of this global variable in that outer scope (i.e. `useState` function definition scope) to ensure that a change in the global value does not make a `setState` function lose track of its corresponding component object reference.
+- Like React.js, Meact.js too uses the order of hooks inside a component's function definition to manage state and side effects.
+
+I just needed to be careful with the "Closure" while creating the inner `setState` function because the inner function gets a reference in a Closure and not the copy of the variable/reference from the outer scope. So, I needed to explictly make a copy of this global variable in that outer scope (i.e. `useState` function definition scope) to ensure that a change in the global value does not make a `setState` function lose track of its corresponding component object reference.
 
 ### A Child depends on Ancestors
 

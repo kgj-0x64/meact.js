@@ -72,6 +72,8 @@ Meact.js = My (implementation of) React.js
 
 ### Interesting Takeaways
 
+- **In-browser debugging** is just so beautiful, nothing short of IntelliJ!
+
 - [JSX Spec - "Why not Template Literals?"](https://facebook.github.io/jsx/#sec-why-not-template-literals)
 
 - **React uses the order of hooks inside a component's function definition to manage state and side effects.**

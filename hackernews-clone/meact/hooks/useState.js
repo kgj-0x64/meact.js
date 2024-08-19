@@ -1,4 +1,4 @@
-import { currActiveComponentForHooks } from "./global.js";
+import { componentFnCallStack } from "../executionContext.js";
 import { badHookCall, getHookCallCount } from "./hookHelpers.js";
 
 /**
@@ -8,7 +8,7 @@ import { badHookCall, getHookCallCount } from "./hookHelpers.js";
  */
 export default function useState(initialValue) {
   /**
-   * ! ALERT
+   * ! ALERT (Early lesson on Closure; kept as useful notes/reminder)
    *
    * Closures capture variables by reference, not by value.
    *
@@ -32,10 +32,14 @@ export default function useState(initialValue) {
   // 1.
   // copying an object reference variable creates one more reference to the same object
   // so, this local variable is assigned the value of global reference variable `currActiveComponentForHooks` at the time `useState` is called
-  const targetComponentForThisHook = currActiveComponentForHooks.get();
+
+  /// discarding this in favour of component call stack to make algorithm simpler for context providers
+  // const targetComponentForThisHook = currActiveComponentForHooks.get();
 
   // Or, 2.
   // const targetComponentForThisHook = reactComponentStack[reactComponentStack.length - 1];
+  const targetComponentForThisHook =
+    componentFnCallStack.getComponentFnCurrInExecutionContext();
 
   badHookCall(targetComponentForThisHook, "useState");
 

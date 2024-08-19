@@ -3,7 +3,6 @@ import { readFileSync, existsSync } from "fs";
 import { join } from "path";
 import {
   BUILD_OUTPUT_DIRECTORY,
-  MEACT_CSR_INDEX_HTML_FILE_NAME,
   PAGES_DIRECTORY_NAME,
   APP_DIRECTORY_NAME,
   PUBLIC_ASSETS_DIRECTORY_NAME,
@@ -23,7 +22,7 @@ app.use(express.static(PUBLIC_ASSETS_DIRECTORY_NAME));
 
 // Serve static index.html
 const indexHtmlContent = readFileSync(
-  join(ROOT_DIRECTORY, MEACT_CSR_INDEX_HTML_FILE_NAME),
+  join(ROOT_DIRECTORY, "index.html"),
   "utf-8"
 );
 
@@ -47,9 +46,7 @@ app.get("/:page", (req, res) => {
     const responseHtmlContent = prepareHtmlForPageRequest(
       indexHtmlContent,
       scriptBundleRelativePath,
-      existsSync(stylesheetBundleRelativePath)
-        ? stylesheetBundleRelativePath
-        : null
+      existsSync(stylesheetBundlePath) ? stylesheetBundleRelativePath : null
     );
 
     // Send the modified HTML as the response

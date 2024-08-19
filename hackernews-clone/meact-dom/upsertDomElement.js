@@ -1,4 +1,4 @@
-import { createBrowserDomForReactElement } from "./createDomElement.js";
+import { createBrowserDomForMeactElement } from "./createDomElement.js";
 import { setAttributesAndProperties } from "./domAttrAndProp.js";
 import {
   findParentDomElementByParentRenderId,
@@ -23,7 +23,7 @@ export function upsertBrowserDomForRerenderDiffItem(rerenderDiffItem) {
   const childPositionInBrowserDom = parentInfoFromBrowserDom.childPositionInDom;
 
   if (action === "created") {
-    const targetDomSubtree = createBrowserDomForReactElement(targetElement);
+    const targetDomSubtree = createBrowserDomForMeactElement(targetElement);
 
     // overwrite the element at the specified child position or append if it's available
     if (
@@ -39,7 +39,7 @@ export function upsertBrowserDomForRerenderDiffItem(rerenderDiffItem) {
       parentElementInBrowserDom.appendChild(targetDomSubtree);
     }
   } else if (action === "updated") {
-    if (targetElement.name === "text") {
+    if (targetElement.type === "MeactTextElement") {
       // we need the parent DOM element because the DOM doesn't hold ID of a text node created using `document.createTextNode`
       const textContent = targetElement.props.content;
       parentElementInBrowserDom.childNodes[

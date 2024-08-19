@@ -1,4 +1,4 @@
-import { currActiveComponentForHooks } from "./global.js";
+import { componentFnCallStack } from "../executionContext.js";
 import { badHookCall, getHookCallCount } from "./hookHelpers.js";
 
 /**
@@ -10,7 +10,8 @@ import { badHookCall, getHookCallCount } from "./hookHelpers.js";
  * @returns {{current: any}}
  */
 export default function useRef(initialValue) {
-  const targetComponentForThisHook = currActiveComponentForHooks.get();
+  const targetComponentForThisHook =
+    componentFnCallStack.getComponentFnCurrInExecutionContext();
 
   badHookCall(targetComponentForThisHook, "useRef");
 

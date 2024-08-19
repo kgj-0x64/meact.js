@@ -1,4 +1,4 @@
-import { currActiveComponentForHooks } from "./global.js";
+import { componentFnCallStack } from "../executionContext.js";
 import {
   badHookCall,
   badHookDependencyArgs,
@@ -16,7 +16,8 @@ import { areArraysEqual } from "../utils.js";
  * @param {any[]} dependencies
  */
 export default function useMemo(calculateValueFn, dependencies) {
-  const targetComponentForThisHook = currActiveComponentForHooks.get();
+  const targetComponentForThisHook =
+    componentFnCallStack.getComponentFnCurrInExecutionContext();
 
   badHookCall(targetComponentForThisHook, "useMemo");
   badHookDependencyArgs(targetComponentForThisHook, "useMemo", dependencies);

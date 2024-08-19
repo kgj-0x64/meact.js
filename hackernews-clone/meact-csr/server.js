@@ -1,6 +1,3 @@
-import { join } from "path";
-import { BUILD_OUTPUT_DIRECTORY } from "../constants/fileAndDirectoryNameAndPaths.js";
-
 /**
  * call this on server to prepare index.html content in response to a page request
  * @param {string} html
@@ -20,7 +17,6 @@ export function prepareHtmlForPageRequest(
       stylesheetBundlePath ? stylesheetBundlePath : ""
     );
     html = html.replaceAll("$scriptBundlePath", scriptBundlePath);
-
     return html;
   } catch (error) {
     console.error("An error occurred while loading assets:", error);

@@ -1,15 +1,14 @@
-import renderTree from "./render-tree/index.js";
+import renderTree from "./render-tree.js";
 import { getNewElementId } from "./utils.js";
-import { updateSubtreeForExistingNode } from "./updateSubtree.js";
-import { ReactElementTreeDebugger } from "./render-tree/treeDebugger.js";
-import { memoizedFunctionsMap } from "./memo.js";
+import { updateSubtreeForExistingNode } from "./reconcile.js";
+import { bypassMemoization } from "./memo.js";
 
 /**
  * A MeactElement object is a node in our "render tree"
  */
 class MeactElement {
   /**
-   * @param {"NullComponent" | "MeactComponent" | "MeactHtmlElement"} type
+   * @param {"MeactHtmlElement" | "MeactTextElement" | "MeactComponent" | "NullComponent"} type
    * @param {string} name
    * @param {object} props
    * @param {MeactElement[]} children
@@ -118,56 +117,46 @@ class MeactElement {
           }
         : undefined;
     // useContext manager useful for an element of type "MeactComponent"
-    this.contextManager =
-      type === "MeactComponent"
-        ? {
-            // a Map of context object reference to current value of this component
-            values: new Map(), // {object} contextObjectRef -> {any} value
+    this.contextManager = {
+      // a Map of context object reference to current value of this component
 
-            setAllContextsProvidedByAncestors: (
-              providedContextRefsAndValuesMapFromParent
-            ) => {
-              const contextValues = this.contextManager.values;
+      /** @typedef {Map<{defaultValue: any; Provider: Function}, any>} ContextManagerValuesMap */
+      /** @type {ContextManagerValuesMap} values */
+      values: new Map(), // {object} contextObjectRef -> {any} value
 
-              let hasValueChanged = false;
+      /**
+       * call this to merge an updated Map object with the existing values Map
+       * @param {ContextManagerValuesMap} updatedContextValuesProvidedByAncestors
+       */
+      mergeContextValuesProvidedByAncestors: (
+        updatedContextValuesProvidedByAncestors
+      ) => {
+        for (const [key, value] of updatedContextValuesProvidedByAncestors) {
+          this.contextManager.values.set(key, value);
+        }
+      },
 
-              for (const [
-                contextObjRef,
-                newValue,
-              ] of providedContextRefsAndValuesMapFromParent) {
-                // does this component calls `useContext` hook with this exact `contextObjectRef` in argument
-                if (!contextValues.has(contextObjRef)) continue;
+      /**
+       * call this to set value from a Context Provider component declaration
+       * which should bypass memoization check on its subtree's re-rendering
+       * @param {{defaultValue: any; Provider: Function}} contextObjectReference
+       * @param {any} newValue
+       */
+      setValueForProviderComponent: (contextObjectReference, newValue) => {
+        let oldValue = null;
+        if (this.contextManager.values.has(contextObjectReference)) {
+          oldValue = this.contextManager.values.get(contextObjectReference);
+        }
 
-                const oldValue = contextValues.get(contextObjRef);
+        // update the values map
+        this.contextManager.values.set(contextObjectReference, newValue);
 
-                // update the value
-                contextValues.set(contextObjRef, newValue);
-
-                hasValueChanged = oldValue !== newValue;
-              }
-
-              /**
-               * ! When should this component be re-rendered due to a change in this context value?
-               *
-               * this child component (i.e. this MeactElement object) is firstly created with the existing hook value,
-               * and then context values provided by ancestors are set in "post reconciliation middleware" before DOM is updated
-               */
-              if (!hasValueChanged) return;
-
-              this.reEvaluateSubtreeFromThisComponent();
-            },
-          }
-        : undefined;
-  }
-
-  /**
-   * call to re-evaluate the subtree rooted at this component even if this component is memoized
-   * but DOM should not be touched here
-   */
-  reEvaluateSubtreeFromThisComponent() {
-    // re-evaluate the subtree of the render tree which is rooted at this element
-    updateSubtreeForExistingNode(this, 0, null, true);
-    // but don't repaint the browser DOM
+        if (oldValue !== newValue) {
+          // memoization should be ignored while re-rendering the subtree from this node
+          bypassMemoization.setSubtreeAsBypassed(this);
+        }
+      },
+    };
   }
 
   /**
@@ -175,7 +164,7 @@ class MeactElement {
    */
   rerenderSubtreeFromThisComponent() {
     // re-evaluate the subtree of the render tree which is rooted at this element
-    updateSubtreeForExistingNode(this, 0, null, true);
+    updateSubtreeForExistingNode(this, 0, null);
     // repaint the browser DOM
     renderTree.reRender(this);
   }
@@ -243,7 +232,7 @@ class MeactElement {
    * call this to pretty-plot the render tree beginning from this node in browser for visual debugging
    */
   plotRenderTree() {
-    new ReactElementTreeDebugger(this).renderTreeInHtmlDocument();
+    renderTree.plotRenderTree(this);
   }
 }
 

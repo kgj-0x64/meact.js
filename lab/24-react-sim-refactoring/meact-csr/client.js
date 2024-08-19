@@ -3,7 +3,7 @@ import { createRoot } from "@meact-dom";
 // to keep this implementation independent of "app author's code"
 import MyApp from "../app/index.js";
 
-export function _initRender(PageComponent, pageProps) {
+function _initRender(PageComponent, pageProps) {
   // get DOM element where our Meact application will be mounted
   const targetNodeInBrowserDom = document.getElementById("root");
 
