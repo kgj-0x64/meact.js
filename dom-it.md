@@ -1,5 +1,41 @@
 # DOM
 
+> We write HTML (plus CSS and JS); and the browser parses this code to construct and manipulate a DOM tree.
+
+**When you load a webpage constructed using HTML and CSS, the browser parses the HTML to create the Document Object Model (DOM) tree and parses the CSS to create the CSS Object Model (CSSOM) tree. These two trees are combined to form the "Render Tree", which the browser's rendering engine (like Blink in Chrome, WebKit in Safari) uses to determine the layout and appearance of the webpage. JavaScript can manipulate these trees directly, resulting in changes to the page’s content, structure, and style.**
+
+## DOM Construction Process
+
+When a browser parses an HTML document, it reads the HTML from top to bottom. As it encounters each element, it is parsed, and a node is created in the DOM tree. If the element has child elements, the browser continues parsing those child elements, adding them as children of the current node. The tree structure is built naturally as the document is parsed.
+
+While the top-down parsing process is typical, the DOM can be dynamically modified after the initial construction. JavaScript, for instance, can create new elements and append them to the DOM at any time, potentially adding child elements before their parents if needed.
+
+### DOM API & Children Context
+
+Q. I faced an issue where "value" property of `select` element in the DOM could only be set to one of the `option` child element values. If browser is building the DOM parent-first, then how could it enforce such rules?
+
+A.
+While the DOM is built top-down, certain rules and constraints, such as those for form controls like `<select>`, are enforced only after the relevant children are available. The browser ensures that interactions with the DOM are consistent with its structure, even if that means delaying the enforcement of certain properties until the full context (i.e., all child elements) is available.
+
+Here’s how it works:
+As the browser parses the HTML and builds the DOM, it creates elements in the order they appear. When it encounters a `<select>` element, it creates that element and then continues parsing its child `<option>` elements. During parsing, the browser might not immediately enforce the relationship between the `select` and its options, but it will enforce it once the relevant parts of the DOM are complete.
+
+1. The `value` property of a `<select>` element depends on the available `<option>` elements. If you try to set the `value` before all the `<option>` elements are parsed, the browser might not find a matching option, and thus, it could reject or ignore the attempt.
+
+2. Once the `<option>` elements are parsed and added to the DOM, the browser ensures that the `value` of the `<select>` element is consistent with its options. If you set the `value` after the DOM is fully constructed, it will only accept values that correspond to one of the existing `<option>` elements.
+
+For example:
+
+```html
+<select id="mySelect"></select>
+<script>
+  const selectElement = document.getElementById("mySelect");
+  selectElement.value = "invalidValue"; // This will likely fail
+  selectElement.innerHTML = '<option value="validValue">Valid</option>';
+  selectElement.value = "validValue"; // This will succeed
+</script>
+```
+
 ## Node vs Element
 
 DOM nodes are regular JavaScript objects. We can alter them.

@@ -33,7 +33,7 @@ const browserDomWriter = {
     meactElement.plotRenderTree();
 
     this.targetNodeInBrowserDom.innerHTML = ""; // clear any existing content
-    const browserDom = createBrowserDomForReactElement(meactElement);
+    const browserDom = createBrowserDomForMeactElement(meactElement);
     // view the all properties and methods of a document object
     console.dir(browserDom);
     this.targetNodeInBrowserDom.appendChild(browserDom);
@@ -44,14 +44,14 @@ const browserDomWriter = {
 
   /**
    * call this to update existing DOM's copy based on render tree's diff
-   * @param {MeactElement} rootReactElement root node of the render tree which is already rendered in browser DOM
+   * @param {MeactElement} rootMeactElement root node of the render tree which is already rendered in browser DOM
    * @param {MeactElement} reactSubtree root node of a subtree from this render tree which should be re-rendered in the browser DOM using fresh values
    */
-  rerenderTheDiff(rootReactElement, reactSubtree) {
+  rerenderTheDiff(rootMeactElement, reactSubtree) {
     console.log("rerenderTheDiff reactSubtree", reactSubtree);
 
     // for visual debugging, plot the render tree at the bottom of browser DOM
-    rootReactElement.plotRenderTree();
+    rootMeactElement.plotRenderTree();
 
     // TODO: further optimize using reconciliatoin to modify browser DOM from renderTree's diff only
     const targetSubtreeNodeInBrowserDom = document.getElementById(
@@ -59,7 +59,7 @@ const browserDomWriter = {
     );
 
     targetSubtreeNodeInBrowserDom.innerHTML = ""; // clear any existing content
-    const subtreeInBrowserDom = createBrowserDomForReactElement(reactSubtree);
+    const subtreeInBrowserDom = createBrowserDomForMeactElement(reactSubtree);
     // view the all properties and methods of a document object
     console.dir(subtreeInBrowserDom);
     targetSubtreeNodeInBrowserDom.appendChild(subtreeInBrowserDom);
@@ -74,7 +74,7 @@ const browserDomWriter = {
  * @param {MeactElement} meactElement
  * @returns {HTMLElement}
  */
-function createBrowserDomForReactElement(meactElement) {
+function createBrowserDomForMeactElement(meactElement) {
   /// render tree nodes which is not meant for browser DOM
 
   if (meactElement.type === "NullComponent") {
@@ -88,7 +88,7 @@ function createBrowserDomForReactElement(meactElement) {
 
   if (meactElement.type === "MeactComponent") {
     // browser DOM cares for DOM element from its return block only
-    return createBrowserDomForReactElement(meactElement.children[0]);
+    return createBrowserDomForMeactElement(meactElement.children[0]);
   }
 
   // show these in the browser DOM
@@ -109,7 +109,7 @@ function createBrowserDomForReactElement(meactElement) {
         // setting innerHTML handles both Unicode characters and HTML entities
         htmlElement.innerHTML = textContent;
       } else {
-        htmlElement.appendChild(createBrowserDomForReactElement(child));
+        htmlElement.appendChild(createBrowserDomForMeactElement(child));
       }
     });
   }

@@ -9,7 +9,7 @@ import { elementRenderId } from "./utils.js";
  * @param {number} insertAtChildPosition
  * @returns {HTMLElement}
  */
-export function createBrowserDomForReactElement(
+export function createBrowserDomForMeactElement(
   meactElement,
   parentDomElementId,
   insertAtChildPosition
@@ -51,7 +51,7 @@ export function createBrowserDomForReactElement(
 
     if (meactElement.children && meactElement.children.length > 0) {
       meactElement.children.forEach((child, index) => {
-        const childElementAtThisIndex = createBrowserDomForReactElement(
+        const childElementAtThisIndex = createBrowserDomForMeactElement(
           child,
           // actual parent node in the DOM is unchanged for this fragment's children
           parentDomElementId,
@@ -84,7 +84,7 @@ export function createBrowserDomForReactElement(
   // If the node has children, create and append child nodes
   if (meactElement.children && meactElement.children.length > 0) {
     meactElement.children.forEach((child, index) => {
-      const childElementAtThisIndex = createBrowserDomForReactElement(
+      const childElementAtThisIndex = createBrowserDomForMeactElement(
         child,
         meactElement.id,
         index

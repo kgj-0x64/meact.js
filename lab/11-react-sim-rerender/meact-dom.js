@@ -25,7 +25,7 @@ const browserDomWriter = {
     meactElement.plotRenderTree();
 
     this.targetNodeInBrowserDom.innerHTML = ""; // clear any existing content
-    const browserDom = createBrowserDomForReactElement(meactElement);
+    const browserDom = createBrowserDomForMeactElement(meactElement);
     // view the all properties and methods of a document object
     console.dir(browserDom);
     console.log(browserDom);
@@ -36,15 +36,15 @@ const browserDomWriter = {
   },
 
   // update existing DOM's copy based on render tree's diff
-  rerenderTheDiff(rootReactElement, reactSubtree) {
+  rerenderTheDiff(rootMeactElement, reactSubtree) {
     console.log("rerenderTheDiff reactSubtree", reactSubtree);
 
     // for visual debugging, plot the render tree at the bottom of browser DOM
-    rootReactElement.plotRenderTree();
+    rootMeactElement.plotRenderTree();
 
     // TODO: modify browser DOM from renderTree's diff only
     this.targetNodeInBrowserDom.innerHTML = ""; // clear any existing content
-    const browserDom = createBrowserDomForReactElement(rootReactElement);
+    const browserDom = createBrowserDomForMeactElement(rootMeactElement);
     // view the all properties and methods of a document object
     console.dir(browserDom);
     console.log(browserDom);
@@ -55,7 +55,7 @@ const browserDomWriter = {
   },
 };
 
-function createBrowserDomForReactElement(meactElement) {
+function createBrowserDomForMeactElement(meactElement) {
   /// render tree nodes which is not meant for browser DOM
 
   if (meactElement.type === "null") {
@@ -69,7 +69,7 @@ function createBrowserDomForReactElement(meactElement) {
 
   if (meactElement.type === "MeactComponent") {
     // browser DOM cares for DOM element from its return block only
-    return createBrowserDomForReactElement(meactElement.children[0]);
+    return createBrowserDomForMeactElement(meactElement.children[0]);
   }
 
   // show these in the browser DOM
@@ -90,7 +90,7 @@ function createBrowserDomForReactElement(meactElement) {
         // setting innerHTML handles both Unicode characters and HTML entities
         htmlElement.innerHTML = textContent;
       } else {
-        htmlElement.appendChild(createBrowserDomForReactElement(child));
+        htmlElement.appendChild(createBrowserDomForMeactElement(child));
       }
     });
   }

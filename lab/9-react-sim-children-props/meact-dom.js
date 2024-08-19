@@ -13,7 +13,7 @@ class BrowserDomWriter {
   // and take over managing the DOM inside it
   render(meactElement) {
     this.rootNodeInBrowserDom.innerHTML = ""; // Clear any existing content
-    const browserDom = createBrowserDomForReactElement(meactElement);
+    const browserDom = createBrowserDomForMeactElement(meactElement);
     // view the all properties and methods of a document object
     console.dir(browserDom);
     console.log(browserDom);
@@ -23,7 +23,7 @@ class BrowserDomWriter {
   destroy() {}
 }
 
-function createBrowserDomForReactElement(meactElement) {
+function createBrowserDomForMeactElement(meactElement) {
   /**
    * this approach renders text including Unicode character ❤️ correctly
    * but it doesn't interpret HTML entities correctly like &#10083; as a heart emoji
@@ -50,7 +50,7 @@ function createBrowserDomForReactElement(meactElement) {
         // setting innerHTML handles both Unicode characters and HTML entities
         htmlElement.innerHTML = textContent;
       } else {
-        htmlElement.appendChild(createBrowserDomForReactElement(child));
+        htmlElement.appendChild(createBrowserDomForMeactElement(child));
       }
     });
   }
