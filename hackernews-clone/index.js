@@ -46,9 +46,7 @@ app.get("/:page", (req, res) => {
     const responseHtmlContent = prepareHtmlForPageRequest(
       indexHtmlContent,
       scriptBundleRelativePath,
-      existsSync(stylesheetBundleRelativePath)
-        ? stylesheetBundleRelativePath
-        : null
+      existsSync(stylesheetBundlePath) ? stylesheetBundleRelativePath : null
     );
 
     // Send the modified HTML as the response
