@@ -10,7 +10,6 @@ import {
   MEACT_LIB_DIRECTORY,
   MEACT_DOM_LIB_DIRECTORY,
   MEACT_CSR_LIB_DIRECTORY,
-  MEACT_CSR_CLIENT_FILE_NAME,
   BUILD_OUTPUT_DIRECTORY_NAME,
 } from "./constants/fileAndDirectoryNameAndPaths.js";
 
@@ -48,7 +47,7 @@ async function buildScriptBundles() {
   await build({
     entryPoints: [
       `${APP_DIRECTORY_NAME}/${PAGES_DIRECTORY_NAME}/*.js`,
-      `${MEACT_CSR_LIB_DIRECTORY}/${MEACT_CSR_CLIENT_FILE_NAME}`,
+      `${MEACT_CSR_LIB_DIRECTORY}/client.js`,
     ],
     outdir: BUILD_OUTPUT_DIRECTORY_NAME, // outdir is required when code splitting is active
     platform: "browser",

@@ -2,10 +2,8 @@ import express from "express";
 import { readFileSync, existsSync } from "fs";
 import { join } from "path";
 import {
+  ROOT_DIRECTORY,
   BUILD_OUTPUT_DIRECTORY,
-  MEACT_CSR_LIB_DIRECTORY,
-  MEACT_CSR_INDEX_HTML_FILE_NAME,
-  GLOBAL_STYLES_FILE_NAME,
   STYLES_DIRECTORY_NAME,
   PAGES_DIRECTORY_NAME,
   APP_DIRECTORY_NAME,
@@ -20,7 +18,7 @@ app.use(express.static(BUILD_OUTPUT_DIRECTORY));
 
 // Serve static index.html
 const indexHtmlContent = readFileSync(
-  join(MEACT_CSR_LIB_DIRECTORY, MEACT_CSR_INDEX_HTML_FILE_NAME),
+  join(ROOT_DIRECTORY, "index.html"),
   "utf-8"
 );
 
@@ -29,11 +27,11 @@ app.get("/:page", (req, res) => {
   const page = req.params.page;
 
   // Construct the expected paths for the JS and CSS bundles
-  const stylesheetBundleRelativePath = `${STYLES_DIRECTORY_NAME}/${GLOBAL_STYLES_FILE_NAME}`;
+  const stylesheetBundleRelativePath = `${STYLES_DIRECTORY_NAME}/global.css`;
   const globalCssBundlePath = join(
     BUILD_OUTPUT_DIRECTORY,
     STYLES_DIRECTORY_NAME,
-    GLOBAL_STYLES_FILE_NAME
+    "global.css"
   );
 
   const scriptBundleRelativePath = `${APP_DIRECTORY_NAME}/${PAGES_DIRECTORY_NAME}/${page}.js`;

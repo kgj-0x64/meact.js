@@ -1,5 +1,6 @@
-import renderTree from "@meact/render-tree";
-import { createBrowserDomForReactElement } from "./createDomElement.js";
+import { meactRendererBridge } from "@meact";
+import { createBrowserDomForMeactElement } from "./createDomElement.js";
+import { MeactElementTreeDebugger } from "./treeDebugger.js";
 import { upsertBrowserDomForRerenderDiffItem } from "./upsertDomElement.js";
 
 /**
@@ -12,6 +13,8 @@ export const browserDomWriter = {
   // constructor
   setbrowserDomWriterAtNode(nodeInBrowserDom) {
     this.targetNodeInBrowserDom = nodeInBrowserDom;
+    // sets itself as the renderer on the bridge
+    meactRendererBridge.setRenderer(this, MeactElementTreeDebugger);
   },
 
   /**
@@ -21,16 +24,13 @@ export const browserDomWriter = {
    */
   render(meactElement) {
     // set this as the root node of the render tree
-    renderTree.setRootNode(meactElement);
-
-    // trigger the middleware handler before DOM is evaluated
-    renderTree.postRecociliationMiddleware(meactElement);
+    meactRendererBridge.setRenderTreeRootNode(meactElement);
 
     // for visual debugging, plot the render tree at the bottom of browser DOM
     meactElement.plotRenderTree();
 
     this.targetNodeInBrowserDom.innerHTML = ""; // clear any existing content
-    const browserDom = createBrowserDomForReactElement(
+    const browserDom = createBrowserDomForMeactElement(
       meactElement,
       this.targetNodeInBrowserDom.id,
       0
@@ -40,27 +40,27 @@ export const browserDomWriter = {
     this.targetNodeInBrowserDom.appendChild(browserDom);
 
     // post render housekeeping
-    renderTree.postDomRenderHandler();
+    meactRendererBridge.postRenderHandler();
   },
 
   /**
    * call this to update existing DOM's copy based on render tree's diff
    * ! calling this before calling `this.render()` will fail rightly because parent DOM nodes will be unknown
-   * @param {MeactElement} rootReactElement root node of the render tree which is already rendered in browser DOM
+   * @param {{action: "created" | "updated" | "deleted", parentElement: MeactElement, childPosition: number, targetElement: MeactElement}[]} diffQueue
    */
-  rerenderTheDiff(rootReactElement) {
+  rerenderTheDiff(diffQueue) {
     // for visual debugging, plot the render tree at the bottom of browser DOM
-    rootReactElement.plotRenderTree();
+    const rootMeactElement = meactRendererBridge.getRenderTreeRootNode();
+    rootMeactElement.plotRenderTree();
 
     // using reconciliatoin to modify browser DOM from renderTree's diff only
-    const rerenderDiffQueue = renderTree.rerenderDiffForDomHandler.getQueue();
-    console.log("Rerender DIFF Queue", rerenderDiffQueue);
+    console.log("Rerender DIFF Queue", diffQueue);
 
-    for (let i = 0; i < rerenderDiffQueue.length; i++) {
-      upsertBrowserDomForRerenderDiffItem(rerenderDiffQueue[i]);
+    for (let i = 0; i < diffQueue.length; i++) {
+      upsertBrowserDomForRerenderDiffItem(diffQueue[i]);
     }
 
     // post re-render housekeeping
-    renderTree.postDomRenderHandler();
+    meactRendererBridge.postRenderHandler();
   },
 };

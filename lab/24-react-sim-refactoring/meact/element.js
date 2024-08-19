@@ -136,6 +136,12 @@ class MeactElement {
         }
       },
 
+      /**
+       * call this to set value from a Context Provider component declaration
+       * which should bypass memoization check on its subtree's re-rendering
+       * @param {{defaultValue: any; Provider: Function}} contextObjectReference
+       * @param {any} newValue
+       */
       setValueForProviderComponent: (contextObjectReference, newValue) => {
         let oldValue = null;
         if (this.contextManager.values.has(contextObjectReference)) {

@@ -1,5 +1,3 @@
-import renderTree from "./render-tree/index.js";
-
 /**
  * call this to get a unique ID for a MeactElement
  * @param {string} elementName
@@ -33,25 +31,6 @@ export const globalMeactComponentRegistry = {
    */
   set(componentName, componentFn) {
     window.MeactApp[componentRegistry].set(componentName, componentFn);
-  },
-};
-
-/**
- * Re-render monitor object to enforce different return behaviour of `createElement` function during re-render dynamically
- */
-export const rerenderMonitor = {
-  isHijackOfCreateElementFnPaused: false,
-  isCreateElementFunctionHijacked() {
-    if (this.isHijackOfCreateElementFnPaused) {
-      return false;
-    }
-    return renderTree.domRefreshCounter > 0;
-  },
-  pauseHijackOfCreateElementFn() {
-    this.isHijackOfCreateElementFnPaused = true;
-  },
-  resumeHijackOfCreateElementFn() {
-    this.isHijackOfCreateElementFnPaused = false;
   },
 };
 
