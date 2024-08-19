@@ -34,13 +34,14 @@ export function createElement(element, props, ...children) {
   // default type, name and props
   const propsObject = props === undefined || !props ? {} : props;
 
-  let type = element
-    ? typeof element === "function"
-      ? "MeactComponent"
-      : element === "text"
-      ? "MeactTextElement"
-      : "MeactHtmlElement"
-    : "NullComponent";
+  let type =
+    element && element !== "null"
+      ? typeof element === "function"
+        ? "MeactComponent"
+        : element === "text"
+        ? "MeactTextElement"
+        : "MeactHtmlElement"
+      : "NullComponent";
 
   let name = element
     ? typeof element === "function"

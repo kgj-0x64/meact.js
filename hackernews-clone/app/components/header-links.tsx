@@ -16,16 +16,18 @@ export function HeaderLinks(props: IHeaderNavProps): MeactElement {
         <a href="/">{title}</a>
       </b>
       &nbsp;
-      {userId && (
+      {userId ? (
         <>
           <a href="/newswelcome">welcome</a>
           {" | "}
         </>
+      ) : (
+        <null />
       )}
       <a href="/newest" class={currentUrl === "/newest" ? "topsel" : ""}>
         new
       </a>
-      {userId && (
+      {userId ? (
         <>
           {" | "}
           <a
@@ -35,6 +37,8 @@ export function HeaderLinks(props: IHeaderNavProps): MeactElement {
             threads
           </a>
         </>
+      ) : (
+        <null />
       )}
       {" | "}
       <a
@@ -59,13 +63,15 @@ export function HeaderLinks(props: IHeaderNavProps): MeactElement {
       <a href="/submit" class={currentUrl === "/submit" ? "topsel" : ""}>
         submit
       </a>
-      {currentUrl === "/best" && (
+      {currentUrl === "/best" ? (
         <>
           {" | "}
           <a href="/best" class="topsel">
             best
           </a>
         </>
+      ) : (
+        <null />
       )}
     </span>
   ) : (

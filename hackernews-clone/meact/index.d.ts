@@ -1,6 +1,6 @@
 declare module "@meact" {
   export type MeactElement = any;
-  export type MeactNode = MeactElement[];
+  export type MeactNode = MeactElement | MeactElement[] | undefined;
 
   // createElement - similar to React.createElement
   export function createElement(
