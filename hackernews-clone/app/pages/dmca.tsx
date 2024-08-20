@@ -1,7 +1,6 @@
 import type { JSX } from "@meact/jsx-runtime";
-import { MeactMeta } from "@meact-csr";
 import { BlankLayout } from "../layouts/blank-layout";
-import dmcaCss from "../styles/dmca.css";
+import "../styles/dmca.css";
 
 const spanStyle = {
   fontSize: "11.5pt",
@@ -34,15 +33,7 @@ const bSpanStyle = {
   color: "#444444",
 };
 
-export const links = () => [
-  { rel: "stylesheet", href: dmcaCss, type: "text/css" },
-];
-
-export const meta: MeactMeta = () => [
-  { title: { text: "DMCA | Hacker News Clone" } },
-];
-
-export default function Page(): JSX.Element {
+export default function DmcaPage(): JSX.Element {
   return (
     <BlankLayout>
       <p

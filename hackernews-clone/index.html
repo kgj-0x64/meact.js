@@ -8,7 +8,8 @@
     <link rel="shortcut icon" href="/static/favicon.ico" />
     <link rel="stylesheet" href="styles/debugger.css" />
     <link rel="stylesheet" href="$stylesheetBundlePath" />
-    <script type="module" src="$scriptBundlePath" defer></script>
+    <script type="module" src="$pageScriptBundlePath" defer></script>
+    <script type="module" src="$pageJsonDataPath" defer></script>
     <script type="module" src="meact-csr/client.js" defer></script>
   </head>
   <body>
@@ -19,13 +20,13 @@
 
     <!-- value set by the loader for a page -->
     <script>
-      window.__INITIAL_PAGE_DATA__ = __PAGE_LOADER_DATA_JSON__;
+      window.__INITIAL_PAGE_DATA_MAP__ = __PAGE_LOADER_DATA_MAP__;
     </script>
 
     <!-- Inline script that calls runApp from "csr.js" -->
     <script type="module">
       // set these values dynamically while handling GET request for a page
-      window.currentPageScriptBundlePath = "$scriptBundlePath";
+      window.currentPageScriptBundlePath = "$pageScriptBundlePath";
 
       // https://developer.mozilla.org/en-US/docs/Web/API/Document/DOMContentLoaded_event#checking_whether_loading_is_already_complete
       // DOMContentLoaded may fire before your script has a chance to run, so it is wise to check before adding a listener.

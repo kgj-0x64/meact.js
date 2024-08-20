@@ -12,6 +12,7 @@ export function getNewElementId(elementName) {
   return instanceId;
 }
 
+// ! global mapping of component's function name to their function objects
 const componentRegistry = "components";
 window.MeactApp = window.MeactApp || {};
 window.MeactApp[componentRegistry] = new Map();

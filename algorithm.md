@@ -69,3 +69,7 @@ I keep a track of all these update/create/delete changes in the `rerenderDiffFor
 "Render Tree" nodes of type `MeactHtmlElement` are converted into corresponding DOM elements. And, those of types `MeactTextElement` and `NullComponent` are handled by creating a text node and a hidden `div` node respectively. Finally, a DOM node of type `DocumentFragment` is created for "Render Tree" nodes which are neither HTML elements nor `null` values.
 
 - See [`upsertBrowserDomForRerenderDiffItem` function](./lab//24-react-sim-refactoring/meact-dom/upsertDomElement.js)
+
+Unlike React.js abstracting DOM attributes vs properties with a clear syntax, I have made it the job of my library user to define property explicitly with a starting substring "prop:" (to handle stateful data differently like `value`, `checked`, event listeners, etc) and attribute as they are expected by the browser (or an attribute name will be transformed from camelCase to kebab-case except for a list of "special cases" like `colSpan` -> `colspan`).
+
+- See [`setAttributesAndProperties` function](./lab/24-react-sim-refactoring/meact-dom/domAttrAndProp.js)

@@ -41,6 +41,13 @@ export const componentFnCallStack = {
    */
   setComponentFnInExecutionContext(componentObjectRef) {
     this.stack.push(componentObjectRef);
+    /**
+     * ! making this available on the global `window` namespace
+     * for library authors exposing their own custom hooks
+     * which also need to manage component's data kept outside of library's `MeactElement` scope
+     * e.g. `useLoaderData` pattern of Remix.js
+     */
+    window.MeactApp["currExecutingComponentName"] = componentObjectRef.name;
   },
 
   /**

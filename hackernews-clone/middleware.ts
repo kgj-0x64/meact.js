@@ -40,7 +40,7 @@ export async function prepareHtmlOnPageRequest(
 
     // Replace the placeholder values in the HTML
     indexHtmlContent = indexHtmlContent.replaceAll(
-      "$scriptBundlePath",
+      "$pageScriptBundlePath",
       scriptBundleRelativePath
     );
     indexHtmlContent = indexHtmlContent.replaceAll(
@@ -48,6 +48,7 @@ export async function prepareHtmlOnPageRequest(
       existsSync(stylesheetBundlePath) ? stylesheetBundleRelativePath : ""
     );
 
+    /// ! TODO
     const pageServerData = await getPageServerData(pageName, request);
     if (pageServerData) {
       indexHtmlContent = indexHtmlContent.replaceAll(

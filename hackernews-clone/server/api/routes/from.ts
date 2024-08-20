@@ -1,5 +1,7 @@
 import { MeactMeta } from "@meact-csr";
 
+export const componentName = "FromPage";
+
 export const meta: MeactMeta = () => {
   const params = new URLSearchParams(window.location.search);
   const site = params.get("site") || "site";

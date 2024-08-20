@@ -8,6 +8,8 @@ import { feedService } from "server/bootstrap.server";
 import { getSession, SessionCookieProperties } from "server/cookies";
 import { FeedType } from "server/models";
 
+export const componentName = "JobsPage";
+
 export const meta: MeactMeta = () => [
   {
     title: {

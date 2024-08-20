@@ -4,7 +4,7 @@ import { NewsFeed } from "../components/news-feed";
 import { usePageNumber } from "../custom-hooks/usePageNumber";
 import { POSTS_PER_PAGE } from "../config";
 import type { IStory } from "server/responses";
-import { useLoaderData } from "app/custom-hooks/useLoaderData";
+import { useLoaderData } from "memix/client/useLoaderData";
 import sGif from "public/static/s.gif";
 
 export interface IJobsPageLoader {

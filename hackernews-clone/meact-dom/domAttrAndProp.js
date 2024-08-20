@@ -24,7 +24,7 @@ export function setAttributesAndProperties(meactElement, htmlElement) {
       }
       // SET DOM element's Attribute
       else {
-        const attrKey = camelCaseToKebabCase(key);
+        const attrKey = transformHtmlAttributeKey(key);
         let attrValue = value;
         if (key === "style") {
           attrValue = inlineStyleObjectToStyleAttrValue(value);
@@ -45,15 +45,6 @@ function isDomNodeProperty(propName) {
 }
 
 /**
- * call this to convert camelCase to kebab-case
- * @param {string} attrKey
- * @returns {string}
- */
-function camelCaseToKebabCase(attrKey) {
-  return attrKey.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
-}
-
-/**
  * call this to convert inline style object into appropriate HTML style attribute value
  * @param {object} styleObj
  * @returns {string}
@@ -65,4 +56,57 @@ function inlineStyleObjectToStyleAttrValue(styleObj) {
       return `${kebabKey}: ${value}`;
     })
     .join("; ");
+}
+
+/**
+ * call this to convert camelCase to kebab-case
+ * @param {string} attrKey
+ * @returns {string}
+ */
+function camelCaseToKebabCase(attrKey) {
+  return attrKey.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
+}
+
+/**
+ * call this to transform a HTML attribute key because kebab-case transformation alone is not always correct
+ * e.g. "colSpan" gives "col-span" when it should be "colspan" only
+ * @param {string} attrKey
+ * @returns {string}
+ */
+function transformHtmlAttributeKey(attrKey) {
+  // Dictionary for special cases where React property doesn't map directly to kebab-case
+  const specialCases = {
+    className: "class",
+    htmlFor: "for",
+    colSpan: "colspan",
+    rowSpan: "rowspan",
+    tabIndex: "tabindex",
+    readOnly: "readonly",
+    maxLength: "maxlength",
+    minLength: "minlength",
+    autoComplete: "autocomplete",
+    autoFocus: "autofocus",
+    spellCheck: "spellcheck",
+    srcSet: "srcset",
+    useMap: "usemap",
+    contentEditable: "contenteditable",
+    formAction: "formaction",
+    formEncType: "formenctype",
+    formMethod: "formmethod",
+    formNoValidate: "formnovalidate",
+    formTarget: "formtarget",
+    acceptCharset: "accept-charset",
+    httpEquiv: "http-equiv",
+    accessKey: "accesskey",
+    encType: "enctype",
+    inputMode: "inputmode",
+  };
+
+  // Check if the HTML attribute name is in the specialCases dictionary
+  if (specialCases.hasOwnProperty(attrKey)) {
+    return specialCases[attrKey];
+  }
+
+  // Convert camelCase to kebab-case for general cases
+  return camelCaseToKebabCase(attrKey);
 }

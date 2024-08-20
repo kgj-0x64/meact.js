@@ -31,7 +31,7 @@ export function ItemDetail(props: IItemDetailProps): JSX.Element {
 
   return isJobListing ? (
     <tr>
-      <td colspan={2} />
+      <td colSpan={2} />
       <td class="subtext">
         <span class="age">
           <a href={`/item?id=${id}`}>{convertNumberToTimeAgo(creationTime)}</a>
@@ -40,7 +40,7 @@ export function ItemDetail(props: IItemDetailProps): JSX.Element {
     </tr>
   ) : (
     <tr>
-      <td colspan={2} />
+      <td colSpan={2} />
       <td class="subtext">
         <span class="score">{upvoteCount} points</span>
         {" by "}
