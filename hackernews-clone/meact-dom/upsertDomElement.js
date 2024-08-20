@@ -7,7 +7,7 @@ import {
 
 /**
  * call this to update or create/insert browser DOM elements in the existing browser DOM from a given render tree root
- * @param {{action: "created" | "updated" | "deleted", parentElement: MeactElement, childPosition: number, targetElement: MeactElement}} rerenderDiffItem
+ * @param {{action: "created" | "updated" | "deleted", parentElement: JSX.Element, childPosition: number, targetElement: JSX.Element}} rerenderDiffItem
  */
 export function upsertBrowserDomForRerenderDiffItem(rerenderDiffItem) {
   const { action, parentElement, childPosition, targetElement } =

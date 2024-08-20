@@ -1,7 +1,7 @@
-import { MeactElement } from "@meact";
+import type { JSX } from "@meact/jsx-runtime";
 import { BlankLayout } from "../layouts/blank-layout";
 
-function ForgotPage(): MeactElement {
+function ForgotPage(): JSX.Element {
   return (
     <BlankLayout>
       <b>Reset your password</b>

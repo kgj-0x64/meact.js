@@ -1,4 +1,4 @@
-import { MeactElement } from "@meact";
+import type { JSX } from "@meact/jsx-runtime";
 import { MeactMeta } from "@meact-csr";
 import { BlankLayout } from "../layouts/blank-layout";
 import dmcaCss from "../styles/dmca.css";
@@ -42,7 +42,7 @@ export const meta: MeactMeta = () => [
   { title: { text: "DMCA | Hacker News Clone" } },
 ];
 
-export default function Page(): MeactElement {
+export default function Page(): JSX.Element {
   return (
     <BlankLayout>
       <p

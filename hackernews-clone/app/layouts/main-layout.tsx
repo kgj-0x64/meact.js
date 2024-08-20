@@ -1,16 +1,16 @@
-import { MeactElement, MeactNode } from "@meact";
+import { JSX } from "@meact/jsx-runtime";
 import { Footer } from "../components/footer";
 import { Header } from "../components/header";
 
 interface IMainLayoutProps {
-  children: MeactNode;
+  children?: JSX.Node;
   isNavVisible?: boolean;
   isUserVisible?: boolean;
   isFooterVisible?: boolean;
   title?: string;
 }
 
-export function MainLayout(props: IMainLayoutProps): MeactElement {
+export function MainLayout(props: IMainLayoutProps): JSX.Element {
   const {
     children,
     isNavVisible = true,

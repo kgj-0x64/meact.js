@@ -1,4 +1,5 @@
-import { MeactElement, useContext } from "@meact";
+import type { JSX } from "@meact/jsx-runtime";
+import { useContext } from "@meact";
 
 import { ICurrentLoggedInUser, MeContext } from "../utils/context";
 import { getCurrentPathname } from "../utils/window";
@@ -11,7 +12,7 @@ export interface IHeaderProps {
   title: string;
 }
 
-export function Header(props: IHeaderProps): MeactElement {
+export function Header(props: IHeaderProps): JSX.Element {
   const { isNavVisible, title } = props;
 
   const currentUrl = getCurrentPathname();

@@ -1,7 +1,7 @@
-import { MeactElement } from "@meact";
+import type { JSX } from "@meact/jsx-runtime";
 import { NoticeLayout } from "../layouts/notice-layout";
 
-export function SecurityPage(): MeactElement {
+export function SecurityPage(): JSX.Element {
   return (
     <NoticeLayout>
       <b>Hacker News Security</b>

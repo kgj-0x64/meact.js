@@ -1,5 +1,4 @@
 import { createElement } from "./createElement.js";
-import MeactElement from "./element.js";
 import {
   useState,
   useRef,
@@ -16,7 +15,6 @@ const Meact = {
 };
 
 export {
-  MeactElement,
   useState,
   useRef,
   useEffect,

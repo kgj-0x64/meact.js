@@ -1,10 +1,10 @@
-import { MeactElement, MeactNode } from "@meact";
+import { JSX } from "@meact/jsx-runtime";
 
 export interface IBlankLayoutProps {
-  children: MeactNode;
+  children?: JSX.Node;
 }
 
-export function BlankLayout(props: IBlankLayoutProps): MeactElement {
+export function BlankLayout(props: IBlankLayoutProps): JSX.Element {
   const { children } = props;
 
   return <div class="WordSection1">{...children}</div>;

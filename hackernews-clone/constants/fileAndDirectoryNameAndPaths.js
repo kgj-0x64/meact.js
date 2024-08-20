@@ -13,6 +13,16 @@ export const PAGES_DIRECTORY_NAME = "pages";
 export const STYLES_DIRECTORY_NAME = "styles";
 
 // absolute path of static assets directory
+const SERVER_DIRECTORY_NAME = "server";
+const SERVER_API_DIRECTORY_NAME = "api";
+export const SERVER_API_PAGES_DIRECTORY = join(
+  __dirname,
+  SERVER_DIRECTORY_NAME,
+  SERVER_API_DIRECTORY_NAME,
+  PAGES_DIRECTORY_NAME
+);
+
+// absolute path of static assets directory
 export const PUBLIC_ASSETS_DIRECTORY_NAME = "public";
 export const PUBLIC_ASSETS_DIRECTORY = join(
   __dirname,

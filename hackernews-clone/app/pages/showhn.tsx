@@ -1,7 +1,7 @@
-import { MeactElement } from "@meact";
+import type { JSX } from "@meact/jsx-runtime";
 import { NoticeLayout } from "../layouts/notice-layout";
 
-export default function Page(): MeactElement {
+export default function Page(): JSX.Element {
   return (
     <NoticeLayout>
       <b>Show HN</b>

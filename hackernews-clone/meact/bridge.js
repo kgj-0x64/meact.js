@@ -38,7 +38,7 @@ const meactRendererBridge = {
 
   /**
    * called by the "Render Tree" object to trigger a re-render using fresh DIFF evaluation
-   * @param {{action: "created" | "updated" | "deleted", parentElement: MeactElement, childPosition: number, targetElement: MeactElement}[]} diffQueue
+   * @param {{action: "created" | "updated" | "deleted", parentElement: JSX.Element, childPosition: number, targetElement: JSX.Element}[]} diffQueue
    */
   rerenderTheDiff(diffQueue) {
     // ask the renderer to re-paint using DIFF from reconciliation

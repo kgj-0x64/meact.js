@@ -1,4 +1,4 @@
-import { MeactElement } from "@meact";
+import type { JSX } from "@meact/jsx-runtime";
 
 declare module "@meact-dom" {
   export function createRoot(
@@ -10,7 +10,7 @@ declare module "@meact-dom" {
   interface BrowserDomWriter {
     targetNodeInBrowserDom: null;
     setbrowserDomWriterAtNode(nodeInBrowserDom: any): void;
-    render(meactElement: MeactElement): void;
-    rerenderTheDiff(rootReactElement: MeactElement): void;
+    render(meactElement: JSX.Element): void;
+    rerenderTheDiff(rootReactElement: JSX.Element): void;
   }
 }

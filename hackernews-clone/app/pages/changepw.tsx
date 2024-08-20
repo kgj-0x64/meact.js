@@ -1,7 +1,7 @@
-import { MeactElement } from "@meact";
+import type { JSX } from "@meact/jsx-runtime";
 import { MainLayout } from "../layouts/main-layout";
 
-export function ChangePasswordPage(): MeactElement {
+export function ChangePasswordPage(): JSX.Element {
   return <MainLayout>Not implemented.</MainLayout>;
 }
 

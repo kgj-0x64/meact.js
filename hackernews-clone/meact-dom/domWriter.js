@@ -46,7 +46,7 @@ export const browserDomWriter = {
   /**
    * call this to update existing DOM's copy based on render tree's diff
    * ! calling this before calling `this.render()` will fail rightly because parent DOM nodes will be unknown
-   * @param {{action: "created" | "updated" | "deleted", parentElement: MeactElement, childPosition: number, targetElement: MeactElement}[]} diffQueue
+   * @param {{action: "created" | "updated" | "deleted", parentElement: JSX.Element, childPosition: number, targetElement: JSX.Element}[]} diffQueue
    */
   rerenderTheDiff(diffQueue) {
     // for visual debugging, plot the render tree at the bottom of browser DOM

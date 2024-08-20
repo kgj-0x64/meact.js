@@ -24,15 +24,15 @@ const renderTree = {
 
   // queues of updated or newly created elements during a re-render
   rerenderDiffForDomHandler: {
-    queue: [], // {{action: "created" | "updated" | "deleted", parentElement: MeactElement, childPosition: number, targetElement: MeactElement}[]}
+    queue: [], // {{action: "created" | "updated" | "deleted", parentElement: JSX.Element, childPosition: number, targetElement: JSX.Element}[]}
     /**
-     * @param {{action: "created" | "updated" | "deleted", parentElement: MeactElement, childPosition: number, targetElement: MeactElement}} elementSnapshot
+     * @param {{action: "created" | "updated" | "deleted", parentElement: JSX.Element, childPosition: number, targetElement: JSX.Element}} elementSnapshot
      */
     enqueue(elementSnapshot) {
       this.queue.push(elementSnapshot);
     },
     /**
-     * @returns {{action: "created" | "updated", parentElement: MeactElement, childPosition: number, targetElement: MeactElement}[]}
+     * @returns {{action: "created" | "updated", parentElement: JSX.Element, childPosition: number, targetElement: JSX.Element}[]}
      */
     getQueue() {
       return this.queue;
@@ -44,9 +44,9 @@ const renderTree = {
 
   // queue of all useEffect calls whose dependencies had changed in the last re-render
   effectHooksForPostDomRenderHandling: {
-    queue: [], // {{component: MeactElement, index: number}[]}
+    queue: [], // {{component: JSX.Element, index: number}[]}
     /**
-     * @param {{component: MeactElement, index: number}} effectObject
+     * @param {{component: JSX.Element, index: number}} effectObject
      */
     enqueue(effectObject) {
       this.queue.push(effectObject);

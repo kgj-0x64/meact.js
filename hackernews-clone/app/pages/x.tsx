@@ -1,8 +1,8 @@
-import { MeactElement } from "@meact";
+import type { JSX } from "@meact/jsx-runtime";
 import { MainLayout } from "../layouts/main-layout";
 
 /** Password recovery email sent page after submitting forgot password */
-function PasswordRecoveryPage(): MeactElement {
+function PasswordRecoveryPage(): JSX.Element {
   return (
     <MainLayout
       isFooterVisible={false}

@@ -1,5 +1,12 @@
 {
-  "include": ["**/*.ts", "**/*.tsx"],
+  "include": [
+    "index.ts",
+    "middleware.ts",
+    "constants/*.ts",
+    "server/*.ts",
+    "**/*.ts",
+    "**/*.tsx"
+  ],
   "compilerOptions": {
     "jsx": "preserve",
     "jsxImportSource": "@meact",
@@ -8,7 +15,8 @@
     "esModuleInterop": true,
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "target": "ESNext",
+    "module": "commonjs",
+    "target": "es6",
     "strict": true,
     "baseUrl": ".",
     "paths": {

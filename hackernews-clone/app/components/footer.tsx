@@ -1,7 +1,7 @@
-import { MeactElement } from "@meact";
+import type { JSX } from "@meact/jsx-runtime";
 import sGif from "../../public/static/s.gif";
 
-export function Footer(): MeactElement {
+export function Footer(): JSX.Element {
   return (
     <tr>
       <td style={{ padding: "0px" }}>

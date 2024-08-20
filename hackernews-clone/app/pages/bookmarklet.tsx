@@ -1,7 +1,7 @@
-import { MeactElement } from "@meact";
+import type { JSX } from "@meact/jsx-runtime";
 import { NoticeLayout } from "../layouts/notice-layout";
 
-export function BookmarkletPage(): MeactElement {
+export function BookmarkletPage(): JSX.Element {
   return (
     <NoticeLayout>
       <b>Bookmarklet</b>

@@ -1,13 +1,8 @@
-declare module "@meact" {
-  export type MeactElement = any;
-  export type MeactNode = MeactElement | MeactElement[] | undefined;
+import type { TMeactElement } from "./element.d.ts";
+import type { TMemoizedFunction } from "./memo.d.ts";
 
-  // createElement - similar to React.createElement
-  export function createElement(
-    type: null | string | Function,
-    props: null | { [key: string]: any },
-    ...children: (string | MeactElement)[]
-  ): MeactElement;
+declare module "@meact" {
+  type Element = TMeactElement;
 
   // useState - similar to React.useState
   export function useState<S>(
@@ -36,9 +31,13 @@ declare module "@meact" {
   };
 
   // Meact - similar to React default export
-  const Meact: {
-    createElement: typeof createElement;
+  type Meact = {
+    // createElement - similar to React.createElement
+    createElement: (
+      element: null | string | Function | TMemoizedFunction,
+      props: null | { [key: string]: any },
+      ...children: (string | Element)[]
+    ) => Element;
   };
-
   export default Meact;
 }

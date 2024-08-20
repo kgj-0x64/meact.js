@@ -1,11 +1,11 @@
-import { MeactElement, MeactNode } from "@meact";
+import { JSX } from "@meact/jsx-runtime";
 import yc500Gif from "../../public/static/yc500.gif";
 
 export interface INoticeLayoutProps {
-  children: MeactNode;
+  children?: JSX.Node;
 }
 
-export function NoticeLayout(props: INoticeLayoutProps): MeactElement {
+export function NoticeLayout(props: INoticeLayoutProps): JSX.Element {
   const { children } = props;
 
   return (

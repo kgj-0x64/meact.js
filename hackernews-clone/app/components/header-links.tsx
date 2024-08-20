@@ -1,4 +1,4 @@
-import { MeactElement } from "@meact";
+import type { JSX } from "@meact/jsx-runtime";
 
 interface IHeaderNavProps {
   userId?: string;
@@ -7,7 +7,7 @@ interface IHeaderNavProps {
   title: string;
 }
 
-export function HeaderLinks(props: IHeaderNavProps): MeactElement {
+export function HeaderLinks(props: IHeaderNavProps): JSX.Element {
   const { userId, currentUrl, isNavVisible, title } = props;
 
   return isNavVisible ? (

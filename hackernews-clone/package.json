@@ -17,17 +17,26 @@
   "main": "index.js",
   "scripts": {
     "build": "node --env-file=.env esbuild.config.js",
-    "start": "node --env-file=.env index.js",
+    "start": "node --env-file=.env index.ts",
     "serve": "npm run build && npm run start",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "@firebase/app": "^0.10.9",
+    "@firebase/database": "^1.0.7",
+    "cookie": "^0.6.0",
+    "debug": "^4.3.6",
     "express": "^4.19.2",
-    "hackernews-clone": "file:"
+    "hackernews-clone": "file:",
+    "lru-cache": "^11.0.0"
   },
   "devDependencies": {
     "@mdx-js/esbuild": "^3.0.1",
+    "@types/debug": "^4.1.12",
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.4.1",
     "esbuild": "^0.23.0",
+    "ts-node": "^10.9.2",
     "typescript": "^5.5.4"
   }
 }

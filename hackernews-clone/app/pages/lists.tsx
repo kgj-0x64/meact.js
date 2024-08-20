@@ -1,4 +1,4 @@
-import { MeactElement } from "@meact";
+import type { JSX } from "@meact/jsx-runtime";
 import { MeactMeta } from "@meact-csr";
 import { MainLayout } from "../layouts/main-layout";
 
@@ -6,7 +6,7 @@ export const meta: MeactMeta = () => [
   { title: { text: "Lists | Hacker News Clone" } },
 ];
 
-export function ListsPage(): MeactElement {
+export function ListsPage(): JSX.Element {
   return (
     <MainLayout>
       <tr>
