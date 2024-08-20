@@ -1,9 +1,9 @@
 import { JSX } from "@meact/jsx-runtime";
-import { useLoaderData } from "memix/client/useLoaderData";
-import { Footer } from "../components/footer";
-import { Header } from "../components/header";
+import { useLoaderData } from "../../memix/client/useLoaderData.js";
+import { Footer } from "../components/footer.js";
+import { Header } from "../components/header.js";
+import { MeContext } from "../utils/context.js";
 import "../styles/news.css";
-import { MeContext } from "../utils/context";
 
 interface IMainLayoutProps {
   children?: JSX.Node;

@@ -1,5 +1,5 @@
-import { useSearchParams } from "./useSearchParams";
-import { getPageNumberFromSearchParams } from "../utils/news-page-number";
+import { useSearchParams } from "./useSearchParams.js";
+import { getPageNumberFromSearchParams } from "../utils/news-page-number.js";
 
 /**
  * Returns the current page number for news feed, default is 0

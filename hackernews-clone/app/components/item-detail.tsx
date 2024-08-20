@@ -1,5 +1,5 @@
 import type { JSX } from "@meact/jsx-runtime";
-import { convertNumberToTimeAgo } from "../utils/convert-number-to-time-ago";
+import { convertNumberToTimeAgo } from "../utils/convert-number-to-time-ago.js";
 
 export interface IItemDetailProps {
   key: string;

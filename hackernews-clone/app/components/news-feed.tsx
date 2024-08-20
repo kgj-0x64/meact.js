@@ -1,9 +1,9 @@
 import type { JSX } from "@meact/jsx-runtime";
-import { useCurrentPathname } from "../custom-hooks/useLocation";
-import { LoadingSpinner } from "./loading-spinner";
-import { ItemDetail } from "./item-detail";
-import { ItemTitle } from "./item-title";
-import type { IStory } from "../../server/responses";
+import { useCurrentPathname } from "../custom-hooks/useLocation.js";
+import { LoadingSpinner } from "./loading-spinner.js";
+import { ItemDetail } from "./item-detail.js";
+import { ItemTitle } from "./item-title.js";
+import type { IStory } from "../../server/responses/index.js";
 
 export interface INewsFeedProps {
   error?: any;

@@ -7,32 +7,48 @@ export const ROOT_DIRECTORY = __dirname;
 const CONSTANTS_DIRECTORY_NAME = "constants";
 export const CONSTANTS_DIRECTORY = join(__dirname, CONSTANTS_DIRECTORY_NAME);
 
+/// ---- server-side code ---- ///
+
+// absolute path of server directory
+export const SERVER_DIRECTORY_NAME = "server";
+export const SERVER_API_DIRECTORY_NAME = "api";
+export const SERVER_API_ROUTES_DIRECTORY_NAME = "routes";
+export const SERVER_API_ROUTES_DIRECTORY_RELATIVE = join(
+  SERVER_DIRECTORY_NAME,
+  SERVER_API_DIRECTORY_NAME,
+  SERVER_API_ROUTES_DIRECTORY_NAME
+);
+
+// absolute path where the build output of server-only code is saved
+export const BUILD_OUTPUT_DIRECTORY_NAME = "build";
+export const BUILD_OUTPUT_DIRECTORY = join(
+  __dirname,
+  BUILD_OUTPUT_DIRECTORY_NAME
+);
+export const BUILD_OUTPUT_API_ROUTES_DIRECTORY_RELATIVE = join(
+  BUILD_OUTPUT_DIRECTORY_NAME,
+  SERVER_API_ROUTES_DIRECTORY_RELATIVE
+);
+
+/// ---- client-facing code ---- ///
+
+// absolute path where the build output of client-facing code is saved
+export const DIST_OUTPUT_DIRECTORY_NAME = "dist";
+export const DIST_OUTPUT_DIRECTORY = join(
+  __dirname,
+  DIST_OUTPUT_DIRECTORY_NAME
+);
+
 // absolute path of pages directory
 export const APP_DIRECTORY_NAME = "app";
 export const PAGES_DIRECTORY_NAME = "pages";
 export const STYLES_DIRECTORY_NAME = "styles";
 
 // absolute path of static assets directory
-const SERVER_DIRECTORY_NAME = "server";
-const SERVER_API_DIRECTORY_NAME = "api";
-export const SERVER_API_PAGES_DIRECTORY_RELATIVE = join(
-  SERVER_DIRECTORY_NAME,
-  SERVER_API_DIRECTORY_NAME,
-  PAGES_DIRECTORY_NAME
-);
-
-// absolute path of static assets directory
 export const PUBLIC_ASSETS_DIRECTORY_NAME = "public";
 export const PUBLIC_ASSETS_DIRECTORY = join(
   __dirname,
   PUBLIC_ASSETS_DIRECTORY_NAME
-);
-
-// absolute path where the build output is saved
-export const BUILD_OUTPUT_DIRECTORY_NAME = "dist";
-export const BUILD_OUTPUT_DIRECTORY = join(
-  __dirname,
-  BUILD_OUTPUT_DIRECTORY_NAME
 );
 
 // absolute path of meact library's directory

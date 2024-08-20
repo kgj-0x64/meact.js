@@ -1,5 +1,5 @@
 import type { JSX } from "@meact/jsx-runtime";
-import { MainLayout } from "../layouts/main-layout";
+import { MainLayout } from "../layouts/main-layout.js";
 
 /** Password recovery email sent page after submitting forgot password */
 function PasswordRecoveryPage(): JSX.Element {

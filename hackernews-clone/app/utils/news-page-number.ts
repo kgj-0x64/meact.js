@@ -1,4 +1,4 @@
-import { URLSearchParamFields } from "./http-handlers";
+import { URLSearchParamFields } from "./http-handlers.js";
 
 /**
  * Page number starts at 1.

@@ -1,11 +1,11 @@
 import type { JSX } from "@meact/jsx-runtime";
-import { MainLayout } from "../layouts/main-layout";
-import { NewsFeed } from "../components/news-feed";
-import { usePageNumber } from "../custom-hooks/usePageNumber";
-import { POSTS_PER_PAGE } from "../config";
-import type { IStory } from "server/responses";
-import { useLoaderData } from "memix/client/useLoaderData";
-import sGif from "public/static/s.gif";
+import { MainLayout } from "../layouts/main-layout.js";
+import { NewsFeed } from "../components/news-feed.js";
+import { usePageNumber } from "../custom-hooks/usePageNumber.js";
+import { POSTS_PER_PAGE } from "../config.js";
+import type { IStory } from "../../server/responses/index.js";
+import { useLoaderData } from "../../memix/client/useLoaderData.js";
+import sGif from "../../public/static/s.gif";
 
 export interface IJobsPageLoader {
   stories: (IStory | void)[];

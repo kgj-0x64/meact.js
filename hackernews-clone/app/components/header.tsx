@@ -1,10 +1,8 @@
 import type { JSX } from "@meact/jsx-runtime";
 import { useContext } from "@meact";
-
-import { ICurrentLoggedInUser, MeContext } from "../utils/context";
-import { getCurrentPathname } from "../utils/window";
-import { HeaderLinks } from "./header-links";
-
+import { ICurrentLoggedInUser, MeContext } from "../utils/context.js";
+import { getCurrentPathname } from "../utils/window.js";
+import { HeaderLinks } from "./header-links.js";
 import y18Gif from "../../public/static/y18.gif";
 
 export interface IHeaderProps {

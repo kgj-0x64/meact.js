@@ -2,29 +2,30 @@
   "include": [
     "index.ts",
     "middleware.ts",
-    "constants/*.ts",
-    "server/*.ts",
+    "server/**/*.ts",
     "**/*.ts",
     "**/*.tsx"
   ],
   "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "baseUrl": ".",
+    "rootDir": "./",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "allowImportingTsExtensions": true,
+
     "jsx": "preserve",
     "jsxImportSource": "@meact",
-    "lib": ["ESNext", "DOM", "DOM.Iterable"],
-    "isolatedModules": true,
-    "esModuleInterop": true,
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "module": "commonjs",
-    "target": "es6",
-    "strict": true,
-    "baseUrl": ".",
     "paths": {
       "@meact/jsx-runtime": ["./meact/jsx-runtime.d.ts"],
-      "@meact": ["./meact/index.d.ts"]
+      "@meact": ["./meact/index.d.ts"],
+      "@meact-csr": ["./meact-csr/index.d.ts"]
     },
 
-    // Esbuild takes care of building everything in `npm run build`.
     "noEmit": true
   }
 }

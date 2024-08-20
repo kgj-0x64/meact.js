@@ -16,10 +16,12 @@
   },
   "main": "index.js",
   "scripts": {
-    "build": "node --env-file=.env esbuild.config.js",
+    "build-client": "node --env-file=.env esbuild.config.js",
+    "build-memix": "tsx --env-file=.env memix.build.ts",
+    "build": "npm run build-memix && npm run build-client",
     "start": "tsx --env-file=.env index.ts",
     "serve": "npm run build && npm run start",
-    "check": "tsc --noEmit",
+    "ts:check": "tsc --noEmit",
     "prettier:check": "prettier --check .",
     "prettier:format": "prettier --write .",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -30,6 +32,7 @@
     "cookie": "^0.6.0",
     "debug": "^4.3.6",
     "express": "^4.19.2",
+    "glob": "^11.0.0",
     "hackernews-clone": "file:",
     "lru-cache": "^11.0.0"
   },

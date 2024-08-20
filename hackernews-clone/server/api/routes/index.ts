@@ -1,12 +1,12 @@
 import { Request } from "express";
 import { MeactMeta } from "@meact-csr";
-import { POSTS_PER_PAGE } from "app/config";
-import { IIndexPageLoader } from "app/pages";
-import { getSearchParamsFromRequest } from "app/utils/http-handlers";
-import { getPageNumberFromSearchParams } from "app/utils/news-page-number";
-import { feedService } from "server/bootstrap.server";
-import { getSession, SessionCookieProperties } from "server/cookies";
-import { FeedType } from "server/models";
+import { POSTS_PER_PAGE } from "../../../app/config";
+import { IIndexPageLoader } from "../../../app/pages";
+import { getSearchParamsFromRequest } from "../../../app/utils/http-handlers";
+import { getPageNumberFromSearchParams } from "../../../app/utils/news-page-number";
+import { feedService } from "../../bootstrap.server";
+import { getSession, SessionCookieProperties } from "../../cookies";
+import { FeedType } from "../../models";
 
 export const componentName = "IndexPage";
 

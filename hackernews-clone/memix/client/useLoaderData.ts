@@ -1,7 +1,7 @@
 import { useState } from "@meact";
-import { useCurrComponent } from "./useCurrComponent";
+import { useCurrComponent } from "./useCurrComponent.js";
 
-type UseLoaderDataState<T> = T;
+type UseLoaderDataState<T> = T | null;
 
 export function useLoaderData<T>() {
   // getting currently executing component's function from the global `window` namespace
@@ -12,7 +12,7 @@ export function useLoaderData<T>() {
   // ! TODO
   const [data, setData] = useState<UseLoaderDataState<T>>(() => {
     // Check if data is available on the window object
-    return <T>{};
+    return null;
   });
 
   return data;

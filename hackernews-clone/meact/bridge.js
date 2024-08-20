@@ -2,8 +2,8 @@
 /// that is, a platform-native renderer (@meact-dom) should only know about the "Render Tree"
 /// and no other internal details of (@meact)
 
-import MeactElement from "./element";
-import renderTree from "./render-tree";
+import MeactElement from "./element.js";
+import renderTree from "./render-tree.js";
 
 const meactRendererBridge = {
   // renderer set to use and paint the "Render Tree"

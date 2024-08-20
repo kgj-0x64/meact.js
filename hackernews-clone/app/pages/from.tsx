@@ -1,5 +1,5 @@
 import type { JSX } from "@meact/jsx-runtime";
-import { MainLayout } from "../layouts/main-layout";
+import { MainLayout } from "../layouts/main-layout.js";
 
 export function FromPage(): JSX.Element {
   return (

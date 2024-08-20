@@ -198,7 +198,7 @@ pre:hover {
   height: 10px;
   border: 0px;
   margin: 3px 2px 6px;
-  background: url("public/static//grayarrow.gif") no-repeat;
+  background: url("../../public/static/grayarrow.gif") no-repeat;
 }
 
 .votelinks.nosee div.votearrow.rotate180 {
@@ -209,7 +209,7 @@ pre:hover {
   only screen and (min-device-pixel-ratio: 2) {
   .votearrow {
     background-size: 10px;
-    background-image: url("public/static//grayarrow2x.gif");
+    background-image: url("../../public/static/grayarrow2x.gif");
   }
 }
 
@@ -259,88 +259,67 @@ pre:hover {
     text-overflow: ellipsis;
     vertical-align: top;
   }
-  img[src="public/static//s.gif"][width="40"]
-  {
+  img[src="public/static/s.gif"][width="40"] {
     width: 12px;
   }
-  img[src="public/static//s.gif"][width="80"]
-  {
+  img[src="public/static/s.gif"][width="80"] {
     width: 24px;
   }
-  img[src="public/static//s.gif"][width="120"]
-  {
+  img[src="public/static/s.gif"][width="120"] {
     width: 36px;
   }
-  img[src="public/static//s.gif"][width="160"]
-  {
+  img[src="public/static/s.gif"][width="160"] {
     width: 48px;
   }
-  img[src="public/static//s.gif"][width="200"]
-  {
+  img[src="public/static/s.gif"][width="200"] {
     width: 60px;
   }
-  img[src="public/static//s.gif"][width="240"]
-  {
+  img[src="public/static/s.gif"][width="240"] {
     width: 72px;
   }
-  img[src="public/static//s.gif"][width="280"]
-  {
+  img[src="public/static/s.gif"][width="280"] {
     width: 84px;
   }
-  img[src="public/static//s.gif"][width="320"]
-  {
+  img[src="public/static/s.gif"][width="320"] {
     width: 96px;
   }
-  img[src="public/static//s.gif"][width="360"]
-  {
+  img[src="public/static/s.gif"][width="360"] {
     width: 108px;
   }
-  img[src="public/static//s.gif"][width="400"]
-  {
+  img[src="public/static/s.gif"][width="400"] {
     width: 120px;
   }
-  img[src="public/static//s.gif"][width="440"]
-  {
+  img[src="public/static/s.gif"][width="440"] {
     width: 132px;
   }
-  img[src="public/static//s.gif"][width="480"]
-  {
+  img[src="public/static/s.gif"][width="480"] {
     width: 144px;
   }
-  img[src="public/static//s.gif"][width="520"]
-  {
+  img[src="public/static/s.gif"][width="520"] {
     width: 156px;
   }
-  img[src="public/static//s.gif"][width="560"]
-  {
+  img[src="public/static/s.gif"][width="560"] {
     width: 168px;
   }
-  img[src="public/static//s.gif"][width="600"]
-  {
+  img[src="public/static/s.gif"][width="600"] {
     width: 180px;
   }
-  img[src="public/static//s.gif"][width="640"]
-  {
+  img[src="public/static/s.gif"][width="640"] {
     width: 192px;
   }
-  img[src="public/static//s.gif"][width="680"]
-  {
+  img[src="public/static/s.gif"][width="680"] {
     width: 204px;
   }
-  img[src="public/static//s.gif"][width="720"]
-  {
+  img[src="public/static/s.gif"][width="720"] {
     width: 216px;
   }
-  img[src="public/static//s.gif"][width="760"]
-  {
+  img[src="public/static/s.gif"][width="760"] {
     width: 228px;
   }
-  img[src="public/static//s.gif"][width="800"]
-  {
+  img[src="public/static/s.gif"][width="800"] {
     width: 240px;
   }
-  img[src="public/static//s.gif"][width="840"]
-  {
+  img[src="public/static/s.gif"][width="840"] {
     width: 252px;
   }
   .title {

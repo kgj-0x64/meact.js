@@ -1,5 +1,5 @@
 import type { JSX } from "@meact/jsx-runtime";
-import { BlankLayout } from "../layouts/blank-layout";
+import { BlankLayout } from "../layouts/blank-layout.js";
 
 function ForgotPage(): JSX.Element {
   return (

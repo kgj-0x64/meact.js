@@ -1,4 +1,4 @@
-import MeactElement from "./element";
+import MeactElement from "./element.js";
 
 /// discarding this in favour of component call stack
 

@@ -4,10 +4,10 @@ import { Request } from "express";
 import { MeactMeta } from "@meact-csr";
 import {
   ROOT_DIRECTORY,
-  BUILD_OUTPUT_DIRECTORY,
+  DIST_OUTPUT_DIRECTORY,
   APP_DIRECTORY_NAME,
   PAGES_DIRECTORY_NAME,
-  SERVER_API_PAGES_DIRECTORY_RELATIVE,
+  SERVER_API_ROUTES_DIRECTORY_RELATIVE,
 } from "./constants/fileAndDirectoryNameAndPaths.js";
 
 /**
@@ -25,11 +25,11 @@ export async function prepareHtmlOnPageRequest(
 
     // Construct the expected paths for the JS and CSS bundles
     const scriptBundleRelativePath = `${APP_DIRECTORY_NAME}/${PAGES_DIRECTORY_NAME}/${pageName}.js`;
-    const jsBundlePath = join(BUILD_OUTPUT_DIRECTORY, scriptBundleRelativePath);
+    const jsBundlePath = join(DIST_OUTPUT_DIRECTORY, scriptBundleRelativePath);
 
     const stylesheetBundleRelativePath = `${APP_DIRECTORY_NAME}/${PAGES_DIRECTORY_NAME}/${pageName}.css`;
     const stylesheetBundlePath = join(
-      BUILD_OUTPUT_DIRECTORY,
+      DIST_OUTPUT_DIRECTORY,
       stylesheetBundleRelativePath
     );
 
@@ -79,7 +79,7 @@ async function getPageServerData(
   meta: string | null;
 } | null> {
   const pageServerModulePath = join(
-    SERVER_API_PAGES_DIRECTORY_RELATIVE,
+    SERVER_API_ROUTES_DIRECTORY_RELATIVE,
     `${pageName}.ts`
   );
 

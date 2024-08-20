@@ -1,7 +1,7 @@
 import { Request } from "express";
-import { getSession, SessionCookieProperties } from "server/cookies";
-import { userService } from "server/bootstrap.server";
-import { IMainLoader } from "app/layouts/main-layout";
+import { getSession, SessionCookieProperties } from "../../cookies/index.js";
+import { userService } from "../../bootstrap.server";
+import { IMainLoader } from "../../../app/layouts/main-layout";
 
 export const componentName = "MainLayout";
 

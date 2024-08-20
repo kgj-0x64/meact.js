@@ -1,4 +1,4 @@
-import { createElement } from "./createElement";
+import { createElement } from "./createElement.js";
 
 // Fragment allows grouping elements without adding extra DOM nodes
 export function Fragment(props) {

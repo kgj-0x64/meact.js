@@ -1,5 +1,5 @@
 import { createRoot } from "@meact-dom";
-// simply assume that library could impose constraint of mandating a default export from "app/index.js"
+// simply assume that library could impose constraint of mandating a default export from "./app/index.js"
 // to keep this implementation independent of "app author's code"
 import MyApp from "../app/index.js";
 

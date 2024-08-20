@@ -1,4 +1,4 @@
-import renderTree from "../render-tree";
+import renderTree from "../render-tree.js";
 import { componentFnCallStack } from "../executionContext.js";
 import {
   badHookCall,

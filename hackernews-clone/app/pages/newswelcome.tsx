@@ -1,5 +1,5 @@
 import type { JSX } from "@meact/jsx-runtime";
-import { NoticeLayout } from "../layouts/notice-layout";
+import { NoticeLayout } from "../layouts/notice-layout.js";
 
 export function NewsWelcomePage(): JSX.Element {
   return (

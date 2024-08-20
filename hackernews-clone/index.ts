@@ -1,19 +1,18 @@
 import express from "express";
 import { prepareHtmlOnPageRequest } from "./middleware";
-// @ts-ignore
 import {
-  BUILD_OUTPUT_DIRECTORY,
+  DIST_OUTPUT_DIRECTORY,
   PUBLIC_ASSETS_DIRECTORY_NAME,
 } from "./constants/fileAndDirectoryNameAndPaths.js";
 
 // ! initialize server resources i.e. cache, DB and services
-import "server/bootstrap.server";
+import "./server/bootstrap.server.ts";
 
 // Create an Express application
 const app = express();
 
 // Serve static files from the "dist" directory
-app.use(express.static(BUILD_OUTPUT_DIRECTORY));
+app.use(express.static(DIST_OUTPUT_DIRECTORY));
 
 // https://expressjs.com/en/starter/static-files.html
 // Serve static files like "robots.txt" from the "public" directory

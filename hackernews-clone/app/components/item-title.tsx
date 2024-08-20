@@ -1,5 +1,5 @@
 import type { JSX } from "@meact/jsx-runtime";
-import { useLocation } from "../custom-hooks/useLocation";
+import { useLocation } from "../custom-hooks/useLocation.js";
 
 export interface IItemTitleProps {
   key: string;
