@@ -1,4 +1,4 @@
-import { debug } from "debug";
+import debug from "debug";
 
 import { FeedType } from "../models";
 import type { HnCache } from "./cache";
@@ -6,6 +6,8 @@ import type { HnDatabase } from "./database";
 
 const logger = debug("app:cache-warmer");
 logger.log = console.log.bind(console);
+
+const TWO_MINUTES = 1000 * 60 * 2;
 
 /**
  * Updates the news feed story orders in memory
@@ -15,6 +17,8 @@ async function updateFeed(
   cache: HnCache,
   feedType: FeedType
 ): Promise<void> {
+  setTimeout(() => updateFeed(db, cache, feedType), TWO_MINUTES);
+
   try {
     const feed = await db.getFeed(feedType);
 

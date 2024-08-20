@@ -9,7 +9,7 @@
  * @license MIT
  */
 
-import { cookie } from "cookie";
+import cookie from "cookie";
 
 /**
  * Creates a logical container for managing a browser cookie from the server.

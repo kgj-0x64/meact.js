@@ -1,5 +1,4 @@
 import type { JSX } from "@meact/jsx-runtime";
-import { MeactMeta } from "@meact-csr";
 import { MainLayout } from "../layouts/main-layout";
 import { NewsFeed } from "../components/news-feed";
 import { usePageNumber } from "../custom-hooks/usePageNumber";
@@ -10,16 +9,6 @@ import { useLoaderData } from "app/custom-hooks/useLoaderData";
 export interface IIndexPageLoader {
   stories: (IStory | void)[];
 }
-
-export const meta: MeactMeta = () => [
-  {
-    meta: {
-      name: "description",
-      content:
-        "The top stories from technology and startup business hackers around the world.",
-    },
-  },
-];
 
 export default function IndexPage(): JSX.Element {
   const { stories } = useLoaderData<IIndexPageLoader>();

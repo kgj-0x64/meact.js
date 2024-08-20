@@ -11,11 +11,10 @@ import { ItemService } from "./services/item-service.server";
 import { StoryService } from "./services/story-service.server";
 import { UserService } from "./services/user-service.server";
 
-const TWO_MINUTES = 1000 * 60 * 2;
-const FIFTEEN_MINUTES = 1000 * 60 * 5;
+const FIVE_SECONDS = 1000 * 5;
 
 // Seed the in-memory data using the HN api
-const delay = dev ? FIFTEEN_MINUTES : TWO_MINUTES;
+const delay = dev ? FIVE_SECONDS : 0;
 
 const firebaseApp = initializeApp({ databaseURL: HN_DB_URI });
 const firebaseDb = getDatabase(firebaseApp);

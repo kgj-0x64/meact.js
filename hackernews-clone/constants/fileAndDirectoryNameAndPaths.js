@@ -15,8 +15,7 @@ export const STYLES_DIRECTORY_NAME = "styles";
 // absolute path of static assets directory
 const SERVER_DIRECTORY_NAME = "server";
 const SERVER_API_DIRECTORY_NAME = "api";
-export const SERVER_API_PAGES_DIRECTORY = join(
-  __dirname,
+export const SERVER_API_PAGES_DIRECTORY_RELATIVE = join(
   SERVER_DIRECTORY_NAME,
   SERVER_API_DIRECTORY_NAME,
   PAGES_DIRECTORY_NAME

@@ -29,12 +29,12 @@ export function ItemTitle(props: IItemTitleProps): JSX.Element {
 
   return (
     <tr class="athing">
-      <td style={{ textAlign: "right", verticalAlign: "top" }} class="title">
-        <span class="rank">{isRankVisible && `${rank}.`}</span>
+      <td align="right" valign="top" class="title">
+        <span class="rank">{isRankVisible ? `${rank}.` : <null />}</span>
       </td>
-      <td style={{ verticalAlign: "top" }} class="votelinks">
+      <td valign="top" class="votelinks">
         <div style={{ textAlign: "center" }}>
-          {isUpvoteVisible && (
+          {isUpvoteVisible ? (
             <a
               href={`/vote?id=${id}&how=up&goto=${loc.pathname + loc.search}`}
               class={upvoted ? "nosee" : " "}
@@ -42,6 +42,8 @@ export function ItemTitle(props: IItemTitleProps): JSX.Element {
             >
               <div class="votearrow" title="upvote" />
             </a>
+          ) : (
+            <null />
           )}
         </div>
       </td>

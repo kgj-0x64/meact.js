@@ -1,6 +1,7 @@
 import { JSX } from "@meact/jsx-runtime";
 import { Footer } from "../components/footer";
 import { Header } from "../components/header";
+import "../styles/news.css";
 
 interface IMainLayoutProps {
   children?: JSX.Node;
@@ -35,9 +36,9 @@ export function MainLayout(props: IMainLayoutProps): JSX.Element {
       >
         <tbody>
           <Header isNavVisible={!!isNavVisible} title={title!} />
-          <tr style={{ height: "10px" }} />
+          <tr id="pagespace" style={{ height: "10px" }} />
           {...children}
-          {isFooterVisible && <Footer />}
+          {isFooterVisible ? <Footer /> : <null />}
         </tbody>
       </table>
     </div>

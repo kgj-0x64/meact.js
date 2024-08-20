@@ -9,8 +9,8 @@
  * @license MIT
  */
 
-import { cookies } from "./cookies";
-import { warnings } from "../warnings";
+import { createCookie, isCookie } from "./cookies";
+import { warnOnce } from "../warnings";
 
 /**
  * An object of name/value pairs to be used in the session.
@@ -110,9 +110,9 @@ function createSessionStorage({
   updateData,
   deleteData,
 }) {
-  let cookie = cookies.isCookie(cookieArg)
+  let cookie = isCookie(cookieArg)
     ? cookieArg
-    : cookies.createCookie(
+    : createCookie(
         (cookieArg === null || cookieArg === void 0
           ? void 0
           : cookieArg.name) || "__session",
@@ -145,7 +145,7 @@ function createSessionStorage({
   };
 }
 function warnOnceAboutSigningSessionCookie(cookie) {
-  warnings.warnOnce(
+  warnOnce(
     cookie.isSigned,
     `The "${cookie.name}" cookie is not signed, but session cookies should be ` +
       `signed to prevent tampering on the client before they are sent back to the ` +

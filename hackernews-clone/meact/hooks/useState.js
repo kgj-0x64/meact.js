@@ -60,7 +60,8 @@ export default function useState(initialValue) {
     stateValue = values[thisHookCallCount];
   } else {
     // SET initial value
-    stateValue = initialValue;
+    stateValue =
+      typeof initialValue === "function" ? initialValue() : initialValue;
     values.push(stateValue);
   }
 

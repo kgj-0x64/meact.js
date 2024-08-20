@@ -1,10 +1,10 @@
-import { debug } from 'debug';
+import debug from "debug";
 
-import { ItemModel } from '../models';
-import { HnCache } from '../database/cache';
-import { HnDatabase } from '../database/database';
+import { ItemModel } from "../models";
+import { HnCache } from "../database/cache";
+import { HnDatabase } from "../database/database";
 
-const logger = debug('app:NewsItem');
+const logger = debug("app:NewsItem");
 logger.log = console.log.bind(console);
 
 export class ItemService {

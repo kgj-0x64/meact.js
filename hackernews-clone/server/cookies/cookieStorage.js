@@ -10,8 +10,8 @@
  * @license MIT
  */
 
-import { cookies } from "./cookies";
-import { sessions } from "./sessions";
+import { createCookie, isCookie } from "./cookies";
+import { createSession, warnOnceAboutSigningSessionCookie } from "./sessions";
 
 /**
  * Creates and returns a SessionStorage object that stores all session data
@@ -25,18 +25,18 @@ import { sessions } from "./sessions";
  * @see https://remix.run/api/remix#createcookiesessionstorage
  */
 function createCookieSessionStorage({ cookie: cookieArg } = {}) {
-  let cookie = cookies.isCookie(cookieArg)
+  let cookie = isCookie(cookieArg)
     ? cookieArg
-    : cookies.createCookie(
+    : createCookie(
         (cookieArg === null || cookieArg === void 0
           ? void 0
           : cookieArg.name) || "__session",
         cookieArg
       );
-  sessions.warnOnceAboutSigningSessionCookie(cookie);
+  warnOnceAboutSigningSessionCookie(cookie);
   return {
     async getSession(cookieHeader, options) {
-      return sessions.createSession(
+      return createSession(
         (cookieHeader && (await cookie.parse(cookieHeader, options))) || {}
       );
     },

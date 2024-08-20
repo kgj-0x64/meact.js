@@ -1,12 +1,13 @@
 import { readFileSync, existsSync } from "fs";
 import { join } from "path";
 import { Request } from "express";
+import { MeactMeta } from "@meact-csr";
 import {
   ROOT_DIRECTORY,
   BUILD_OUTPUT_DIRECTORY,
   APP_DIRECTORY_NAME,
   PAGES_DIRECTORY_NAME,
-  SERVER_API_PAGES_DIRECTORY,
+  SERVER_API_PAGES_DIRECTORY_RELATIVE,
 } from "./constants/fileAndDirectoryNameAndPaths.js";
 
 /**
@@ -47,11 +48,20 @@ export async function prepareHtmlOnPageRequest(
       existsSync(stylesheetBundlePath) ? stylesheetBundleRelativePath : ""
     );
 
-    const data = await setPageLoaderData(pageName, request);
-    indexHtmlContent = indexHtmlContent.replaceAll(
-      "__PAGE_LOADER_DATA_JSON__",
-      data ? JSON.stringify(data) : "{}"
-    );
+    const pageServerData = await getPageServerData(pageName, request);
+    if (pageServerData) {
+      indexHtmlContent = indexHtmlContent.replaceAll(
+        "__PAGE_LOADER_DATA_JSON__",
+        pageServerData.loader ? JSON.stringify(pageServerData.loader) : "{}"
+      );
+
+      if (pageServerData.meta) {
+        indexHtmlContent = indexHtmlContent.replace(
+          "<title>HackerNews x Meact.js</title>",
+          pageServerData.meta
+        );
+      }
+    }
 
     return indexHtmlContent;
   } catch (error) {
@@ -60,20 +70,56 @@ export async function prepareHtmlOnPageRequest(
   }
 }
 
-async function setPageLoaderData(
+async function getPageServerData(
   pageName: string,
   request: Request
-): Promise<any> {
-  const loaderModulePath = join(SERVER_API_PAGES_DIRECTORY, `${pageName}.ts`);
+): Promise<{
+  loader: object | null;
+  meta: string | null;
+} | null> {
+  const pageServerModulePath = join(
+    SERVER_API_PAGES_DIRECTORY_RELATIVE,
+    `${pageName}.ts`
+  );
 
-  if (!existsSync(loaderModulePath)) {
+  if (!existsSync(pageServerModulePath)) {
     return null;
   }
 
-  // Dynamically import the loader function
-  const loaderModule = require(`./api/pages/${pageName}.ts`);
-  const loaderFn = loaderModule.loader;
+  // Dynamically import the module
+  const pageServerModule = await import(pageServerModulePath);
 
-  // Call the loader function and get the data
-  return await loaderFn({ request });
+  const loaderFn = pageServerModule.loader;
+  const metaFn = pageServerModule.meta;
+
+  return {
+    loader: typeof loaderFn === "function" ? await loaderFn({ request }) : null,
+    meta: typeof metaFn === "function" ? await generateMetaTags(metaFn) : null,
+  };
+}
+
+async function generateMetaTags(metaFn: MeactMeta): Promise<string | null> {
+  const metaArray = metaFn();
+
+  return metaArray
+    .map((metaObj) => {
+      if (metaObj.title) {
+        // Handle <title> tag
+        return `<title>${metaObj.title.text}</title>`;
+      } else if (metaObj.link) {
+        // Handle <link> tag
+        const attributes = Object.entries(metaObj.link)
+          .map(([key, value]) => `${key}="${value}"`)
+          .join(" ");
+        return `<link ${attributes} />`;
+      } else if (metaObj.meta) {
+        // Handle <meta> tag
+        const attributes = Object.entries(metaObj.meta)
+          .map(([key, value]) => `${key}="${value}"`)
+          .join(" ");
+        return `<meta ${attributes} />`;
+      }
+      return "";
+    })
+    .join("\n");
 }

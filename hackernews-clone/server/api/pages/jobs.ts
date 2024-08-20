@@ -1,7 +1,7 @@
 import { MeactMeta } from "@meact-csr";
 import { Request } from "express";
 import { POSTS_PER_PAGE } from "app/config";
-import { IIndexPageLoader } from "app/pages";
+import { IJobsPageLoader } from "app/pages/jobs";
 import { getSearchParamsFromRequest } from "app/utils/http-handlers";
 import { getPageNumberFromSearchParams } from "app/utils/news-page-number";
 import { feedService } from "server/bootstrap.server";
@@ -10,10 +10,8 @@ import { FeedType } from "server/models";
 
 export const meta: MeactMeta = () => [
   {
-    meta: {
-      name: "description",
-      content:
-        "The top stories from technology and startup business hackers around the world.",
+    title: {
+      text: "jobs | Hacker News Clone",
     },
   },
 ];
@@ -22,7 +20,7 @@ export const loader = async ({
   request,
 }: {
   request: Request;
-}): Promise<IIndexPageLoader> => {
+}): Promise<IJobsPageLoader> => {
   const session = await getSession(request.headers.cookie);
   const userId = session.get(SessionCookieProperties.USER_ID);
 
@@ -33,7 +31,7 @@ export const loader = async ({
   const skip = POSTS_PER_PAGE * (pageNumber - 1);
 
   const stories = await feedService.getForType(
-    FeedType.TOP,
+    FeedType.JOB,
     first,
     skip,
     userId

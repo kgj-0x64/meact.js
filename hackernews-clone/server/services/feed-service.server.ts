@@ -1,12 +1,12 @@
-import { debug } from 'debug';
+import debug from "debug";
 
-import { FeedType } from '../models';
-import { sampleData } from '../sample-data';
-import { HnCache } from '../database/cache';
-import { HnDatabase } from '../database/database';
-import { ClientStory, IStory } from '../responses';
+import { FeedType } from "../models";
+import { sampleData } from "../sample-data";
+import { HnCache } from "../database/cache";
+import { HnDatabase } from "../database/database";
+import { ClientStory, IStory } from "../responses";
 
-const logger = debug('app:Feed');
+const logger = debug("app:Feed");
 logger.log = console.log.bind(console);
 
 export class FeedService {
@@ -24,7 +24,7 @@ export class FeedService {
     skip: number,
     userId: string | undefined
   ): Promise<Array<IStory | undefined>> {
-    logger('Get first', first, type, 'stories skip', skip);
+    logger("Get first", first, type, "stories skip", skip);
 
     switch (type) {
       case FeedType.TOP: {
@@ -35,7 +35,9 @@ export class FeedService {
             .map((id) => this.cache.getStory(id) || this.db.fetchStory(id))
         );
 
-        return topStories.map((id) => (id ? ClientStory(id, userId) : undefined));
+        return topStories.map((id) =>
+          id ? ClientStory(id, userId) : undefined
+        );
       }
 
       case FeedType.NEW: {
@@ -45,7 +47,9 @@ export class FeedService {
             .map((id) => this.cache.getStory(id) || this.db.fetchStory(id))
         );
 
-        return newStories.map((id) => (id ? ClientStory(id, userId) : undefined));
+        return newStories.map((id) =>
+          id ? ClientStory(id, userId) : undefined
+        );
       }
 
       case FeedType.BEST: {
@@ -55,7 +59,9 @@ export class FeedService {
             .map((id) => this.cache.getStory(id) || this.db.fetchStory(id))
         );
 
-        return bestStories.map((id) => (id ? ClientStory(id, userId) : undefined));
+        return bestStories.map((id) =>
+          id ? ClientStory(id, userId) : undefined
+        );
       }
 
       case FeedType.SHOW: {
@@ -65,7 +71,9 @@ export class FeedService {
             .map((id) => this.cache.getStory(id) || this.db.fetchStory(id))
         );
 
-        return showStories.map((id) => (id ? ClientStory(id, userId) : undefined));
+        return showStories.map((id) =>
+          id ? ClientStory(id, userId) : undefined
+        );
       }
 
       case FeedType.ASK: {
@@ -75,7 +83,9 @@ export class FeedService {
             .map((id) => this.cache.getStory(id) || this.db.fetchStory(id))
         );
 
-        return askStories.map((id) => (id ? ClientStory(id, userId) : undefined));
+        return askStories.map((id) =>
+          id ? ClientStory(id, userId) : undefined
+        );
       }
 
       case FeedType.JOB: {
@@ -85,7 +95,9 @@ export class FeedService {
             .map((id) => this.cache.getStory(id) || this.db.fetchStory(id))
         );
 
-        return jobStories.map((id) => (id ? ClientStory(id, userId) : undefined));
+        return jobStories.map((id) =>
+          id ? ClientStory(id, userId) : undefined
+        );
       }
 
       default:

@@ -1,10 +1,10 @@
-import { debug } from 'debug';
+import debug from "debug";
 
-import { StoryModel } from '../models';
-import { HnCache } from '../database/cache';
-import { HnDatabase } from '../database/database';
+import { StoryModel } from "../models";
+import { HnCache } from "../database/cache";
+import { HnDatabase } from "../database/database";
 
-const logger = debug('app:NewsItem');
+const logger = debug("app:NewsItem");
 logger.log = console.log.bind(console);
 
 let newPostIdCounter = 100;
@@ -19,13 +19,19 @@ export class StoryService {
   }
 
   async getStory(id: number): Promise<StoryModel | void> {
-    return this.cache.getStory(id) || this.db.getNewsItem(id) || this.db.fetchStory(id);
+    return (
+      this.cache.getStory(id) ||
+      this.db.getNewsItem(id) ||
+      this.db.fetchStory(id)
+    );
   }
 
   async getStories(ids: number[]): Promise<Array<StoryModel | void> | void> {
     return Promise.all(ids.map((id) => this.getStory(id)))
-      .then((newsItems) => newsItems.filter((newsItem) => newsItem !== undefined))
-      .catch((reason) => logger('Rejected News Items:', reason));
+      .then((newsItems) =>
+        newsItems.filter((newsItem) => newsItem !== undefined)
+      )
+      .catch((reason) => logger("Rejected News Items:", reason));
   }
 
   async hideStory(id: number, userId: string): Promise<StoryModel> {

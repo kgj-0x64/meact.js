@@ -1,5 +1,6 @@
 import { JSX } from "@meact/jsx-runtime";
 import yc500Gif from "../../public/static/yc500.gif";
+import "../styles/yc.css";
 
 export interface INoticeLayoutProps {
   children?: JSX.Node;

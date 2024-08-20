@@ -1,12 +1,12 @@
-import { debug } from 'debug';
-import { child, get, DatabaseReference } from '@firebase/database';
+import debug from "debug";
+import { child, get, DatabaseReference } from "@firebase/database";
 
-import type { HnCache } from './cache';
-import { CommentModel, FeedType, StoryModel, UserModel } from '../models';
-import { sampleData } from '../sample-data';
-import { HN_API_URL } from '../config.server';
+import type { HnCache } from "./cache";
+import { CommentModel, FeedType, StoryModel, UserModel } from "../models";
+import { sampleData } from "../sample-data";
+import { HN_API_URL } from "../config.server";
 
-const logger = debug('app:Database');
+const logger = debug("app:Database");
 logger.log = console.log.bind(console);
 
 let newCommentIdCounter = 100_000_000;
@@ -23,7 +23,7 @@ export class HnDatabase {
   }
 
   async fetchStory(id: number): Promise<StoryModel | void> {
-    logger('Fetching item:', `${HN_API_URL}/item/${id}.json`);
+    logger("Fetching item:", `${HN_API_URL}/item/${id}.json`);
 
     return get(child(this.db, `item/${id}`))
       .then((itemSnapshot) => {
@@ -42,18 +42,18 @@ export class HnDatabase {
           });
 
           this.cache.setStory(newsItem.id, newsItem);
-          logger('Saved item in cache:', item.id);
+          logger("Saved item in cache:", item.id);
 
           return newsItem;
         }
 
         throw item;
       })
-      .catch((reason) => logger('Fetching post failed:', reason));
+      .catch((reason) => logger("Fetching post failed:", reason));
   }
 
   async fetchComment(id: number): Promise<CommentModel | void> {
-    logger('Fetching comment:', `${HN_API_URL}/item/${id}.json`);
+    logger("Fetching comment:", `${HN_API_URL}/item/${id}.json`);
 
     return get(child(this.db, `item/${id}`))
       .then((itemSnapshot) => {
@@ -70,18 +70,18 @@ export class HnDatabase {
           });
 
           this.cache.setComment(comment.id, comment);
-          logger('Created Comment:', item.id);
+          logger("Created Comment:", item.id);
 
           return comment;
         }
 
         throw item;
       })
-      .catch((reason) => logger('Fetching comment failed:', reason));
+      .catch((reason) => logger("Fetching comment failed:", reason));
   }
 
   async fetchUser(id: string): Promise<UserModel | void> {
-    logger('Fetching user:', `${HN_API_URL}/user/${id}.json`);
+    logger("Fetching user:", `${HN_API_URL}/user/${id}.json`);
 
     return get(child(this.db, `user/${id}`))
       .then((itemSnapshot) => {
@@ -97,23 +97,25 @@ export class HnDatabase {
           });
 
           this.cache.setUser(user.id, user);
-          logger('Created User:', item.id, item);
+          logger("Created User:", item.id, item);
 
           return user;
         }
 
         throw item;
       })
-      .catch((reason) => logger('Fetching user failed:', reason));
+      .catch((reason) => logger("Fetching user failed:", reason));
   }
 
   async getFeed(feedType: FeedType): Promise<number[] | void> {
-    logger('Fetching', `/${feedType}stories.json`);
+    logger("Fetching", `/${feedType}stories.json`);
 
     return get(child(this.db, `${feedType}stories`))
       .then((feedSnapshot) => feedSnapshot.val())
-      .then((feed) => feed.filter((newsItem) => newsItem !== undefined && newsItem !== null))
-      .catch((reason) => logger('Fetching news feed failed:', reason));
+      .then((feed) =>
+        feed.filter((newsItem) => newsItem !== undefined && newsItem !== null)
+      )
+      .catch((reason) => logger("Fetching news feed failed:", reason));
   }
 
   /*                  BEGIN NEWS ITEMS                      */
@@ -130,7 +132,10 @@ export class HnDatabase {
 
   //                  ITEM MUTATIONS
 
-  async upvoteItem(id: number, userId: string): Promise<StoryModel | undefined> {
+  async upvoteItem(
+    id: number,
+    userId: string
+  ): Promise<StoryModel | undefined> {
     // Upvote the News Item in the DB
     const item = this.cache.getStory(id);
 
@@ -143,7 +148,10 @@ export class HnDatabase {
     return item;
   }
 
-  async unvoteItem(id: number, userId: string): Promise<StoryModel | undefined> {
+  async unvoteItem(
+    id: number,
+    userId: string
+  ): Promise<StoryModel | undefined> {
     const item = this.cache.getStory(id);
 
     if (item && !item.upvotes.has(userId)) {
@@ -156,19 +164,24 @@ export class HnDatabase {
   }
 
   async hideNewsItem(id: number, userId: string): Promise<StoryModel> {
-    logger('Hiding News Item id by userId:', id, userId);
+    logger("Hiding News Item id by userId:", id, userId);
 
     const newsItem = this.cache.getStory(id);
     const user = this.cache.getUser(userId);
 
-    if (user && !user.hides.includes(id) && newsItem && !newsItem.hides.includes(userId)) {
+    if (
+      user &&
+      !user.hides.includes(id) &&
+      newsItem &&
+      !newsItem.hides.includes(userId)
+    ) {
       user.hides.push(id);
       this.cache.setUser(userId, user);
 
       newsItem.hides.push(userId);
       this.cache.setStory(id, newsItem);
 
-      logger('Hid News Item id by userId:', id, userId);
+      logger("Hid News Item id by userId:", id, userId);
     } else {
       throw new Error(`Data error, user has already hidden ${id} by ${userId}`);
     }
@@ -184,7 +197,7 @@ export class HnDatabase {
       return newsItem;
     }
 
-    throw new Error('Unable to submit News Item.');
+    throw new Error("Unable to submit News Item.");
   }
 
   /*                  END NEWS ITEMS                      */
@@ -192,7 +205,12 @@ export class HnDatabase {
   /*                  BEGIN COMMENTS                      */
 
   async createComment(parent: number, submitterId: string, text: string) {
-    return new CommentModel({ parent, submitterId, text, id: newCommentIdCounter++ });
+    return new CommentModel({
+      parent,
+      submitterId,
+      text,
+      id: newCommentIdCounter++,
+    });
   }
 
   /*                  END COMMENTS                        */

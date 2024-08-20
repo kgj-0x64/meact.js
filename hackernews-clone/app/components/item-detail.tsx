@@ -60,7 +60,7 @@ export function ItemDetail(props: IItemDetailProps): JSX.Element {
             hide
           </a>
         )}
-        {isPostScrutinyVisible && (
+        {isPostScrutinyVisible ? (
           <span>
             {" | "}
             <a href="https://hn.algolia.com/?query=Sublime%20Text%203.0&sort=byDate&dateRange=all&type=story&storyText=false&prefix&page=0">
@@ -71,6 +71,8 @@ export function ItemDetail(props: IItemDetailProps): JSX.Element {
               web
             </a>
           </span>
+        ) : (
+          <null />
         )}
         {" | "}
         <a href={`/item?id=${id}`}>
@@ -80,7 +82,7 @@ export function ItemDetail(props: IItemDetailProps): JSX.Element {
             ? "1 comment"
             : `${commentCount} comments`}
         </a>
-        {isFavoriteVisible && " | favorite"}
+        {isFavoriteVisible ? " | favorite" : <null />}
       </td>
     </tr>
   );

@@ -64,14 +64,15 @@ export function NewsFeed(props: INewsFeedProps): JSX.Element {
             border: "0px",
             padding: "0px",
             borderCollapse: "collapse",
-            borderSpacing: "0px",
+            cellPadding: "0px",
+            cellSpacing: "0px",
           }}
           class="itemlist"
         >
           <tbody>
-            {notice && notice}
+            {notice ? notice : <null />}
             <>
-              {stories
+              {...stories
                 .filter(
                   (newsItem): newsItem is IStory =>
                     !!newsItem && !newsItem.hidden
@@ -107,16 +108,16 @@ export function NewsFeed(props: INewsFeedProps): JSX.Element {
                 ])}
               <tr
                 key="morespace"
-                class="morespace"
+                className="morespace"
                 style={{ height: "10px" }}
               />
               <tr key="morelinktr">
                 <td key="morelinkcolspan" colSpan={2} />
-                <td key="morelinktd" class="title">
+                <td key="morelinktd" className="title">
                   <a
                     key="morelink"
                     href={`${currentPathname}?p=${nextPage}`}
-                    class="morelink"
+                    className="morelink"
                     rel="nofollow"
                   >
                     More
