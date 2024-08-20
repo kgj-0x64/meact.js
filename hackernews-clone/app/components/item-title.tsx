@@ -29,10 +29,10 @@ export function ItemTitle(props: IItemTitleProps): JSX.Element {
 
   return (
     <tr class="athing">
-      <td align="right" valign="top" class="title">
+      <td style={{ textAlign: "right", verticalAlign: "top" }} class="title">
         <span class="rank">{isRankVisible ? `${rank}.` : <null />}</span>
       </td>
-      <td valign="top" class="votelinks">
+      <td style={{ verticalAlign: "top" }} class="votelinks">
         <div style={{ textAlign: "center" }}>
           {isUpvoteVisible ? (
             <a
@@ -50,7 +50,7 @@ export function ItemTitle(props: IItemTitleProps): JSX.Element {
       <td class="title">
         {url ? (
           <>
-            <a class="storylink" href={url}>
+            <a href={url} class="storylink">
               {title}
             </a>
             <span class="sitebit comhead">

@@ -64,8 +64,7 @@ export function NewsFeed(props: INewsFeedProps): JSX.Element {
             border: "0px",
             padding: "0px",
             borderCollapse: "collapse",
-            cellPadding: "0px",
-            cellSpacing: "0px",
+            borderSpacing: "0px",
           }}
           class="itemlist"
         >
@@ -101,23 +100,23 @@ export function NewsFeed(props: INewsFeedProps): JSX.Element {
                     upvoteCount={newsItem.upvoteCount}
                   />,
                   <tr
-                    class="spacer"
                     key={`${newsItem.id}spacer`}
                     style={{ height: 5 }}
+                    class="spacer"
                   />,
                 ])}
               <tr
                 key="morespace"
-                className="morespace"
                 style={{ height: "10px" }}
+                class="morespace"
               />
               <tr key="morelinktr">
                 <td key="morelinkcolspan" colSpan={2} />
-                <td key="morelinktd" className="title">
+                <td key="morelinktd" class="title">
                   <a
-                    key="morelink"
                     href={`${currentPathname}?p=${nextPage}`}
-                    className="morelink"
+                    key="morelink"
+                    class="morelink"
                     rel="nofollow"
                   >
                     More
