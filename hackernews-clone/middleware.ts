@@ -7,8 +7,9 @@ import {
   DIST_OUTPUT_DIRECTORY,
   APP_DIRECTORY_NAME,
   PAGES_DIRECTORY_NAME,
-  SERVER_API_ROUTES_DIRECTORY_RELATIVE,
 } from "./constants/fileAndDirectoryNameAndPaths.js";
+import { runExtraLoadersFromComponentsForThisPage } from "app/_app.js";
+import { mapOfComponentNameToServerSideHandlers } from "memix/server/build.js";
 
 /**
  * call this on server to prepare index.html content in response to a page request
@@ -48,20 +49,20 @@ export async function prepareHtmlOnPageRequest(
       existsSync(stylesheetBundlePath) ? stylesheetBundleRelativePath : ""
     );
 
-    /// ! TODO
+    // Run MeactMeta and Loader functions for the requested page and related components with their own Loader functions (if any)
     const pageServerData = await getPageServerData(pageName, request);
     if (pageServerData) {
-      indexHtmlContent = indexHtmlContent.replaceAll(
-        "__PAGE_LOADER_DATA_JSON__",
-        pageServerData.loader ? JSON.stringify(pageServerData.loader) : "{}"
-      );
-
-      if (pageServerData.meta) {
+      if (pageServerData.metaTagsForThisPage) {
         indexHtmlContent = indexHtmlContent.replace(
           "<title>HackerNews x Meact.js</title>",
-          pageServerData.meta
+          pageServerData.metaTagsForThisPage
         );
       }
+
+      indexHtmlContent = indexHtmlContent.replaceAll(
+        "__PAGE_LOADER_DATA_MAP__",
+        JSON.stringify(Object.fromEntries(pageServerData.loaderDataMap))
+      );
     }
 
     return indexHtmlContent;
@@ -75,27 +76,52 @@ async function getPageServerData(
   pageName: string,
   request: Request
 ): Promise<{
-  loader: object | null;
-  meta: string | null;
+  loaderDataMap: Map<string, any>;
+  metaTagsForThisPage: string | null;
 } | null> {
-  const pageServerModulePath = join(
-    SERVER_API_ROUTES_DIRECTORY_RELATIVE,
-    `${pageName}.ts`
-  );
+  const serverSideHandlersForThisPage =
+    mapOfComponentNameToServerSideHandlers.get(pageName);
+  if (serverSideHandlersForThisPage === undefined) return null;
 
-  if (!existsSync(pageServerModulePath)) {
-    return null;
+  // generate meta tags
+  let metaTagsForThisPage: null | string = null;
+  if (serverSideHandlersForThisPage.metaFn !== undefined) {
+    metaTagsForThisPage = await generateMetaTags(
+      serverSideHandlersForThisPage.metaFn
+    );
   }
 
-  // Dynamically import the module
-  const pageServerModule = await import(pageServerModulePath);
+  // generate loader data
+  const loaderDataMap = new Map<string, any>();
+  const thisPageComponentName = serverSideHandlersForThisPage.componentName;
 
-  const loaderFn = pageServerModule.loader;
-  const metaFn = pageServerModule.meta;
+  let componentsToRunLoadersFor =
+    runExtraLoadersFromComponentsForThisPage(pageName);
+  componentsToRunLoadersFor = [pageName, ...componentsToRunLoadersFor];
+
+  for await (const mapKey of componentsToRunLoadersFor) {
+    const serverSideHandlersForThisComponent =
+      mapOfComponentNameToServerSideHandlers.get(mapKey);
+    if (
+      serverSideHandlersForThisComponent === undefined ||
+      serverSideHandlersForThisComponent.loaderFn === undefined
+    )
+      continue;
+
+    const loaderData = await serverSideHandlersForThisComponent.loaderFn({
+      request,
+    });
+
+    if (loaderData) {
+      const componentName =
+        mapKey === pageName ? thisPageComponentName : mapKey;
+      loaderDataMap.set(componentName, loaderData);
+    }
+  }
 
   return {
-    loader: typeof loaderFn === "function" ? await loaderFn({ request }) : null,
-    meta: typeof metaFn === "function" ? await generateMetaTags(metaFn) : null,
+    metaTagsForThisPage,
+    loaderDataMap,
   };
 }
 

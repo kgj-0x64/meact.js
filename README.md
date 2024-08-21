@@ -42,7 +42,8 @@ Meact.js = My (implementation of) React.js
 - [x] [Tree Shaking](https://github.com/evanw/esbuild/blob/main/docs/architecture.md#tree-shaking) (by routes)
 - [x] [Code splitting](https://github.com/evanw/esbuild/blob/main/docs/architecture.md#code-splitting) (chunks shared between routes)
 
-- [x] Meta Tags (Client side rehydration)
+- [x] Meta Tags (Server-side Hydration)
+- [x] Server-side Loader Pattern (Remix.js-like)
 
 ### Constraints
 
