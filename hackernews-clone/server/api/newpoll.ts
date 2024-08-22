@@ -1,4 +1,4 @@
-import { MeactMeta } from "@meact-framework/client";
+import type { MeactMeta } from "@meact-framework/server";
 
 export const componentName = "NewPollPage";
 

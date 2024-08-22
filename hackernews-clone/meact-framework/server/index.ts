@@ -8,6 +8,10 @@ import {
 // ! Userland (user of framework) plug of server for initialization of resources
 import "../../app.server.ts";
 
+// import types to export
+import type { MeactMeta, MeactLoader } from "./types.ts";
+export { MeactMeta, MeactLoader };
+
 // Create an Express application
 const app = express();
 

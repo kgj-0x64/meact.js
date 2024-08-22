@@ -24,7 +24,8 @@ interface MetaTagObject {
 type IMeactMetaArgs =
   | undefined
   | {
-      data: any;
+      req?: Request;
+      data?: object;
     };
 
 export type MeactMeta = (args: IMeactMetaArgs) => MetaTagObject[];

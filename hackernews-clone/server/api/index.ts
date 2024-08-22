@@ -1,12 +1,11 @@
-import { MeactMeta } from "@meact-framework/client";
+import type { MeactMeta, MeactLoader } from "@meact-framework/server";
 import { POSTS_PER_PAGE } from "../../app/config";
 import { IIndexPageLoader } from "../../app/pages";
-import { getSearchParamsFromRequest } from "../../app/utils/http-handlers";
+import { getUrlSearchParamsFromReq } from "app/utils/http-handlers";
 import { getPageNumberFromSearchParams } from "../../app/utils/news-page-number";
 import { feedService } from "../bootstrap.server";
 import { getSession, SessionCookieProperties } from "../cookies";
 import { FeedType } from "../models";
-import { MeactLoader } from "meact-framework/client/types";
 
 export const componentName = "IndexPage";
 
@@ -28,7 +27,7 @@ export const loader: MeactLoader<IIndexPageLoader> = async (
   const session = await getSession(req.headers.cookie);
   const userId = session.get(SessionCookieProperties.USER_ID);
 
-  const searchParams = getSearchParamsFromRequest(req);
+  const searchParams = getUrlSearchParamsFromReq(req);
   const pageNumber: number = getPageNumberFromSearchParams(searchParams);
 
   const first = POSTS_PER_PAGE;

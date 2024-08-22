@@ -1,10 +1,10 @@
-import { MeactMeta } from "@meact-framework/client";
+import type { MeactMeta } from "@meact-framework/server";
 
 export const componentName = "FromPage";
 
-export const meta: MeactMeta = () => {
-  const params = new URLSearchParams(window.location.search);
-  const site = params.get("site") || "site";
+export const meta: MeactMeta = (args) => {
+  const params = args && args.req ? args.req.query : null;
+  const site = (params && params.site) || "site";
 
   return [{ title: { text: `Submissions from ${site} | Hacker News Clone` } }];
 };

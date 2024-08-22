@@ -1,7 +1,7 @@
 import { readFileSync, existsSync } from "fs";
 import { join } from "path";
 import { Request } from "express";
-import { MeactMeta } from "../client/index.js";
+import type { MeactMeta } from "./types.js";
 import {
   MEACT_FRAMEWORK_SERVER_DIRECTORY,
   DIST_OUTPUT_DIRECTORY,
@@ -127,7 +127,10 @@ async function getPageServerData(req: Request): Promise<{
   if (serverSideHandlersForThisPage.meta !== undefined) {
     metaTagsForThisPage = await generateMetaTags(
       serverSideHandlersForThisPage.meta,
-      loaderDataMap.get(thisPageComponentName)
+      {
+        req,
+        thisPageLoaderData: loaderDataMap.get(thisPageComponentName),
+      }
     );
   }
 
@@ -139,9 +142,10 @@ async function getPageServerData(req: Request): Promise<{
 
 async function generateMetaTags(
   meta: MeactMeta,
-  thisPageLoaderData: any
+  { req, thisPageLoaderData }: { req: Request; thisPageLoaderData: any }
 ): Promise<string | null> {
   const metaArray = meta({
+    req,
     data: thisPageLoaderData,
   });
 

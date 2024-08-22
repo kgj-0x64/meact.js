@@ -1,8 +1,7 @@
-import { MeactMeta } from "@meact-framework/client";
-import { Request } from "express";
+import type { MeactMeta, MeactLoader } from "@meact-framework/server";
 import { POSTS_PER_PAGE } from "../../app/config";
 import { IJobsPageLoader } from "../../app/pages/jobs";
-import { getSearchParamsFromRequest } from "../../app/utils/http-handlers";
+import { getUrlSearchParamsFromReq } from "app/utils/http-handlers";
 import { getPageNumberFromSearchParams } from "../../app/utils/news-page-number";
 import { feedService } from "../bootstrap.server";
 import { getSession, SessionCookieProperties } from "../cookies";
@@ -18,15 +17,15 @@ export const meta: MeactMeta = () => [
   },
 ];
 
-export const loader = async ({
-  request,
-}: {
-  request: Request;
-}): Promise<IJobsPageLoader> => {
-  const session = await getSession(request.headers.cookie);
+export const loader: MeactLoader<IJobsPageLoader> = async (
+  args
+): Promise<IJobsPageLoader> => {
+  const { req } = args;
+
+  const session = await getSession(req.headers.cookie);
   const userId = session.get(SessionCookieProperties.USER_ID);
 
-  const searchParams = getSearchParamsFromRequest(request);
+  const searchParams = getUrlSearchParamsFromReq(req);
   const pageNumber: number = getPageNumberFromSearchParams(searchParams);
 
   const first = POSTS_PER_PAGE;

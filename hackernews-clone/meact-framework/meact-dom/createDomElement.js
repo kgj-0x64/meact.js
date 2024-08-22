@@ -16,6 +16,19 @@ export function createBrowserDomForMeactElement(
 ) {
   /// render tree nodes which is not meant for browser DOM
 
+  if ("dangerouslySetInnerHTML" in meactElement.props) {
+    const htmlText = meactElement.props.dangerouslySetInnerHTML.__html;
+
+    // let's add it to the browser DOM
+    const dangerouslySetElement = document.createElement(meactElement.type);
+    dangerouslySetElement.setAttribute(elementRenderId, meactElement.id);
+
+    // set its inner HTML content directly
+    dangerouslySetElement.innerHTML = htmlText;
+
+    return dangerouslySetElement;
+  }
+
   if (meactElement.type === "MeactTextElement") {
     // ! BUG: when overwriting `innerHTML` so as to handle both Unicode characters and HTML entities
     // ```createElement("b", null, "Note: ", createElement("code", null, "filterTodos"), " is artificially slowed down!")```

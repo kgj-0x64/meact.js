@@ -1,5 +1,4 @@
 import { hydrate } from "./client.js";
-import { MeactMeta } from "./types.ts";
 import { useCurrComponent, useLoaderData } from "./hooks.ts";
 import {
   json,
@@ -10,7 +9,6 @@ import {
 } from "./responses.js";
 
 export {
-  MeactMeta,
   useCurrComponent,
   useLoaderData,
   json,
