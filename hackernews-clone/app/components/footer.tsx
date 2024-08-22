@@ -15,7 +15,7 @@ export function Footer(): JSX.Element {
         </table>
         <br />
         <div style={{ textAlign: "center" }}>
-          <span class="yclinks">
+          <span className="yclinks">
             <a href="/newsguidelines">Guidelines</a>
             &nbsp;| <a href="/newsfaq">FAQ</a>
             &nbsp;| <a href="mailto:hn@ycombinator.com">Support</a>

@@ -28,42 +28,45 @@ export function ItemTitle(props: IItemTitleProps): JSX.Element {
   const hostname: string | undefined = url ? new URL(url).hostname : undefined;
 
   return (
-    <tr class="athing">
-      <td style={{ textAlign: "right", verticalAlign: "top" }} class="title">
-        <span class="rank">{isRankVisible ? `${rank}.` : <null />}</span>
+    <tr className="athing">
+      <td
+        style={{ textAlign: "right", verticalAlign: "top" }}
+        className="title"
+      >
+        <span className="rank">{isRankVisible ? `${rank}.` : <null />}</span>
       </td>
-      <td style={{ verticalAlign: "top" }} class="votelinks">
+      <td style={{ verticalAlign: "top" }} className="votelinks">
         <div style={{ textAlign: "center" }}>
           {isUpvoteVisible ? (
             <a
               href={`/vote?id=${id}&how=up&goto=${loc.pathname + loc.search}`}
-              class={upvoted ? "nosee" : " "}
+              className={upvoted ? "nosee" : " "}
               style={{ cursor: "pointer" }}
             >
-              <div class="votearrow" title="upvote" />
+              <div className="votearrow" title="upvote" />
             </a>
           ) : (
             <null />
           )}
         </div>
       </td>
-      <td class="title">
+      <td className="title">
         {url ? (
           <>
-            <a href={url} class="storylink">
+            <a href={url} className="storylink">
               {title}
             </a>
-            <span class="sitebit comhead">
+            <span className="sitebit comhead">
               {" "}
               (
               <a href={`/from?site=${hostname}`}>
-                <span class="sitestr">{hostname}</span>
+                <span className="sitestr">{hostname}</span>
               </a>
               )
             </span>
           </>
         ) : (
-          <a href={`/item?id=${id}`} class="storylink">
+          <a href={`/item?id=${id}`} className="storylink">
             {title}
           </a>
         )}

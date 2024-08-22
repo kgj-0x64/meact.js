@@ -44,6 +44,7 @@ Meact.js = My (implementation of) React.js
 
 - [x] Meta Tags (Server-side Hydration)
 - [x] Server-side Loader Pattern (Remix.js-like)
+- [x] Framework's Abstraction
 
 ### Constraints
 

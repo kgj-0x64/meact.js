@@ -10,7 +10,7 @@ export function FormatDocPage(): JSX.Element {
     >
       <tr>
         <td>
-          <span class="admin">
+          <span className="admin">
             <div style={{ textAlign: "center" }}>
               <table style={{ width: "500px" }}>
                 <tbody>

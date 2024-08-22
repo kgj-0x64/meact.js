@@ -130,7 +130,7 @@ export function NewsGuidelinesPage(): JSX.Element {
         </table>
       </p>
       <p>
-        <span class="foot">
+        <span className="foot">
           <br />
           <br />
         </span>

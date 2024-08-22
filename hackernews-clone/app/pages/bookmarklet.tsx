@@ -36,7 +36,7 @@ export function BookmarkletPage(): JSX.Element {
           </tbody>
         </table>
         <p style={{ textAlign: "center" }}>
-          <span class="foot">
+          <span className="foot">
             <br />
             <br />
           </span>

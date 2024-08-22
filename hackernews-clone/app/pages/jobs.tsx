@@ -4,7 +4,7 @@ import { NewsFeed } from "../components/news-feed.js";
 import { usePageNumber } from "../custom-hooks/usePageNumber.js";
 import { POSTS_PER_PAGE } from "../config.js";
 import type { IStory } from "../../server/responses/index.js";
-import { useLoaderData } from "../../memix/client/useLoaderData.js";
+import { useLoaderData } from "@meact-framework/client";
 import sGif from "../../public/static/s.gif";
 
 export interface IJobsPageLoader {
@@ -12,7 +12,8 @@ export interface IJobsPageLoader {
 }
 
 export default function JobsPage(): JSX.Element {
-  const { stories } = useLoaderData<IJobsPageLoader>();
+  const loaderData = useLoaderData<IJobsPageLoader>();
+  const stories = loaderData?.stories;
   const pageNumber: number = usePageNumber();
 
   return (

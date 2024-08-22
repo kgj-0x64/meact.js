@@ -62,7 +62,7 @@ export function Header(props: IHeaderProps): JSX.Element {
                 }}
               >
                 {me ? (
-                  <span class="pagetop">
+                  <span className="pagetop">
                     <a href={`/user?id=${me.id}`}>{me.id}</a>
                     {` (${me.karma}) | `}
                     <a
@@ -72,7 +72,7 @@ export function Header(props: IHeaderProps): JSX.Element {
                     </a>
                   </span>
                 ) : (
-                  <span class="pagetop">
+                  <span className="pagetop">
                     <a href={`/login?goto=${currentUrl}`}>login</a>
                   </span>
                 )}

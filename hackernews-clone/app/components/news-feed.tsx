@@ -66,7 +66,7 @@ export function NewsFeed(props: INewsFeedProps): JSX.Element {
             borderCollapse: "collapse",
             borderSpacing: "0px",
           }}
-          class="itemlist"
+          className="itemlist"
         >
           <tbody>
             {notice ? notice : <null />}
@@ -102,21 +102,21 @@ export function NewsFeed(props: INewsFeedProps): JSX.Element {
                   <tr
                     key={`${newsItem.id}spacer`}
                     style={{ height: 5 }}
-                    class="spacer"
+                    className="spacer"
                   />,
                 ])}
               <tr
                 key="morespace"
                 style={{ height: "10px" }}
-                class="morespace"
+                className="morespace"
               />
               <tr key="morelinktr">
                 <td key="morelinkcolspan" colSpan={2} />
-                <td key="morelinktd" class="title">
+                <td key="morelinktd" className="title">
                   <a
                     href={`${currentPathname}?p=${nextPage}`}
                     key="morelink"
-                    class="morelink"
+                    className="morelink"
                     rel="nofollow"
                   >
                     More

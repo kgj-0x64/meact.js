@@ -11,8 +11,8 @@ export function HeaderLinks(props: IHeaderNavProps): JSX.Element {
   const { userId, currentUrl, isNavVisible, title } = props;
 
   return isNavVisible ? (
-    <span class="pagetop">
-      <b class="hnname">
+    <span className="pagetop">
+      <b className="hnname">
         <a href="/">{title}</a>
       </b>
       &nbsp;
@@ -24,7 +24,7 @@ export function HeaderLinks(props: IHeaderNavProps): JSX.Element {
       ) : (
         <null />
       )}
-      <a href="/newest" class={currentUrl === "/newest" ? "topsel" : ""}>
+      <a href="/newest" className={currentUrl === "/newest" ? "topsel" : ""}>
         new
       </a>
       {userId ? (
@@ -32,7 +32,7 @@ export function HeaderLinks(props: IHeaderNavProps): JSX.Element {
           {" | "}
           <a
             href={`/threads?id=${userId}`}
-            class={currentUrl === "/threads" ? "topsel" : ""}
+            className={currentUrl === "/threads" ? "topsel" : ""}
           >
             threads
           </a>
@@ -43,30 +43,30 @@ export function HeaderLinks(props: IHeaderNavProps): JSX.Element {
       {" | "}
       <a
         href="/newcomments"
-        class={currentUrl === "/newcomments" ? "topsel" : ""}
+        className={currentUrl === "/newcomments" ? "topsel" : ""}
       >
         comments
       </a>
       {" | "}
-      <a href="/show" class={currentUrl === "/show" ? "topsel" : ""}>
+      <a href="/show" className={currentUrl === "/show" ? "topsel" : ""}>
         show
       </a>
       {" | "}
-      <a href="/ask" class={currentUrl === "/ask" ? "topsel" : ""}>
+      <a href="/ask" className={currentUrl === "/ask" ? "topsel" : ""}>
         ask
       </a>
       {" | "}
-      <a href="/jobs" class={currentUrl === "/jobs" ? "topsel" : ""}>
+      <a href="/jobs" className={currentUrl === "/jobs" ? "topsel" : ""}>
         jobs
       </a>
       {" | "}
-      <a href="/submit" class={currentUrl === "/submit" ? "topsel" : ""}>
+      <a href="/submit" className={currentUrl === "/submit" ? "topsel" : ""}>
         submit
       </a>
       {currentUrl === "/best" ? (
         <>
           {" | "}
-          <a href="/best" class="topsel">
+          <a href="/best" className="topsel">
             best
           </a>
         </>
@@ -75,7 +75,7 @@ export function HeaderLinks(props: IHeaderNavProps): JSX.Element {
       )}
     </span>
   ) : (
-    <span class="pagetop">
+    <span className="pagetop">
       <b>{title}</b>
     </span>
   );

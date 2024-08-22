@@ -1,12 +1,11 @@
 import { JSX } from "@meact/jsx-runtime";
-import { useLoaderData } from "../../memix/client/useLoaderData.js";
+import { useLoaderData } from "@meact-framework/client";
 import { Footer } from "../components/footer.js";
 import { Header } from "../components/header.js";
 import { MeContext } from "../utils/context.js";
 import "../styles/news.css";
 
 interface IMainLayoutProps {
-  children?: JSX.Node;
   isNavVisible?: boolean;
   isUserVisible?: boolean;
   isFooterVisible?: boolean;
@@ -17,7 +16,9 @@ export interface IMainLoader {
   me: { id: string; karma: number } | undefined;
 }
 
-export function MainLayout(props: IMainLayoutProps): JSX.Element {
+export function MainLayout(
+  props: JSX.PropsWithChildren<IMainLayoutProps>
+): JSX.Element {
   const {
     children,
     isNavVisible = true,
@@ -25,7 +26,8 @@ export function MainLayout(props: IMainLayoutProps): JSX.Element {
     title = "Hacker News",
   } = props;
 
-  const { me } = useLoaderData<IMainLoader>();
+  const loaderData = useLoaderData<IMainLoader>();
+  const me = loaderData?.me;
 
   return (
     <MeContext.Provider value={me}>
@@ -46,7 +48,7 @@ export function MainLayout(props: IMainLayoutProps): JSX.Element {
           <tbody>
             <Header isNavVisible={!!isNavVisible} title={title!} />
             <tr id="pagespace" style={{ height: "10px" }} />
-            {...children}
+            {children}
             {isFooterVisible ? <Footer /> : <null />}
           </tbody>
         </table>

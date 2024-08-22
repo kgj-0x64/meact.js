@@ -22,7 +22,7 @@ interface UseMutationResult<T, V> {
 
 export function useMutation<T, V>(
   url: string,
-  method: "POST" | "PUT" | "PATCH" | "DELETE",
+  method: "POST" | "PUT" | "DELETE",
   options: UseMutationOptions<T> = {}
 ): UseMutationResult<T, V> {
   const { onSuccess, onError } = options;

@@ -2,11 +2,7 @@ import { JSX } from "@meact/jsx-runtime";
 import yc500Gif from "../../public/static/yc500.gif";
 import "../styles/yc.css";
 
-export interface INoticeLayoutProps {
-  children?: JSX.Node;
-}
-
-export function NoticeLayout(props: INoticeLayoutProps): JSX.Element {
+export function NoticeLayout(props: JSX.PropsWithChildren<{}>): JSX.Element {
   const { children } = props;
 
   return (
@@ -34,7 +30,7 @@ export function NoticeLayout(props: INoticeLayoutProps): JSX.Element {
               </a>
               <br />
               <br />
-              {...children}
+              {children}
             </td>
           </tr>
         </tbody>

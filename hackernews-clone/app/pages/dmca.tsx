@@ -37,7 +37,7 @@ export default function DmcaPage(): JSX.Element {
   return (
     <BlankLayout>
       <p
-        class="MsoNormal"
+        className="MsoNormal"
         style={{
           marginBottom: "15.0pt",
           lineHeight: "normal",
@@ -60,14 +60,14 @@ export default function DmcaPage(): JSX.Element {
           <b>Designated Agent</b>") is listed below.
         </span>
       </p>
-      <p class="MsoNormal" style={paragraphStyle}>
+      <p className="MsoNormal" style={paragraphStyle}>
         <b>
           <span style={bSpanStyle}>
             Reporting Instances of Copyright Infringement:
           </span>
         </b>
       </p>
-      <p class="MsoNormal" style={paragraphStyle2}>
+      <p className="MsoNormal" style={paragraphStyle2}>
         <span style={spanStyle}>
           If you believe that content residing or accessible on or through the
           our website (“Services”) infringes a copyright, please send a written
@@ -83,34 +83,34 @@ export default function DmcaPage(): JSX.Element {
         </span>
       </p>
       <ol style={{ marginTop: "0in" }} start={1} type="1">
-        <li class="MsoNormal" style={liStyle}>
+        <li className="MsoNormal" style={liStyle}>
           <span style={liSpanStyle}>
             Identification of the work or material being infringed.{" "}
             <i>&nbsp;</i>
           </span>
         </li>
-        <li class="MsoNormal" style={liStyle}>
+        <li className="MsoNormal" style={liStyle}>
           <span style={liSpanStyle}>
             Identification of the material that is claimed to be infringing,
             including its location, with sufficient detail so that Y Combinator
             is capable of finding it and verifying its existence.
           </span>
         </li>
-        <li class="MsoNormal" style={liStyle}>
+        <li className="MsoNormal" style={liStyle}>
           <span style={liSpanStyle}>
             Contact information for the notifying party (the "
             <b>Notifying Party</b>"), including name, address, telephone number
             and e-mail address.
           </span>
         </li>
-        <li class="MsoNormal" style={liStyle}>
+        <li className="MsoNormal" style={liStyle}>
           <span style={liSpanStyle}>
             A statement that the Notifying Party has a good faith belief that
             the material is not authorized by the copyright owner, its agent or
             law.
           </span>
         </li>
-        <li class="MsoNormal" style={liStyle}>
+        <li className="MsoNormal" style={liStyle}>
           <span style={liSpanStyle}>
             A statement made under penalty of perjury that the information
             provided in the notice is accurate and that the Notifying Party is
@@ -118,7 +118,7 @@ export default function DmcaPage(): JSX.Element {
             behalf of the copyright owner.
           </span>
         </li>
-        <li class="MsoNormal" style={liStyle}>
+        <li className="MsoNormal" style={liStyle}>
           <span style={liSpanStyle}>
             A signature of the copyright owner, or a person authorized to act on
             behalf of the owner of the copyright that has been allegedly
@@ -126,7 +126,7 @@ export default function DmcaPage(): JSX.Element {
           </span>
         </li>
       </ol>
-      <p class="MsoNormal" style={paragraphStyle2}>
+      <p className="MsoNormal" style={paragraphStyle2}>
         <span style={spanStyle}>
           After removing material pursuant to a valid DMCA notice, Y Combinator
           will notify the Subscriber responsible for the allegedly infringing
@@ -136,14 +136,14 @@ export default function DmcaPage(): JSX.Element {
           DMCA notifications.
         </span>
       </p>
-      <p class="MsoNormal" style={paragraphStyle}>
+      <p className="MsoNormal" style={paragraphStyle}>
         <b>
           <span style={bSpanStyle}>
             Submitting a DMCA Counter-Notification:
           </span>
         </b>
       </p>
-      <p class="MsoNormal" style={paragraphStyle2}>
+      <p className="MsoNormal" style={paragraphStyle2}>
         <span style={spanStyle}>
           If you believe you are the wrongful subject of a DMCA notification,
           you may file a counter-notification with Y Combinator by providing the
@@ -151,18 +151,18 @@ export default function DmcaPage(): JSX.Element {
         </span>
       </p>
       <ul style={{ listStyleType: "disc", marginTop: "0in" }}>
-        <li class="MsoNormal" style={liStyle}>
+        <li className="MsoNormal" style={liStyle}>
           <span style={liSpanStyle}>
             The specific URLs of material that Y Combinator has removed or to
             which Y Combinator has disabled access.
           </span>
         </li>
-        <li class="MsoNormal" style={liStyle}>
+        <li className="MsoNormal" style={liStyle}>
           <span style={liSpanStyle}>
             Your name, address, telephone number, and email address.
           </span>
         </li>
-        <li class="MsoNormal" style={liStyle}>
+        <li className="MsoNormal" style={liStyle}>
           <span style={liSpanStyle}>
             A statement that you consent to the jurisdiction of Federal District
             Court for the judicial district in which your address is located (or
@@ -172,7 +172,7 @@ export default function DmcaPage(): JSX.Element {
             notification or an agent of such person.
           </span>
         </li>
-        <li class="MsoNormal" style={liStyle}>
+        <li className="MsoNormal" style={liStyle}>
           <span style={liSpanStyle}>
             The following statement: "I swear, under penalty of perjury, that I
             have a good faith belief that the material was removed or disabled
@@ -180,11 +180,11 @@ export default function DmcaPage(): JSX.Element {
             removed or disabled."
           </span>
         </li>
-        <li class="MsoNormal" style={liStyle}>
+        <li className="MsoNormal" style={liStyle}>
           <span style={liSpanStyle}>Sign the written document.</span>
         </li>
       </ul>
-      <p class="MsoNormal" style={paragraphStyle2}>
+      <p className="MsoNormal" style={paragraphStyle2}>
         <span style={spanStyle}>
           Upon receipt of a valid counter-notification, Y Combinator will
           forward it to Notifying Party who submitted the original DMCA
@@ -195,12 +195,12 @@ export default function DmcaPage(): JSX.Element {
           within ten (10) days, we may restore the material to the Services.
         </span>
       </p>
-      <p class="MsoNormal" style={paragraphStyle}>
+      <p className="MsoNormal" style={paragraphStyle}>
         <b>
           <span style={bSpanStyle}>Designated Agent</span>
         </b>
       </p>
-      <p class="MsoNormal" style={paragraphStyle2}>
+      <p className="MsoNormal" style={paragraphStyle2}>
         <span style={spanStyle}>
           Y Combinator
           <br />
@@ -212,7 +212,7 @@ export default function DmcaPage(): JSX.Element {
           <br />
         </span>
       </p>
-      <p class="MsoNormal">&nbsp;</p>
+      <p className="MsoNormal">&nbsp;</p>
     </BlankLayout>
   );
 }

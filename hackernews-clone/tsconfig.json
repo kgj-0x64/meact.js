@@ -1,7 +1,7 @@
 {
   "include": [
-    "index.ts",
-    "middleware.ts",
+    "meact-framework/server/index.ts",
+    "memix/server/middleware.ts",
     "server/**/*.ts",
     "**/*.ts",
     "**/*.tsx"
@@ -21,9 +21,11 @@
     "jsx": "preserve",
     "jsxImportSource": "@meact",
     "paths": {
-      "@meact/jsx-runtime": ["./meact/jsx-runtime.d.ts"],
-      "@meact": ["./meact/index.d.ts"],
-      "@meact-csr": ["./meact-csr/index.d.ts"]
+      "@meact/jsx-runtime": ["./meact-framework/meact/jsx-runtime.d.ts"],
+      "@meact": ["./meact-framework/meact/index.d.ts"],
+      "@meact-dom": ["./meact-framework/meact-dom/index.d.ts"],
+      "@meact-framework/client": ["./meact-framework/client/index.ts"],
+      "@meact-framework/server": ["./meact-framework/server/index.ts"]
     },
 
     "noEmit": true

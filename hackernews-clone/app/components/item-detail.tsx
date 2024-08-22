@@ -32,8 +32,8 @@ export function ItemDetail(props: IItemDetailProps): JSX.Element {
   return isJobListing ? (
     <tr>
       <td colSpan={2} />
-      <td class="subtext">
-        <span class="age">
+      <td className="subtext">
+        <span className="age">
           <a href={`/item?id=${id}`}>{convertNumberToTimeAgo(creationTime)}</a>
         </span>
       </td>
@@ -41,13 +41,13 @@ export function ItemDetail(props: IItemDetailProps): JSX.Element {
   ) : (
     <tr>
       <td colSpan={2} />
-      <td class="subtext">
-        <span class="score">{upvoteCount} points</span>
+      <td className="subtext">
+        <span className="score">{upvoteCount} points</span>
         {" by "}
-        <a href={`/user?id=${submitterId}`} class="hnuser">
+        <a href={`/user?id=${submitterId}`} className="hnuser">
           {submitterId}
         </a>{" "}
-        <span class="age">
+        <span className="age">
           <a href={`/item?id=${id}`}>{convertNumberToTimeAgo(creationTime)}</a>
         </span>
         {" | "}

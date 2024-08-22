@@ -11,15 +11,12 @@
     "react"
   ],
   "type": "module",
-  "imports": {
-    "#meact-csr/server.js": "./meact-csr/server.js"
-  },
   "main": "index.js",
   "scripts": {
-    "build-client": "node --env-file=.env esbuild.config.js",
-    "build-memix": "tsx --env-file=.env memix.build.ts",
-    "build": "npm run build-memix && npm run build-client",
-    "start": "tsx --env-file=.env index.ts",
+    "build-client": "tsx --env-file=.env meact-framework/server/esbuild.config.js",
+    "build-server": "tsx --env-file=.env meact-framework/server/framework.build.ts",
+    "build": "npm run build-server && npm run build-client",
+    "start": "tsx --env-file=.env meact-framework/server/index.ts",
     "serve": "npm run build && npm run start",
     "ts:check": "tsc --noEmit",
     "prettier:check": "prettier --check .",

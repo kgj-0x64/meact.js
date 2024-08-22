@@ -14,7 +14,7 @@ function PasswordRecoveryPage(): JSX.Element {
         <tr style={{ height: 10 }} />
         <tr>
           <td>
-            <span class="admin">
+            <span className="admin">
               <table style={{ width: 500 }}>
                 <tbody>
                   <tr>
