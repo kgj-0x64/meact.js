@@ -27,6 +27,13 @@ export async function buildMeactFrameworkServerSideHandlersMap() {
     // Dynamically import the module
     const fileModule = await import(importPath); // relative path
 
+    // sanity check
+    if (!("componentName" in fileModule)) {
+      throw new Error(
+        `server/api/${file} is missing export of "componentName" value`
+      );
+    }
+
     const fileModuleExports = ["componentName", "meta", "loader", "action"]
       .filter((name) => name in fileModule)
       .map((exportedName) => `${exportedName}: ${fileName}.${exportedName},`);

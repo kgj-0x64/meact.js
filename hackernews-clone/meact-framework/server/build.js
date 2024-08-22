@@ -8,9 +8,13 @@
 import * as upvoted from "../../server/api/upvoted.ts";
 import * as threads from "../../server/api/threads.ts";
 import * as submitted from "../../server/api/submitted.ts";
+import * as shownew from "../../server/api/shownew.ts";
+import * as show from "../../server/api/show.ts";
 import * as noobstories from "../../server/api/noobstories.ts";
 import * as noobcomments from "../../server/api/noobcomments.ts";
 import * as newpoll from "../../server/api/newpoll.ts";
+import * as newest from "../../server/api/newest.ts";
+import * as newcomments from "../../server/api/newcomments.ts";
 import * as lists from "../../server/api/lists.ts";
 import * as leaders from "../../server/api/leaders.ts";
 import * as jobs from "../../server/api/jobs.ts";
@@ -26,6 +30,8 @@ import * as dmca from "../../server/api/dmca.ts";
 import * as changepw from "../../server/api/changepw.ts";
 import * as bookmarklet from "../../server/api/bookmarklet.ts";
 import * as bestcomments from "../../server/api/bestcomments.ts";
+import * as best from "../../server/api/best.ts";
+import * as ask from "../../server/api/ask.ts";
 import * as active from "../../server/api/active.ts";
 
     export const mapOfComponentNameToServerSideHandlers = new Map([
@@ -58,6 +64,22 @@ meta: submitted.meta,
       },
     ],
 [
+      "shownew",
+      {
+        componentName: shownew.componentName,
+meta: shownew.meta,
+loader: shownew.loader,
+      },
+    ],
+[
+      "show",
+      {
+        componentName: show.componentName,
+meta: show.meta,
+loader: show.loader,
+      },
+    ],
+[
       "noobstories",
       {
         componentName: noobstories.componentName,
@@ -76,6 +98,22 @@ meta: noobcomments.meta,
       {
         componentName: newpoll.componentName,
 meta: newpoll.meta,
+      },
+    ],
+[
+      "newest",
+      {
+        componentName: newest.componentName,
+meta: newest.meta,
+loader: newest.loader,
+      },
+    ],
+[
+      "newcomments",
+      {
+        componentName: newcomments.componentName,
+meta: newcomments.meta,
+loader: newcomments.loader,
       },
     ],
 [
@@ -184,6 +222,22 @@ meta: bookmarklet.meta,
       {
         componentName: bestcomments.componentName,
 meta: bestcomments.meta,
+      },
+    ],
+[
+      "best",
+      {
+        componentName: best.componentName,
+meta: best.meta,
+loader: best.loader,
+      },
+    ],
+[
+      "ask",
+      {
+        componentName: ask.componentName,
+meta: ask.meta,
+loader: ask.loader,
       },
     ],
 [
