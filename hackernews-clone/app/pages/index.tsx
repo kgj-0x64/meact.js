@@ -11,7 +11,9 @@ export interface IIndexPageLoader {
 }
 
 export default function IndexPage(): JSX.Element {
-  const { stories } = useLoaderData<IIndexPageLoader>();
+  const loaderData = useLoaderData<IIndexPageLoader>();
+  const stories = loaderData?.stories;
+
   const pageNumber: number = usePageNumber();
 
   return (

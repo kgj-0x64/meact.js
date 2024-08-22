@@ -35,3 +35,42 @@ export function getSearchParamsFromRequest(req: Request) {
   // Create a URL object and return the search params
   return new URL(fullUrl).searchParams;
 }
+
+/**
+ * Remix-like Response throwers for CatchBoundary rendering
+ */
+function isAsserted(value: any): boolean {
+  return value === undefined || value === null || value === false;
+}
+
+export function checkBadRequest(value: any, message: string): asserts value {
+  if (isAsserted(value)) {
+    throw new Response(message, { status: 400, statusText: "Bad Request" });
+  }
+
+  return;
+}
+
+export function checkUnauthorized(value: any, message: string): asserts value {
+  if (isAsserted(value)) {
+    throw new Response(message, { status: 401, statusText: "Not Authorized" });
+  }
+
+  return;
+}
+
+export function checkForbidden(value: any, message: string): asserts value {
+  if (isAsserted(value)) {
+    throw new Response(message, { status: 403, statusText: "Forbidden" });
+  }
+
+  return;
+}
+
+export function checkNotFound(value: any, message: string): asserts value {
+  if (isAsserted(value)) {
+    throw new Response(message, { status: 404, statusText: "Not Found" });
+  }
+
+  return;
+}

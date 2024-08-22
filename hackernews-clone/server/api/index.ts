@@ -1,5 +1,4 @@
-import { Request } from "express";
-import { MeactMeta } from "@meact-framework";
+import { MeactMeta } from "@meact-framework/client";
 import { POSTS_PER_PAGE } from "../../app/config";
 import { IIndexPageLoader } from "../../app/pages";
 import { getSearchParamsFromRequest } from "../../app/utils/http-handlers";
@@ -7,6 +6,7 @@ import { getPageNumberFromSearchParams } from "../../app/utils/news-page-number"
 import { feedService } from "../bootstrap.server";
 import { getSession, SessionCookieProperties } from "../cookies";
 import { FeedType } from "../models";
+import { MeactLoader } from "meact-framework/client/types";
 
 export const componentName = "IndexPage";
 
@@ -20,15 +20,15 @@ export const meta: MeactMeta = () => [
   },
 ];
 
-export const loader = async ({
-  request,
-}: {
-  request: Request;
-}): Promise<IIndexPageLoader> => {
-  const session = await getSession(request.headers.cookie);
+export const loader: MeactLoader<IIndexPageLoader> = async (
+  args
+): Promise<IIndexPageLoader> => {
+  const { req } = args;
+
+  const session = await getSession(req.headers.cookie);
   const userId = session.get(SessionCookieProperties.USER_ID);
 
-  const searchParams = getSearchParamsFromRequest(request);
+  const searchParams = getSearchParamsFromRequest(req);
   const pageNumber: number = getPageNumberFromSearchParams(searchParams);
 
   const first = POSTS_PER_PAGE;

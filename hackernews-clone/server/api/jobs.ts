@@ -1,4 +1,4 @@
-import { MeactMeta } from "@meact-framework";
+import { MeactMeta } from "@meact-framework/client";
 import { Request } from "express";
 import { POSTS_PER_PAGE } from "../../app/config";
 import { IJobsPageLoader } from "../../app/pages/jobs";

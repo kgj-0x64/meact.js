@@ -32,7 +32,7 @@ declare module "@meact/jsx-runtime" {
 
 declare namespace JSX {
   export type Element = TMeactElement;
-  export type Node = Element | Element[];
+  export type Node = Element[];
   export type PropsWithChildren<T> = T & {
     children?: Node;
   };

@@ -1,5 +1,5 @@
 import express from "express";
-import { prepareHtmlOnPageRequest } from "./middleware.ts";
+import { preparePageContentMiddleware } from "./server.middleware.ts";
 import {
   DIST_OUTPUT_DIRECTORY,
   PUBLIC_ASSETS_DIRECTORY,
@@ -18,15 +18,23 @@ app.use(express.static(DIST_OUTPUT_DIRECTORY));
 // Serve static files like "robots.txt" and logo assets from the "public" directory
 app.use(express.static(PUBLIC_ASSETS_DIRECTORY));
 
+// Middleware that applies to all routes except those starting with /api/ or /_
+app.use((req, res, next) => {
+  console.log(`LOG: Got ${req.method} request on ${req.path} at ${Date.now()}`);
+
+  if (!req.path.startsWith("/app") && !req.path.startsWith("/_")) {
+    return preparePageContentMiddleware(req, res, next);
+  }
+
+  next();
+});
+
 // check if the requested page exists
 app.get(["/", "/:pageName"], async (req, res) => {
-  const pageName = req.params.pageName || "index";
+  // Access the generated content from the middleware
+  const responseHtmlContent = req.preparedHtmlContent;
 
-  // Inject the correct JS and CSS files into the index.html content
-  const responseHtmlContent = await prepareHtmlOnPageRequest(pageName, req);
-
-  if (responseHtmlContent) {
-    // Serve static index.html
+  if (responseHtmlContent !== undefined && responseHtmlContent.length > 0) {
     // Send the modified HTML as the response
     res.send(responseHtmlContent);
   } else {

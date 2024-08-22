@@ -15,10 +15,13 @@ import { runExtraLoadersFromComponentsForThisPage } from "../../app/_app.js";
  * call this on server to prepare index.html content in response to a page request
  */
 export async function prepareHtmlOnPageRequest(
-  pageName: string,
-  request: Request
+  req: Request
 ): Promise<string | null> {
   try {
+    // Get the page name (path)
+    const pathName = req.path === "/" ? "/index" : req.path; // starts with "/"
+    const pageName = pathName.substring(1);
+
     let indexHtmlContent = readFileSync(
       // relative path "./index.html" is not working
       join(MEACT_FRAMEWORK_SERVER_DIRECTORY, "index.html"),
@@ -51,7 +54,7 @@ export async function prepareHtmlOnPageRequest(
     );
 
     // Run MeactMeta and Loader functions for the requested page and related components with their own Loader functions (if any)
-    const pageServerData = await getPageServerData(pageName, request);
+    const pageServerData = await getPageServerData(req);
     if (pageServerData) {
       if (pageServerData.metaTagsForThisPage) {
         indexHtmlContent = indexHtmlContent.replace(
@@ -70,29 +73,26 @@ export async function prepareHtmlOnPageRequest(
 
     return indexHtmlContent;
   } catch (error) {
-    console.error("An error occurred while loading assets:", error);
+    console.error(
+      `LOG: Error while preparing HTML content on ${req.method} ${req.path} request`,
+      error
+    );
     return null;
   }
 }
 
-async function getPageServerData(
-  pageName: string,
-  request: Request
-): Promise<{
+async function getPageServerData(req: Request): Promise<{
   loaderDataMap: Map<string, any>;
   metaTagsForThisPage: string | null;
 } | null> {
+  // Get the page name (path)
+  const pathName = req.path === "/" ? "/index" : req.path; // starts with "/"
+  const pageName = pathName.substring(1);
+
   const serverSideHandlersForThisPage =
     mapOfComponentNameToServerSideHandlers.get(pageName);
-  if (serverSideHandlersForThisPage === undefined) return null;
 
-  // generate meta tags
-  let metaTagsForThisPage: null | string = null;
-  if (serverSideHandlersForThisPage.metaFn !== undefined) {
-    metaTagsForThisPage = await generateMetaTags(
-      serverSideHandlersForThisPage.metaFn
-    );
-  }
+  if (serverSideHandlersForThisPage === undefined) return null;
 
   // generate loader data
   const loaderDataMap = new Map<string, any>();
@@ -105,21 +105,30 @@ async function getPageServerData(
   for await (const mapKey of componentsToRunLoadersFor) {
     const serverSideHandlersForThisComponent =
       mapOfComponentNameToServerSideHandlers.get(mapKey);
+
     if (
-      serverSideHandlersForThisComponent === undefined ||
-      serverSideHandlersForThisComponent.loaderFn === undefined
-    )
-      continue;
+      serverSideHandlersForThisComponent !== undefined &&
+      serverSideHandlersForThisComponent.loader !== undefined
+    ) {
+      const loaderData = await serverSideHandlersForThisComponent.loader({
+        req,
+      });
 
-    const loaderData = await serverSideHandlersForThisComponent.loaderFn({
-      request,
-    });
-
-    if (loaderData) {
-      const componentName =
-        mapKey === pageName ? thisPageComponentName : mapKey;
-      loaderDataMap.set(componentName, loaderData);
+      if (loaderData) {
+        const componentName =
+          mapKey === pageName ? thisPageComponentName : mapKey;
+        loaderDataMap.set(componentName, loaderData);
+      }
     }
+  }
+
+  // generate meta tags
+  let metaTagsForThisPage: null | string = null;
+  if (serverSideHandlersForThisPage.meta !== undefined) {
+    metaTagsForThisPage = await generateMetaTags(
+      serverSideHandlersForThisPage.meta,
+      loaderDataMap.get(thisPageComponentName)
+    );
   }
 
   return {
@@ -128,8 +137,13 @@ async function getPageServerData(
   };
 }
 
-async function generateMetaTags(metaFn: MeactMeta): Promise<string | null> {
-  const metaArray = metaFn();
+async function generateMetaTags(
+  meta: MeactMeta,
+  thisPageLoaderData: any
+): Promise<string | null> {
+  const metaArray = meta({
+    data: thisPageLoaderData,
+  });
 
   return metaArray
     .map((metaObj) => {

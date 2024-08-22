@@ -1,4 +1,4 @@
-import { MeactMeta } from "@meact-framework";
+import { MeactMeta } from "@meact-framework/client";
 
 export const componentName = "FavoritesPage";
 

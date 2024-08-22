@@ -45,7 +45,18 @@ const jsxExtension = {
 };
 
 const staticContentLoaders = {
-  // resolveExtensions: [".js", ".jsx", ".ts", ".tsx", ".css", ".gif", ".png", ".jpg", ".jpeg", ".svg"],
+  resolveExtensions: [
+    ".js",
+    ".jsx",
+    ".ts",
+    ".tsx",
+    ".css",
+    ".gif",
+    ".png",
+    ".jpg",
+    ".jpeg",
+    ".svg",
+  ],
   loader: {
     ".ts": "tsx",
     ".js": "jsx",
