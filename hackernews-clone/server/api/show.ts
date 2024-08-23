@@ -1,4 +1,4 @@
-import { MeactLoader, MeactMeta } from "@meact-framework/server";
+import { MeactLoader, MeactMeta } from "meact-framework/server-runtime";
 import { IShowPageLoader } from "../../app/pages/show";
 import { getUrlSearchParamsFromReq } from "../../app/utils/http-handlers";
 import { getPageNumberFromSearchParams } from "../../app/utils/news-page-number";

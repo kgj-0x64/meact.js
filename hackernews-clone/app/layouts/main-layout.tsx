@@ -1,5 +1,5 @@
 import { JSX } from "@meact/jsx-runtime";
-import { useLoaderData } from "@meact-framework/client";
+import { useLoaderData } from "@meact-framework/client-runtime";
 import { Footer } from "../components/footer.js";
 import { Header } from "../components/header.js";
 import { MeContext } from "../utils/context.js";

@@ -4,7 +4,7 @@ import { NewsFeed } from "../components/news-feed.js";
 import { usePageNumber } from "../custom-hooks/usePageNumber.js";
 import { POSTS_PER_PAGE } from "../config.js";
 import type { IStory } from "../../server/responses/index.js";
-import { useLoaderData } from "@meact-framework/client";
+import { useLoaderData } from "@meact-framework/client-runtime";
 
 export interface IIndexPageLoader {
   stories: (IStory | void)[];

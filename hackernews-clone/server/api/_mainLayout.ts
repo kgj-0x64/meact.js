@@ -1,4 +1,4 @@
-import type { MeactLoader } from "@meact-framework/server";
+import type { MeactLoader } from "meact-framework/server-runtime/index.js";
 import { getSession, SessionCookieProperties } from "../cookies/index.js";
 import { userService } from "../bootstrap.server.js";
 import { IMainLoader } from "../../app/layouts/main-layout.jsx";

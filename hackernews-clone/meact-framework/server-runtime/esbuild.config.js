@@ -18,7 +18,7 @@ const meactLibAlias = {
   "@meact": path.join(MEACT_LIB_DIRECTORY, "index.js"),
   "@meact/jsx-runtime": path.join(MEACT_LIB_DIRECTORY, "jsx-runtime.js"),
   "@meact-dom": path.join(MEACT_DOM_LIB_DIRECTORY, "index.js"),
-  "@meact-framework/client": path.join(
+  "@meact-framework/client-runtime": path.join(
     MEACT_FRAMEWORK_CLIENT_DIRECTORY,
     "index.js"
   ),

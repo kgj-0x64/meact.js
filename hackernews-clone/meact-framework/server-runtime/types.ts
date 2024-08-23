@@ -1,4 +1,5 @@
 import { Request } from "express";
+import { MeactJsonResponse } from "./responses";
 
 interface MetaTagAttributes {
   [key: string]: string;
@@ -34,4 +35,14 @@ interface IMeactLoaderArgs {
   req: Request;
 }
 
-export type MeactLoader<T> = (args: IMeactLoaderArgs) => Promise<T>;
+export type MeactLoader<T> = (
+  args: IMeactLoaderArgs
+) => Promise<T | MeactJsonResponse>;
+
+interface IMeactActionArgs {
+  req: Request;
+}
+
+export type MeactAction = (
+  args: IMeactActionArgs
+) => Promise<MeactJsonResponse>;

@@ -51,15 +51,20 @@ export function ItemDetail(props: IItemDetailProps): JSX.Element {
           <a href={`/item?id=${id}`}>{convertNumberToTimeAgo(creationTime)}</a>
         </span>
         {" | "}
-        {hidden ? (
-          <a href={`/hide?id=${id}&how=un&goto=news`} style={HIDE_BUTTON_STYLE}>
-            unhide
-          </a>
-        ) : (
-          <a href={`/hide?id=${id}&how=up&goto=news`} style={HIDE_BUTTON_STYLE}>
-            hide
-          </a>
-        )}
+        {
+          // TODO (since, not a priority rn)
+          /**
+            {hidden ? (
+              <a href={`/hide?id=${id}&how=un&goto=news`} style={HIDE_BUTTON_STYLE}>
+                unhide
+              </a>
+            ) : (
+              <a href={`/hide?id=${id}&how=up&goto=news`} style={HIDE_BUTTON_STYLE}>
+                hide
+              </a>
+            )}
+           */
+        }
         {isPostScrutinyVisible ? (
           <span>
             {" | "}

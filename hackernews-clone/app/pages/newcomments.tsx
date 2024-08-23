@@ -1,4 +1,4 @@
-import { useLoaderData } from "@meact-framework/client";
+import { useLoaderData } from "@meact-framework/client-runtime";
 import { JSX } from "@meact/jsx-runtime";
 import { MainLayout } from "../layouts/main-layout.js";
 import { Comments } from "../components/comments.js";

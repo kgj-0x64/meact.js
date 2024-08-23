@@ -1,4 +1,4 @@
-import type { MeactMeta } from "@meact-framework/server";
+import type { MeactMeta } from "meact-framework/server-runtime";
 
 export const componentName = "NoobCommentsPage";
 

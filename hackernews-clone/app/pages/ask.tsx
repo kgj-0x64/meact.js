@@ -1,4 +1,4 @@
-import { useLoaderData } from "@meact-framework/client";
+import { useLoaderData } from "@meact-framework/client-runtime";
 import { JSX } from "@meact/jsx-runtime";
 import { NewsFeed } from "../components/news-feed.js";
 import { POSTS_PER_PAGE } from "../config.js";

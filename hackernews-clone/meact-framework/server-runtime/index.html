@@ -9,7 +9,11 @@
     <link rel="stylesheet" href="styles/debugger.css" />
     <link rel="stylesheet" href="$stylesheetBundlePath" />
     <script type="module" src="$pageScriptBundlePath" defer></script>
-    <script type="module" src="meact-framework/client/client.js" defer></script>
+    <script
+      type="module"
+      src="meact-framework/client-runtime/client.js"
+      defer
+    ></script>
     <script id=""></script>
     <!-- https://stackoverflow.com/a/7956249/3083243 -->
     <!-- The type="application/json" is needed to prevent browser from parsing it while loading. -->
@@ -43,7 +47,7 @@
         window.currentPageModule = currentPageModule;
 
         const meactFrameworkClientModule = await import(
-          "./meact-framework/client/client.js"
+          "./meact-framework/client-runtime/client.js"
         );
         meactFrameworkClientModule.hydrate();
       }

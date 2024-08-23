@@ -7,7 +7,8 @@ import {
   DIST_OUTPUT_DIRECTORY,
   APP_DIRECTORY_NAME,
   PAGES_DIRECTORY_NAME,
-} from "../constants/fileAndDirectoryNameAndPaths.js";
+} from "../constants/fileAndDirectoryNameAndPaths.ts";
+// @ts-ignore
 import { mapOfComponentNameToServerSideHandlers } from "./build.js";
 import { runExtraLoadersFromComponentsForThisPage } from "../../app/_app.js";
 

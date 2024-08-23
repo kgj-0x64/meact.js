@@ -4,7 +4,7 @@ import { writeFileSync } from "fs";
 import {
   SERVER_API_DIRECTORY,
   MEACT_FRAMEWORK_SERVER_DIRECTORY,
-} from "../constants/fileAndDirectoryNameAndPaths.js";
+} from "../constants/fileAndDirectoryNameAndPaths.ts";
 
 export async function buildMeactFrameworkServerSideHandlersMap() {
   console.log("Meact app's server side handlers have to be registered...");

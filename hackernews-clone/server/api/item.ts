@@ -1,4 +1,7 @@
-import type { MeactMeta, MeactLoader } from "@meact-framework/server";
+import type {
+  MeactMeta,
+  MeactLoader,
+} from "meact-framework/server-runtime/index.js";
 import { IItemPageLoader } from "../../app/pages/item.js";
 import {
   checkBadRequest,

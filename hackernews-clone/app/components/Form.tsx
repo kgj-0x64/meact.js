@@ -1,5 +1,5 @@
 import { JSX } from "@meact/jsx-runtime";
-import { useMutation } from "../custom-hooks/useMutation";
+import { useMutation } from "../custom-hooks/useMutation.js";
 
 interface FormProps<T> {
   method: "POST" | "PUT" | "DELETE";

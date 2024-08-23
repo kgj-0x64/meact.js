@@ -1,4 +1,4 @@
-import { MeactMeta, MeactLoader } from "@meact-framework/server";
+import { MeactMeta, MeactLoader } from "meact-framework/server-runtime";
 import { commentService } from "../bootstrap.server";
 import { getSession, SessionCookieProperties } from "../cookies";
 import { INewCommentsPageLoader } from "../../app/pages/newcomments";

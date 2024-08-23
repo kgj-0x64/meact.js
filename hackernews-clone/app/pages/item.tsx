@@ -1,5 +1,5 @@
 import { JSX } from "@meact/jsx-runtime";
-import { useLoaderData } from "@meact-framework/client";
+import { useLoaderData } from "@meact-framework/client-runtime";
 import type { StoryModel } from "../../server/models/index.js";
 import { MainLayout } from "../layouts/main-layout.js";
 import { ItemWithComments } from "app/components/item-with-comments.js";

@@ -1,4 +1,4 @@
-import type { MeactMeta, MeactLoader } from "@meact-framework/server";
+import type { MeactMeta, MeactLoader } from "meact-framework/server-runtime";
 import { POSTS_PER_PAGE } from "../../app/config";
 import { IIndexPageLoader } from "../../app/pages";
 import { getUrlSearchParamsFromReq } from "app/utils/http-handlers";

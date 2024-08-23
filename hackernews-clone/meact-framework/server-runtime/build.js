@@ -5,6 +5,7 @@
       *  
     */
     import * as _mainLayout from "../../server/api/_mainLayout.ts";
+import * as user from "../../server/api/user.ts";
 import * as upvoted from "../../server/api/upvoted.ts";
 import * as threads from "../../server/api/threads.ts";
 import * as submitted from "../../server/api/submitted.ts";
@@ -15,6 +16,8 @@ import * as noobcomments from "../../server/api/noobcomments.ts";
 import * as newpoll from "../../server/api/newpoll.ts";
 import * as newest from "../../server/api/newest.ts";
 import * as newcomments from "../../server/api/newcomments.ts";
+import * as logout from "../../server/api/logout.ts";
+import * as login from "../../server/api/login.ts";
 import * as lists from "../../server/api/lists.ts";
 import * as leaders from "../../server/api/leaders.ts";
 import * as jobs from "../../server/api/jobs.ts";
@@ -40,6 +43,14 @@ import * as active from "../../server/api/active.ts";
       {
         componentName: _mainLayout.componentName,
 loader: _mainLayout.loader,
+      },
+    ],
+[
+      "user",
+      {
+        componentName: user.componentName,
+meta: user.meta,
+loader: user.loader,
       },
     ],
 [
@@ -114,6 +125,22 @@ loader: newest.loader,
         componentName: newcomments.componentName,
 meta: newcomments.meta,
 loader: newcomments.loader,
+      },
+    ],
+[
+      "logout",
+      {
+        componentName: logout.componentName,
+action: logout.action,
+      },
+    ],
+[
+      "login",
+      {
+        componentName: login.componentName,
+meta: login.meta,
+loader: login.loader,
+action: login.action,
       },
     ],
 [
