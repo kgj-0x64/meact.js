@@ -1,5 +1,8 @@
-import type { MeactLoader } from "meact-framework/server-runtime/index.js";
-import { getSession, SessionCookieProperties } from "../cookies/index.js";
+import {
+  MeactLoader,
+  getSession,
+  SessionCookieProperties,
+} from "@meact-framework/server-runtime";
 import { userService } from "../bootstrap.server.js";
 import { IMainLoader } from "../../app/layouts/main-layout.jsx";
 
@@ -11,7 +14,7 @@ export const loader: MeactLoader<IMainLoader> = async (
   const { req } = args;
 
   const session = await getSession(req.headers.cookie);
-  const loggedInUserId = session.get(SessionCookieProperties.USER_ID);
+  const loggedInUserId = session.data[SessionCookieProperties.USER_ID];
   const loggedInUser = loggedInUserId
     ? await userService.getUser(loggedInUserId)
     : undefined;

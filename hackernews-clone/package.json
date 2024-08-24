@@ -26,6 +26,7 @@
   "dependencies": {
     "@firebase/app": "^0.10.9",
     "@firebase/database": "^1.0.7",
+    "body-parser": "^1.20.2",
     "cookie": "^0.6.0",
     "debug": "^4.3.6",
     "express": "^4.19.2",

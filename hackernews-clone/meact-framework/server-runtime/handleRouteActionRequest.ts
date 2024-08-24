@@ -6,9 +6,9 @@ import { mapOfComponentNameToServerSideHandlers } from "./build.js";
 /**
  * call this on server to prepare index.html content in response to a page request
  */
-export async function handleRouteActionRequest(
-  req: Request
-): Promise<MeactJsonResponse | MeactErrorResponse> {
+export async function handleRouteActionRequest(req: Request): Promise<{
+  routeActionData: MeactJsonResponse<any> | MeactErrorResponse;
+}> {
   try {
     // Get the page name (path)
     const pathName = req.path === "/" ? "/index" : req.path; // starts with "/"
@@ -21,22 +21,29 @@ export async function handleRouteActionRequest(
       serverSideHandlersForThisPage === undefined ||
       serverSideHandlersForThisPage.action === undefined
     ) {
-      return new MeactErrorResponse("Route does not exist", 404);
+      return {
+        routeActionData: new MeactErrorResponse("Route does not exist", 404),
+      };
     }
 
-    const actionData = await serverSideHandlersForThisPage.action({
-      req,
-    });
+    const actionData: MeactJsonResponse<any> | MeactErrorResponse =
+      await serverSideHandlersForThisPage.action({
+        req,
+      });
 
-    return actionData;
+    return {
+      routeActionData: actionData,
+    };
   } catch (error) {
     console.error(
       `LOG: Error while handling route action on ${req.method} ${req.path} request`,
       error
     );
-    return new MeactErrorResponse(
-      "Server failed to process this request, please try again",
-      500
-    );
+    return {
+      routeActionData: new MeactErrorResponse(
+        "Server failed to process this request, please try again",
+        500
+      ),
+    };
   }
 }

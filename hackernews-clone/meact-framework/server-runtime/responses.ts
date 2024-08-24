@@ -1,26 +1,32 @@
 const redirectStatusCodes = new Set([301, 302, 303, 307, 308]);
 
-export class MeactJsonResponse {
-  data: any;
-  setInHeaders: Record<string, any>;
-  status: number;
-  redirectToUrl?: string;
+export class MeactJsonResponse<T> {
+  data: T;
+  meta: {
+    setInHeaders: Record<string, any>;
+    status: number;
+    redirectToUrl?: string;
+  } | null;
 
   constructor(
-    data: any,
+    data: T,
     setInHeaders: Record<string, any>,
     status: number,
     redirectToUrl?: string
   ) {
     this.data = data;
-    this.setInHeaders = setInHeaders;
-    this.status = status;
-    this.redirectToUrl = redirectToUrl;
+    this.meta = {
+      setInHeaders,
+      status,
+      redirectToUrl,
+    };
   }
 
   isRedirectResponse(): boolean {
     return (
-      this.redirectToUrl !== undefined && redirectStatusCodes.has(this.status)
+      this.meta !== null &&
+      this.meta.redirectToUrl !== undefined &&
+      redirectStatusCodes.has(this.meta.status)
     );
   }
 }
@@ -42,7 +48,7 @@ export class MeactErrorResponse {
 export function makeJsonResponse<T>(
   data: T,
   updateInHeaders?: Record<string, any>
-): MeactJsonResponse {
+): MeactJsonResponse<T> {
   const jsonContentType = { "Content-Type": "application/json; charset=utf-8" };
   const setInHeaders =
     updateInHeaders === undefined
@@ -63,7 +69,7 @@ export function makeRedirectResponse(
   url: string,
   updateInHeaders?: Record<string, any>,
   statusCode: number = 302
-): MeactJsonResponse {
+): MeactJsonResponse<null> {
   const setInHeaders = updateInHeaders === undefined ? {} : updateInHeaders;
 
   return new MeactJsonResponse(null, setInHeaders, statusCode, url);

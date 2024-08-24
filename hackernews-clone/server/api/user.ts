@@ -1,4 +1,4 @@
-import { MeactLoader, MeactMeta } from "meact-framework/server-runtime";
+import { MeactLoader, MeactMeta } from "@meact-framework/server-runtime";
 import {
   checkBadRequest,
   checkNotFound,

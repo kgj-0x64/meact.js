@@ -1,4 +1,5 @@
 import express from "express";
+import bodyParser from "body-parser";
 import {
   preparePageContentMiddleware,
   handleRouteActionMiddleware,
@@ -22,6 +23,15 @@ app.use(express.static(DIST_OUTPUT_DIRECTORY));
 // Serve static files like "robots.txt" and logo assets from the "public" directory
 app.use(express.static(PUBLIC_ASSETS_DIRECTORY));
 
+// middleware to parse incoming requests with URL-encoded payloads,
+// which are typically sent by traditional HTML forms using the "application/x-www-form-urlencoded" content type
+app.use(bodyParser.urlencoded({ extended: true }));
+
+// middleware to parse incoming requests with JSON payloads,
+// which are typically sent by APIs or applications using the "application/json" content type
+// it makes parsed JSON object available on `req.body` as a JavaScript object
+app.use(bodyParser.json());
+
 // custom middleware
 app.use(async (req, res, next) => {
   console.log(`LOG: Got ${req.method} ${req.path} request at ${Date.now()}`);
@@ -36,9 +46,9 @@ app.use(async (req, res, next) => {
   }
 
   // Handle the request with exactly one path segment
-  if (req.method === "GET" && !req.path.startsWith("/_")) {
+  if (req.method === "GET") {
     await preparePageContentMiddleware(req, res, next);
-  } else if (req.method === "POST" && !req.path.startsWith("/_")) {
+  } else if (req.method === "POST") {
     await handleRouteActionMiddleware(req, res, next);
   }
 
@@ -51,6 +61,23 @@ app.get(["/", "/:pageName"], async (req, res) => {
   const responseHtmlContent = req._preparedHtmlContent;
 
   if (responseHtmlContent !== undefined && responseHtmlContent.length > 0) {
+    // set header properties, if any
+    // Access the generated content from the loader
+    const jsonResponseContent: MeactJsonResponse | MeactErrorResponse =
+      req._preparedJsonResponseContent;
+    console.log("jsonResponseContent", jsonResponseContent);
+
+    if (jsonResponseContent instanceof MeactErrorResponse) {
+      res.status(jsonResponseContent.status).send(jsonResponseContent.message);
+      return;
+    }
+
+    for (const [key, value] of Object.entries(jsonResponseContent)) {
+      console.log(`Key: ${key}, Value: ${value}`);
+      // Manually set the header properties e.g. "Set-Cookie"
+      res.setHeader(key, value);
+    }
+
     // Send the modified HTML as the response
     res.send(responseHtmlContent);
   } else {
@@ -61,7 +88,7 @@ app.get(["/", "/:pageName"], async (req, res) => {
 
 /// POST requests
 app.post(["/login", "/logout"], async (req, res) => {
-  // Access the generated content from the middleware
+  // Access the generated content from the action
   const jsonResponseContent: MeactJsonResponse | MeactErrorResponse =
     req._preparedJsonResponseContent;
   console.log("jsonResponseContent", jsonResponseContent);

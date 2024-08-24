@@ -46,11 +46,12 @@ export async function handleRouteActionMiddleware(
       } request at ${Date.now()}`
     );
 
-    //
+    // Get response data from route's action handler
     const preparedJsonResponseContent = await handleRouteActionRequest(req);
 
     // Attach the generated content to the `req` object
-    req._preparedJsonResponseContent = preparedJsonResponseContent;
+    req._preparedJsonResponseContent =
+      preparedJsonResponseContent.routeActionData;
 
     console.log(
       `LOG: Prepared JSON content for ${req.method} ${

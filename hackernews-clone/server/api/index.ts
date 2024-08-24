@@ -1,10 +1,16 @@
-import type { MeactMeta, MeactLoader } from "meact-framework/server-runtime";
+import {
+  MeactMeta,
+  MeactLoader,
+  getSession,
+  SessionCookieProperties,
+  MeactJsonResponse,
+  makeJsonResponse,
+} from "@meact-framework/server-runtime";
 import { POSTS_PER_PAGE } from "../../app/config";
 import { IIndexPageLoader } from "../../app/pages";
 import { getUrlSearchParamsFromReq } from "app/utils/http-handlers";
 import { getPageNumberFromSearchParams } from "../../app/utils/news-page-number";
 import { feedService } from "../bootstrap.server";
-import { getSession, SessionCookieProperties } from "../cookies";
 import { FeedType } from "../models";
 
 export const componentName = "IndexPage";
@@ -21,11 +27,11 @@ export const meta: MeactMeta = () => [
 
 export const loader: MeactLoader<IIndexPageLoader> = async (
   args
-): Promise<IIndexPageLoader> => {
+): Promise<MeactJsonResponse<IIndexPageLoader>> => {
   const { req } = args;
 
   const session = await getSession(req.headers.cookie);
-  const userId = session.get(SessionCookieProperties.USER_ID);
+  const userId = session.data[SessionCookieProperties.USER_ID];
 
   const searchParams = getUrlSearchParamsFromReq(req);
   const pageNumber: number = getPageNumberFromSearchParams(searchParams);
@@ -40,7 +46,5 @@ export const loader: MeactLoader<IIndexPageLoader> = async (
     userId
   );
 
-  return {
-    stories,
-  };
+  return makeJsonResponse<IIndexPageLoader>({ stories });
 };

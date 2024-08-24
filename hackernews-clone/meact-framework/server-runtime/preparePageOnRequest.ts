@@ -11,17 +11,37 @@ import {
 // @ts-ignore
 import { mapOfComponentNameToServerSideHandlers } from "./build.js";
 import { runExtraLoadersFromComponentsForThisPage } from "../../app/_app.js";
+import {
+  makeJsonResponse,
+  MeactErrorResponse,
+  MeactJsonResponse,
+} from "./responses.ts";
 
 /**
  * call this on server to prepare index.html content in response to a page request
  */
-export async function prepareHtmlOnPageRequest(
-  req: Request
-): Promise<string | null> {
+export async function prepareHtmlOnPageRequest(req: Request): Promise<{
+  html: string | null;
+  routeLoaderData: MeactJsonResponse<any> | MeactErrorResponse;
+}> {
   try {
     // Get the page name (path)
     const pathName = req.path === "/" ? "/index" : req.path; // starts with "/"
     const pageName = pathName.substring(1);
+
+    // Check if this route is a valid page component
+    if (
+      !mapOfComponentNameToServerSideHandlers.has(pageName) ||
+      !mapOfComponentNameToServerSideHandlers.get(pageName).isPage
+    ) {
+      return {
+        html: null,
+        routeLoaderData: new MeactErrorResponse(
+          "Page does not exist at this route",
+          404
+        ),
+      };
+    }
 
     let indexHtmlContent = readFileSync(
       // relative path "./index.html" is not working
@@ -41,7 +61,13 @@ export async function prepareHtmlOnPageRequest(
 
     // Check if both the JS and CSS files for the requested page exist
     if (!existsSync(jsBundlePath)) {
-      return null;
+      return {
+        html: null,
+        routeLoaderData: new MeactErrorResponse(
+          "Page does not exist at this route",
+          404
+        ),
+      };
     }
 
     // Replace the placeholder values in the HTML
@@ -65,27 +91,37 @@ export async function prepareHtmlOnPageRequest(
       }
 
       indexHtmlContent = indexHtmlContent.replace(
-        `<script id="page-data" type="application/json"></script>`,
-        `<script id="page-data" type="application/json">${JSON.stringify(
+        `<script id="page-loader-data" type="application/json"></script>`,
+        `<script id="page-loader-data" type="application/json">${JSON.stringify(
           Object.fromEntries(pageServerData.loaderDataMap)
         )}</script>`
       );
     }
 
-    return indexHtmlContent;
+    return {
+      html: indexHtmlContent,
+      routeLoaderData: pageServerData.pageLoaderData,
+    };
   } catch (error) {
     console.error(
       `LOG: Error while preparing HTML content on ${req.method} ${req.path} request`,
       error
     );
-    return null;
+    return {
+      html: null,
+      routeLoaderData: new MeactErrorResponse(
+        "Server failed to process this request, please try again",
+        500
+      ),
+    };
   }
 }
 
 async function getPageServerData(req: Request): Promise<{
-  loaderDataMap: Map<string, any>;
   metaTagsForThisPage: string | null;
-} | null> {
+  pageLoaderData: MeactJsonResponse<any> | null;
+  loaderDataMap: Map<string, MeactJsonResponse<any>>;
+}> {
   // Get the page name (path)
   const pathName = req.path === "/" ? "/index" : req.path; // starts with "/"
   const pageName = pathName.substring(1);
@@ -93,11 +129,17 @@ async function getPageServerData(req: Request): Promise<{
   const serverSideHandlersForThisPage =
     mapOfComponentNameToServerSideHandlers.get(pageName);
 
-  if (serverSideHandlersForThisPage === undefined) return null;
+  if (serverSideHandlersForThisPage === undefined)
+    return {
+      metaTagsForThisPage: null,
+      pageLoaderData: null,
+      loaderDataMap: new Map(),
+    };
 
   // generate loader data
-  const loaderDataMap = new Map<string, any>();
+  const loaderDataMap = new Map<string, MeactJsonResponse<any>>();
   const thisPageComponentName = serverSideHandlersForThisPage.componentName;
+  let pageLoaderData: MeactJsonResponse<any> | null = null;
 
   let componentsToRunLoadersFor =
     runExtraLoadersFromComponentsForThisPage(pageName);
@@ -111,15 +153,19 @@ async function getPageServerData(req: Request): Promise<{
       serverSideHandlersForThisComponent !== undefined &&
       serverSideHandlersForThisComponent.loader !== undefined
     ) {
-      const loaderData = await serverSideHandlersForThisComponent.loader({
-        req,
-      });
+      const loaderData: MeactJsonResponse<any> =
+        await serverSideHandlersForThisComponent.loader({
+          req,
+        });
 
-      if (loaderData) {
-        const componentName =
-          mapKey === pageName ? thisPageComponentName : mapKey;
-        loaderDataMap.set(componentName, loaderData);
+      if (mapKey === pageName) {
+        pageLoaderData = loaderData;
       }
+      loaderData.meta = null;
+
+      const componentName =
+        mapKey === pageName ? thisPageComponentName : mapKey;
+      loaderDataMap.set(componentName, loaderData);
     }
   }
 
@@ -137,6 +183,7 @@ async function getPageServerData(req: Request): Promise<{
 
   return {
     metaTagsForThisPage,
+    pageLoaderData,
     loaderDataMap,
   };
 }

@@ -1,4 +1,5 @@
 import { useState } from "@meact";
+import { MeactJsonResponse } from "meact-framework/server-runtime/responses";
 
 export function useCurrComponent(): string {
   // @ts-ignore
@@ -6,23 +7,22 @@ export function useCurrComponent(): string {
   return meactAppNamespace["currExecutingComponentName"];
 }
 
-type UseLoaderDataState<T> = T | null;
-
 export function useLoaderData<T>() {
   // getting currently executing component's function from the global `window` namespace
   // where it has been set by the Meact.js library
   const currExecutingComponentName = useCurrComponent();
 
-  const targetScriptElement = document.getElementById("page-data");
+  const targetScriptElement = document.getElementById("page-loader-data");
   if (!targetScriptElement) return null;
   const pageData = targetScriptElement.textContent;
   if (!pageData) return null;
 
-  const loaderDataObject = JSON.parse(pageData);
+  const loaderDataObject: Record<string, MeactJsonResponse<any>> = JSON.parse(
+    pageData
+  );
 
-  const thisComponentLoaderData = loaderDataObject[currExecutingComponentName];
+  const thisComponentLoaderData: MeactJsonResponse<T> =
+    loaderDataObject[currExecutingComponentName];
 
-  const [data, _] = useState<UseLoaderDataState<T>>(thisComponentLoaderData);
-
-  return data;
+  return thisComponentLoaderData.data;
 }

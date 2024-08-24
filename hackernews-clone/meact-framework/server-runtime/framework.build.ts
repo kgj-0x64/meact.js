@@ -27,22 +27,34 @@ export async function buildMeactFrameworkServerSideHandlersMap() {
     // Dynamically import the module
     const fileModule = await import(importPath); // relative path
 
+    let isThisPageRoute = false;
+
     // sanity check
     if (!("componentName" in fileModule)) {
       throw new Error(
         `server/api/${file} is missing export of "componentName" value`
       );
+    } else {
+      isThisPageRoute =
+        fileModule["componentName"] &&
+        fileModule["componentName"].endsWith("Page");
     }
+
+    const mapKey = fileName.startsWith("_")
+      ? `${fileName}.componentName`
+      : `"${fileName}"`;
+
+    const isThisRouteForAPage =
+      "componentName" in fileModule && fileModule["componentName"];
 
     const fileModuleExports = ["componentName", "meta", "loader", "action"]
       .filter((name) => name in fileModule)
       .map((exportedName) => `${exportedName}: ${fileName}.${exportedName},`);
 
     const mapEntry = `[
-      ${
-        fileName.startsWith("_") ? `${fileName}.componentName` : `"${fileName}"`
-      },
+      ${mapKey},
       {
+        isPage: ${isThisPageRoute},
         ${fileModuleExports.join("\n")}
       },
     ],`;

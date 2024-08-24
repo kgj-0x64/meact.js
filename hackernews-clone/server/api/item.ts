@@ -1,7 +1,9 @@
-import type {
+import {
   MeactMeta,
   MeactLoader,
-} from "meact-framework/server-runtime/index.js";
+  getSession,
+  SessionCookieProperties,
+} from "@meact-framework/server-runtime";
 import { IItemPageLoader } from "../../app/pages/item.js";
 import {
   checkBadRequest,
@@ -9,7 +11,6 @@ import {
   getUrlSearchParamsFromReq,
   URLSearchParamFields,
 } from "../../app/utils/http-handlers.js";
-import { getSession, SessionCookieProperties } from "../cookies/index.js";
 import { newsItemService, commentService } from "../bootstrap.server.js";
 
 export const componentName = "ItemPage";
@@ -45,7 +46,7 @@ export const loader: MeactLoader<IItemPageLoader> = async (
   checkNotFound(newsItem, "News Item not found");
 
   const session = await getSession(req.headers.cookie);
-  const userId = session.get(SessionCookieProperties.USER_ID);
+  const userId = session.data[SessionCookieProperties.USER_ID];
 
   const comments = await commentService.getCommentTree(
     newsItem.comments,

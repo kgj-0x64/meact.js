@@ -1,4 +1,4 @@
-import type { MeactMeta } from "meact-framework/server-runtime";
+import type { MeactMeta } from "@meact-framework/server-runtime";
 import { getUrlSearchParamsFromReq } from "app/utils/http-handlers";
 
 export const componentName = "ThreadsPage";

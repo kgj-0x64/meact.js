@@ -40,8 +40,8 @@ function LoginPage(): JSX.Element {
 
   return (
     <BlankLayout>
-      {message && <p>{message}</p>}
-      {validationMessage && <p>{validationMessage}</p>}
+      {message ? <p>{message}</p> : <null />}
+      {validationMessage ? <p>{validationMessage}</p> : <null />}
       <b>Login</b>
       <br />
       <br />
@@ -88,7 +88,6 @@ function LoginPage(): JSX.Element {
         <br />
         <input type="submit" value="login" />
       </Form>
-      <a href="/forgot">Forgot your password?</a>
     </BlankLayout>
   );
 }

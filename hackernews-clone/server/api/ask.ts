@@ -1,10 +1,14 @@
-import { MeactLoader, MeactMeta } from "meact-framework/server-runtime";
+import {
+  MeactLoader,
+  MeactMeta,
+  getSession,
+  SessionCookieProperties,
+} from "@meact-framework/server-runtime";
 import { POSTS_PER_PAGE } from "../../app/config";
 import { IAskPageLoader } from "../../app/pages/ask";
 import { getUrlSearchParamsFromReq } from "../../app/utils/http-handlers";
 import { getPageNumberFromSearchParams } from "../../app/utils/news-page-number";
 import { feedService } from "../bootstrap.server";
-import { getSession, SessionCookieProperties } from "../cookies";
 import { FeedType } from "../models";
 
 export const componentName = "AskPage";
@@ -21,7 +25,7 @@ export const loader: MeactLoader<IAskPageLoader> = async (args) => {
   const { req } = args;
 
   const session = await getSession(req.headers.cookie);
-  const userId = session.get(SessionCookieProperties.USER_ID);
+  const userId = session.data[SessionCookieProperties.USER_ID];
 
   const searchParams = getUrlSearchParamsFromReq(req);
   const pageNumber: number = getPageNumberFromSearchParams(searchParams);
