@@ -85,6 +85,7 @@ function transformHtmlAttributeKey(attrKey) {
     maxLength: "maxlength",
     minLength: "minlength",
     autoComplete: "autocomplete",
+    autoCapitalize: "autocapitalize",
     autoFocus: "autofocus",
     spellCheck: "spellcheck",
     srcSet: "srcset",

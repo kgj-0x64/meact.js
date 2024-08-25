@@ -3,11 +3,12 @@ import {
   MeactLoader,
   getSession,
   SessionCookieProperties,
+  MeactJsonResponse,
+  makeDataResponse,
+  makeErrorResponse,
 } from "@meact-framework/server-runtime";
 import { IItemPageLoader } from "../../app/pages/item.js";
 import {
-  checkBadRequest,
-  checkNotFound,
   getUrlSearchParamsFromReq,
   URLSearchParamFields,
 } from "../../app/utils/http-handlers.js";
@@ -17,14 +18,17 @@ export const componentName = "ItemPage";
 
 export type PageLoaderDataType = IItemPageLoader;
 
-export const meta: MeactMeta = (args) => {
-  if (args && args.data) {
+export const meta: MeactMeta<IItemPageLoader | null> = (args) => {
+  if (
+    args &&
+    args.pageLoaderData &&
+    args.pageLoaderData.data &&
+    args.pageLoaderData.data.newsItem
+  ) {
     return [
       {
         title: {
-          text: `${
-            (args.data as IItemPageLoader).newsItem.title
-          } | Hacker News Clone`,
+          text: `${args.pageLoaderData.data.newsItem.title} | Hacker News Clone`,
         },
       },
     ];
@@ -33,26 +37,30 @@ export const meta: MeactMeta = (args) => {
   return [{ title: { text: "Story not found | Hacker News Clone" } }];
 };
 
-export const loader: MeactLoader<IItemPageLoader> = async (
+export const loader: MeactLoader<IItemPageLoader | null> = async (
   args
-): Promise<IItemPageLoader> => {
+): Promise<MeactJsonResponse<IItemPageLoader | null>> => {
   const { req } = args;
 
   const searchParams = getUrlSearchParamsFromReq(req);
   const newsItemId = searchParams.get(URLSearchParamFields.ID);
-  checkBadRequest(newsItemId, '"id" is required.');
+  if (!newsItemId) {
+    return makeErrorResponse('"id" is required.');
+  }
 
   const newsItem = await newsItemService.getStory(+newsItemId);
-  checkNotFound(newsItem, "News Item not found");
+  if (!newsItem) {
+    return makeErrorResponse("News Item not found");
+  }
 
   const session = await getSession(req.headers.cookie);
-  const userId = session.data[SessionCookieProperties.USER_ID];
+  const loggedInUserId = session.data[SessionCookieProperties.USER_ID];
 
   const comments = await commentService.getCommentTree(
     newsItem.comments,
-    userId
+    loggedInUserId
   );
   newsItem.comments = comments;
 
-  return { newsItem };
+  return makeDataResponse<IItemPageLoader>({ newsItem });
 };

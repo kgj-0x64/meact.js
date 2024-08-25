@@ -12,6 +12,8 @@ export function ItemPage(): JSX.Element {
   const loaderData = useLoaderData<IItemPageLoader>();
   const newsItem = loaderData?.newsItem;
 
+  if (newsItem === undefined) return <null />;
+
   return (
     <MainLayout>
       {newsItem === undefined ? (

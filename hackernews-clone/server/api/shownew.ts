@@ -3,6 +3,8 @@ import {
   MeactMeta,
   getSession,
   SessionCookieProperties,
+  MeactJsonResponse,
+  makeDataResponse,
 } from "@meact-framework/server-runtime";
 import { IShowNewPageLoader } from "../../app/pages/shownew";
 import { getUrlSearchParamsFromReq } from "../../app/utils/http-handlers";
@@ -13,7 +15,7 @@ import { POSTS_PER_PAGE } from "../../app/config";
 
 export const componentName = "ShowNewPage";
 
-export const meta: MeactMeta = () => [
+export const meta: MeactMeta<any> = () => [
   {
     title: {
       text: "New Show | Hacker News Clone",
@@ -21,11 +23,13 @@ export const meta: MeactMeta = () => [
   },
 ];
 
-export const loader: MeactLoader<IShowNewPageLoader> = async (args) => {
+export const loader: MeactLoader<IShowNewPageLoader> = async (
+  args
+): Promise<MeactJsonResponse<IShowNewPageLoader>> => {
   const { req } = args;
 
   const session = await getSession(req.headers.cookie);
-  const userId = session.data[SessionCookieProperties.USER_ID];
+  const loggedInUserId = session.data[SessionCookieProperties.USER_ID];
 
   const searchParams = getUrlSearchParamsFromReq(req);
   const pageNumber: number = getPageNumberFromSearchParams(searchParams);
@@ -33,7 +37,12 @@ export const loader: MeactLoader<IShowNewPageLoader> = async (args) => {
   const first = POSTS_PER_PAGE;
   const skip = POSTS_PER_PAGE * (pageNumber - 1);
 
-  return {
-    stories: await feedService.getForType(FeedType.SHOW, first, skip, userId),
-  };
+  return makeDataResponse({
+    stories: await feedService.getForType(
+      FeedType.SHOW,
+      first,
+      skip,
+      loggedInUserId
+    ),
+  });
 };

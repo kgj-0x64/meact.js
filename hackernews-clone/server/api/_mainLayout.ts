@@ -2,6 +2,8 @@ import {
   MeactLoader,
   getSession,
   SessionCookieProperties,
+  MeactJsonResponse,
+  makeDataResponse,
 } from "@meact-framework/server-runtime";
 import { userService } from "../bootstrap.server.js";
 import { IMainLoader } from "../../app/layouts/main-layout.jsx";
@@ -10,7 +12,7 @@ export const componentName = "MainLayout";
 
 export const loader: MeactLoader<IMainLoader> = async (
   args
-): Promise<IMainLoader> => {
+): Promise<MeactJsonResponse<IMainLoader>> => {
   const { req } = args;
 
   const session = await getSession(req.headers.cookie);
@@ -24,5 +26,5 @@ export const loader: MeactLoader<IMainLoader> = async (
       ? { id: loggedInUser.id, karma: loggedInUser.karma }
       : undefined;
 
-  return { me };
+  return makeDataResponse<IMainLoader>({ me });
 };

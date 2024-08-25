@@ -3,7 +3,7 @@ import { getUrlSearchParamsFromReq } from "app/utils/http-handlers";
 
 export const componentName = "ThreadsPage";
 
-export const meta: MeactMeta = (args) => {
+export const meta: MeactMeta<any> = (args) => {
   const req = args && args.req ? args.req : null;
   if (!req) return [];
 

@@ -1,4 +1,3 @@
-import { useState } from "@meact";
 import { MeactJsonResponse } from "meact-framework/server-runtime/responses";
 
 export function useCurrComponent(): string {

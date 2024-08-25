@@ -50,19 +50,23 @@ export function ItemDetail(props: IItemDetailProps): JSX.Element {
         <span className="age">
           <a href={`/item?id=${id}`}>{convertNumberToTimeAgo(creationTime)}</a>
         </span>
-        {" | "}
         {
           // TODO (since, not a priority rn)
           /**
-            {hidden ? (
-              <a href={`/hide?id=${id}&how=un&goto=news`} style={HIDE_BUTTON_STYLE}>
-                unhide
-              </a>
-            ) : (
-              <a href={`/hide?id=${id}&how=up&goto=news`} style={HIDE_BUTTON_STYLE}>
-                hide
-              </a>
-            )}
+            <span>
+              {" | "}
+              {
+                hidden ? (
+                  <a href={`/hide?id=${id}&how=un&goto=news`} style={HIDE_BUTTON_STYLE}>
+                    unhide
+                  </a>
+                ) : (
+                  <a href={`/hide?id=${id}&how=up&goto=news`} style={HIDE_BUTTON_STYLE}>
+                    hide
+                  </a>
+                )
+              }
+            </span>
            */
         }
         {isPostScrutinyVisible ? (
@@ -79,14 +83,16 @@ export function ItemDetail(props: IItemDetailProps): JSX.Element {
         ) : (
           <null />
         )}
-        {" | "}
-        <a href={`/item?id=${id}`}>
-          {commentCount === 0
-            ? "discuss"
-            : commentCount === 1
-            ? "1 comment"
-            : `${commentCount} comments`}
-        </a>
+        <span>
+          {" | "}
+          <a href={`/item?id=${id}`}>
+            {commentCount === 0
+              ? "discuss"
+              : commentCount === 1
+              ? "1 comment"
+              : `${commentCount} comments`}
+          </a>
+        </span>
         {isFavoriteVisible ? " | favorite" : <null />}
       </td>
     </tr>

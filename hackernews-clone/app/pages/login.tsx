@@ -27,11 +27,23 @@ function LoginPage(): JSX.Element {
 
   const [loginId, setLoginId] = useState<string>("");
   const [loginPassword, setLoginPassword] = useState<string>("");
+  const [registerId, setRegisterId] = useState<string>("");
+  const [registerPassword, setRegisterPassword] = useState<string>("");
   const [validationMessage, setValidationMessage] = useState<string>("");
 
   const validateLogin = (e: any): void => {
     try {
       validateNewUser({ id: loginId, password: loginPassword });
+      console.log("VALIDATED validateLogin");
+    } catch (err: any) {
+      e.preventDefault();
+      setValidationMessage(err.message);
+    }
+  };
+
+  const validateRegister = (e: any): void => {
+    try {
+      validateNewUser({ id: registerId, password: registerPassword });
     } catch (err: any) {
       e.preventDefault();
       setValidationMessage(err.message);
@@ -51,22 +63,22 @@ function LoginPage(): JSX.Element {
         onSubmit={(e): void => validateLogin(e)}
         style={{ marginBottom: "1em" }}
       >
-        <input type="hidden" name="goto" value={goto || "news"} />
+        <input name="goto" type="hidden" prop:value={goto || "news"} />
         <table style={{ border: "0px" }}>
           <tbody>
             <tr>
               <td>username:</td>
               <td>
                 <input
-                  autoCapitalize="off"
-                  autoCorrect="off"
                   name="id"
+                  type="text"
+                  size={20}
+                  autoCapitalize="off"
+                  spellCheck={false}
                   minLength={USERID_MIN_LENGTH}
                   maxLength={USERID_MAX_LENGTH}
-                  onChange={(e: any): void => setLoginId(e.target.value)}
-                  size={20}
-                  spellCheck={false}
-                  type="text"
+                  prop:value={loginId}
+                  prop:onChange={(e: any): void => setLoginId(e.target.value)}
                 />
               </td>
             </tr>
@@ -74,19 +86,77 @@ function LoginPage(): JSX.Element {
               <td>password:</td>
               <td>
                 <input
-                  type="password"
                   name="password"
+                  type="password"
+                  size={20}
                   minLength={PASSWORD_MIN_LENGTH}
                   maxLength={PASSWORD_MAX_LENGTH}
-                  onChange={(e: any): void => setLoginPassword(e.target.value)}
-                  size={20}
+                  prop:value={loginPassword}
+                  prop:onChange={(e: any): void =>
+                    setLoginPassword(e.target.value)
+                  }
                 />
               </td>
             </tr>
           </tbody>
         </table>
         <br />
-        <input type="submit" value="login" />
+        <input type="submit" prop:value="login" />
+      </Form>
+      <a href="/forgot">Forgot your password?</a>
+      <br />
+      <br />
+      <b>Create Account</b>
+      <br />
+      <br />
+      <Form
+        method="POST"
+        action="/register"
+        onSubmit={(e): void => validateRegister(e)}
+        style={{ marginBottom: "1em" }}
+      >
+        <table style={{ border: "0px" }}>
+          <tbody>
+            <tr>
+              <td>username:</td>
+              <td>
+                <input
+                  name="id"
+                  type="text"
+                  size={20}
+                  autoComplete="off"
+                  autoCapitalize="off"
+                  spellCheck={false}
+                  minLength={USERID_MIN_LENGTH}
+                  maxLength={USERID_MAX_LENGTH}
+                  prop:value={registerId}
+                  prop:onChange={(e: any): void =>
+                    setRegisterId(e.target.value)
+                  }
+                />
+              </td>
+            </tr>
+            <tr>
+              <td>password:</td>
+              <td>
+                <input
+                  name="password"
+                  type="password"
+                  size={20}
+                  autoComplete="off"
+                  minLength={PASSWORD_MIN_LENGTH}
+                  maxLength={PASSWORD_MAX_LENGTH}
+                  prop:value={registerPassword}
+                  prop:onChange={(e: any): void =>
+                    setRegisterPassword(e.target.value)
+                  }
+                />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <br />
+        <input type="submit" prop:value="create account" />
       </Form>
     </BlankLayout>
   );

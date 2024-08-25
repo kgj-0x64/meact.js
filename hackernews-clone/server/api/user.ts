@@ -1,7 +1,11 @@
-import { MeactLoader, MeactMeta } from "@meact-framework/server-runtime";
 import {
-  checkBadRequest,
-  checkNotFound,
+  makeDataResponse,
+  makeErrorResponse,
+  MeactJsonResponse,
+  MeactLoader,
+  MeactMeta,
+} from "@meact-framework/server-runtime";
+import {
   getUrlSearchParamsFromReq,
   URLSearchParamFields,
 } from "../../app/utils/http-handlers";
@@ -10,7 +14,7 @@ import { IUserPageLoader } from "app/pages/user";
 
 export const componentName = "UserPage";
 
-export const meta: MeactMeta = (args) => {
+export const meta: MeactMeta<any> = (args) => {
   let idParam: string | null | undefined = "";
 
   const req = args?.req;
@@ -28,15 +32,21 @@ export const meta: MeactMeta = (args) => {
   ];
 };
 
-export const loader: MeactLoader<IUserPageLoader> = async (args) => {
+export const loader: MeactLoader<IUserPageLoader | null> = async (
+  args
+): Promise<MeactJsonResponse<IUserPageLoader | null>> => {
   const { req } = args;
 
   const searchParams = getUrlSearchParamsFromReq(req);
   const userId = searchParams.get(URLSearchParamFields.ID);
-  checkBadRequest(userId, '"id" must be provided.');
+  if (!userId) {
+    return makeErrorResponse('"id" must be provided.');
+  }
 
   const rawUser = await userService.getUser(userId);
-  checkNotFound(rawUser, "No such user.");
+  if (!rawUser) {
+    return makeErrorResponse("No such user.");
+  }
 
   const user = {
     id: rawUser.id,
@@ -46,5 +56,5 @@ export const loader: MeactLoader<IUserPageLoader> = async (args) => {
     karma: rawUser.karma,
   };
 
-  return { user };
+  return makeDataResponse({ user });
 };

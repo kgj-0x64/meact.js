@@ -12,17 +12,17 @@ import {
 import { mapOfComponentNameToServerSideHandlers } from "./build.js";
 import { runExtraLoadersFromComponentsForThisPage } from "../../app/_app.js";
 import {
-  makeJsonResponse,
-  MeactErrorResponse,
+  makeDataResponse,
+  makeErrorResponse,
   MeactJsonResponse,
 } from "./responses.ts";
 
 /**
  * call this on server to prepare index.html content in response to a page request
  */
-export async function prepareHtmlOnPageRequest(req: Request): Promise<{
+export async function preparePageContentOnRequest(req: Request): Promise<{
   html: string | null;
-  routeLoaderData: MeactJsonResponse<any> | MeactErrorResponse;
+  routeLoaderData: MeactJsonResponse<any>;
 }> {
   try {
     // Get the page name (path)
@@ -36,7 +36,7 @@ export async function prepareHtmlOnPageRequest(req: Request): Promise<{
     ) {
       return {
         html: null,
-        routeLoaderData: new MeactErrorResponse(
+        routeLoaderData: makeErrorResponse(
           "Page does not exist at this route",
           404
         ),
@@ -63,7 +63,7 @@ export async function prepareHtmlOnPageRequest(req: Request): Promise<{
     if (!existsSync(jsBundlePath)) {
       return {
         html: null,
-        routeLoaderData: new MeactErrorResponse(
+        routeLoaderData: makeErrorResponse(
           "Page does not exist at this route",
           404
         ),
@@ -109,7 +109,7 @@ export async function prepareHtmlOnPageRequest(req: Request): Promise<{
     );
     return {
       html: null,
-      routeLoaderData: new MeactErrorResponse(
+      routeLoaderData: makeErrorResponse(
         "Server failed to process this request, please try again",
         500
       ),
@@ -119,7 +119,7 @@ export async function prepareHtmlOnPageRequest(req: Request): Promise<{
 
 async function getPageServerData(req: Request): Promise<{
   metaTagsForThisPage: string | null;
-  pageLoaderData: MeactJsonResponse<any> | null;
+  pageLoaderData: MeactJsonResponse<any>;
   loaderDataMap: Map<string, MeactJsonResponse<any>>;
 }> {
   // Get the page name (path)
@@ -132,14 +132,17 @@ async function getPageServerData(req: Request): Promise<{
   if (serverSideHandlersForThisPage === undefined)
     return {
       metaTagsForThisPage: null,
-      pageLoaderData: null,
+      pageLoaderData: makeErrorResponse(
+        "A loader is not defined for this page",
+        404
+      ),
       loaderDataMap: new Map(),
     };
 
   // generate loader data
   const loaderDataMap = new Map<string, MeactJsonResponse<any>>();
   const thisPageComponentName = serverSideHandlersForThisPage.componentName;
-  let pageLoaderData: MeactJsonResponse<any> | null = null;
+  let pageLoaderData: MeactJsonResponse<any> = makeDataResponse(null);
 
   let componentsToRunLoadersFor =
     runExtraLoadersFromComponentsForThisPage(pageName);
@@ -161,6 +164,8 @@ async function getPageServerData(req: Request): Promise<{
       if (mapKey === pageName) {
         pageLoaderData = loaderData;
       }
+
+      // reset meta values so that they are not visible in the browser under that script tag
       loaderData.meta = null;
 
       const componentName =
@@ -176,7 +181,7 @@ async function getPageServerData(req: Request): Promise<{
       serverSideHandlersForThisPage.meta,
       {
         req,
-        thisPageLoaderData: loaderDataMap.get(thisPageComponentName),
+        thisPageLoaderData: pageLoaderData,
       }
     );
   }
@@ -189,12 +194,15 @@ async function getPageServerData(req: Request): Promise<{
 }
 
 async function generateMetaTags(
-  meta: MeactMeta,
-  { req, thisPageLoaderData }: { req: Request; thisPageLoaderData: any }
+  meta: MeactMeta<any>,
+  {
+    req,
+    thisPageLoaderData,
+  }: { req: Request; thisPageLoaderData: MeactJsonResponse<any> }
 ): Promise<string | null> {
   const metaArray = meta({
     req,
-    data: thisPageLoaderData,
+    pageLoaderData: thisPageLoaderData,
   });
 
   return metaArray

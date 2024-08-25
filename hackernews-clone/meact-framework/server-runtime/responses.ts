@@ -7,19 +7,20 @@ export class MeactJsonResponse<T> {
     status: number;
     redirectToUrl?: string;
   } | null;
+  error: MeactErrorResponse | null;
 
   constructor(
     data: T,
-    setInHeaders: Record<string, any>,
-    status: number,
-    redirectToUrl?: string
+    meta: {
+      setInHeaders: Record<string, any>;
+      status: number;
+      redirectToUrl?: string;
+    },
+    error: MeactErrorResponse | null
   ) {
     this.data = data;
-    this.meta = {
-      setInHeaders,
-      status,
-      redirectToUrl,
-    };
+    this.meta = meta;
+    this.error = error;
   }
 
   isRedirectResponse(): boolean {
@@ -31,13 +32,11 @@ export class MeactJsonResponse<T> {
   }
 }
 
-export class MeactErrorResponse {
+class MeactErrorResponse {
   message: string;
-  status: number;
 
-  constructor(message: string, status: number) {
+  constructor(message: string) {
     this.message = message;
-    this.status = status;
   }
 }
 
@@ -45,7 +44,7 @@ export class MeactErrorResponse {
  * This is a shortcut for creating `application/json` responses.
  * Converts `data` to JSON and sets the `Content-Type` header.
  */
-export function makeJsonResponse<T>(
+export function makeDataResponse<T>(
   data: T,
   updateInHeaders?: Record<string, any>
 ): MeactJsonResponse<T> {
@@ -58,19 +57,67 @@ export function makeJsonResponse<T>(
           ...jsonContentType,
         };
 
-  return new MeactJsonResponse(data, setInHeaders, 200);
+  return new MeactJsonResponse(
+    data,
+    {
+      setInHeaders,
+      status: 200,
+    },
+    null
+  );
 }
 
 /**
- * A redirect response. Sets the status code and the `Location` header.
+ * A redirect response.
+ * Sets the status code and the `Location` header.
  * Defaults to "302 Found".
  */
 export function makeRedirectResponse(
   url: string,
   updateInHeaders?: Record<string, any>,
-  statusCode: number = 302
+  status: number = 302,
+  errorMessage?: string
 ): MeactJsonResponse<null> {
   const setInHeaders = updateInHeaders === undefined ? {} : updateInHeaders;
 
-  return new MeactJsonResponse(null, setInHeaders, statusCode, url);
+  return new MeactJsonResponse(
+    null,
+    {
+      setInHeaders,
+      status,
+      redirectToUrl: url,
+    },
+    errorMessage === undefined ? null : new MeactErrorResponse(errorMessage)
+  );
+}
+
+/**
+ * An Error response.
+ * Sets the status code and the `Location` header.
+ * Defaults to "500 server side error".
+ */
+export function makeErrorResponse(
+  message: string,
+  status: number = 500,
+  updateInHeaders?: Record<string, any>
+): MeactJsonResponse<null> {
+  const jsonContentType = {
+    "Content-Type": "application/json; charset=utf-8",
+  };
+  const setInHeaders =
+    updateInHeaders === undefined
+      ? jsonContentType
+      : {
+          ...updateInHeaders,
+          ...jsonContentType,
+        };
+
+  return new MeactJsonResponse(
+    null,
+    {
+      setInHeaders,
+      status,
+    },
+    new MeactErrorResponse(message)
+  );
 }

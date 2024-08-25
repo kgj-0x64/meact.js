@@ -15,6 +15,7 @@ export function Header(props: IHeaderProps): JSX.Element {
 
   const currentUrl = getCurrentPathname();
   const me = useContext<ICurrentLoggedInUser | undefined>(MeContext);
+  console.log("USE CONTEXT HEADER ME", me);
 
   return (
     <tr>

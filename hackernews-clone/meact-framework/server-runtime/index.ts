@@ -1,10 +1,10 @@
 // import types to export
 import type { MeactMeta, MeactLoader, MeactAction } from "./types.ts";
 import {
-  MeactErrorResponse,
   MeactJsonResponse,
-  makeJsonResponse,
+  makeDataResponse,
   makeRedirectResponse,
+  makeErrorResponse,
 } from "./responses.js";
 import {
   SessionCookieProperties,
@@ -16,10 +16,10 @@ import {
 export { MeactMeta, MeactLoader, MeactAction };
 
 export {
-  MeactErrorResponse,
   MeactJsonResponse,
-  makeJsonResponse,
+  makeDataResponse,
   makeRedirectResponse,
+  makeErrorResponse,
 };
 
 export { SessionCookieProperties, getSession, commitSession, destroySession };

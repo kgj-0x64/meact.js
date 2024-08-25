@@ -11,7 +11,6 @@ import {
 
 // ! Userland (user of framework) plug of server for initialization of resources
 import "../../app.server.ts";
-import { MeactErrorResponse, MeactJsonResponse } from "./responses.ts";
 
 // Create an Express application
 const app = express();
@@ -58,27 +57,24 @@ app.use(async (req, res, next) => {
 /// GET HTML page requests
 app.get(["/", "/:pageName"], async (req, res) => {
   // Access the generated content from the middleware
-  const responseHtmlContent = req._preparedHtmlContent;
+  const responseHtmlContent = req._preparedPageHtmlContent;
+  const jsonRouteResponseContent = req._preparedRouteResponseContent;
 
   if (responseHtmlContent !== undefined && responseHtmlContent.length > 0) {
-    // set header properties, if any
-    // Access the generated content from the loader
-    const jsonResponseContent: MeactJsonResponse | MeactErrorResponse =
-      req._preparedJsonResponseContent;
-    console.log("jsonResponseContent", jsonResponseContent);
+    if (jsonRouteResponseContent && jsonRouteResponseContent.meta) {
+      // set response status
+      res.status(jsonRouteResponseContent.meta.status);
 
-    if (jsonResponseContent instanceof MeactErrorResponse) {
-      res.status(jsonResponseContent.status).send(jsonResponseContent.message);
-      return;
+      // set header properties, if any
+      for (const [key, value] of Object.entries(
+        jsonRouteResponseContent.meta.setInHeaders
+      )) {
+        // Manually set the header properties e.g. "Set-Cookie"
+        res.setHeader(key, value);
+      }
     }
 
-    for (const [key, value] of Object.entries(jsonResponseContent)) {
-      console.log(`Key: ${key}, Value: ${value}`);
-      // Manually set the header properties e.g. "Set-Cookie"
-      res.setHeader(key, value);
-    }
-
-    // Send the modified HTML as the response
+    // Send the prepare page HTML as the response
     res.send(responseHtmlContent);
   } else {
     // If the page doesn't exist, return a 404 status
@@ -87,29 +83,32 @@ app.get(["/", "/:pageName"], async (req, res) => {
 });
 
 /// POST requests
-app.post(["/login", "/logout"], async (req, res) => {
+app.post(["/register", "/login", "/logout"], async (req, res) => {
   // Access the generated content from the action
-  const jsonResponseContent: MeactJsonResponse | MeactErrorResponse =
-    req._preparedJsonResponseContent;
-  console.log("jsonResponseContent", jsonResponseContent);
+  const jsonRouteResponseContent = req._preparedRouteResponseContent;
 
-  if (jsonResponseContent instanceof MeactErrorResponse) {
-    res.status(jsonResponseContent.status).send(jsonResponseContent.message);
-    return;
+  if (jsonRouteResponseContent && jsonRouteResponseContent.meta) {
+    // set response status
+    res.status(jsonRouteResponseContent.meta.status);
+
+    // set header properties, if any
+    for (const [key, value] of Object.entries(
+      jsonRouteResponseContent.meta.setInHeaders
+    )) {
+      // Manually set the header properties e.g. "Set-Cookie"
+      res.setHeader(key, value);
+    }
+
+    if (jsonRouteResponseContent.isRedirectResponse()) {
+      res.redirect(jsonRouteResponseContent.meta.redirectToUrl!);
+      return;
+    } else {
+      jsonRouteResponseContent.meta = null;
+      res.json(jsonRouteResponseContent);
+    }
+  } else {
+    res.status(500).send("Server failed to process this request");
   }
-
-  for (const [key, value] of Object.entries(jsonResponseContent)) {
-    console.log(`Key: ${key}, Value: ${value}`);
-    // Manually set the header properties e.g. "Set-Cookie"
-    res.setHeader(key, value);
-  }
-
-  if (jsonResponseContent.isRedirectResponse()) {
-    res.redirect(jsonResponseContent.redirectToUrl!);
-    return;
-  }
-
-  res.status(jsonResponseContent.status).json(jsonResponseContent.data);
 });
 
 // Set the port

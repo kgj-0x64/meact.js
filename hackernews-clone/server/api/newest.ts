@@ -3,6 +3,8 @@ import {
   MeactMeta,
   getSession,
   SessionCookieProperties,
+  MeactJsonResponse,
+  makeDataResponse,
 } from "@meact-framework/server-runtime";
 import { POSTS_PER_PAGE } from "../../app/config";
 import { INewestPageLoader } from "../../app/pages/newest";
@@ -13,7 +15,7 @@ import { FeedType } from "../models";
 
 export const componentName = "NewestPage";
 
-export const meta: MeactMeta = () => [
+export const meta: MeactMeta<any> = () => [
   {
     title: {
       text: "New Links | Hacker News Clone",
@@ -21,11 +23,13 @@ export const meta: MeactMeta = () => [
   },
 ];
 
-export const loader: MeactLoader<INewestPageLoader> = async (args) => {
+export const loader: MeactLoader<INewestPageLoader> = async (
+  args
+): Promise<MeactJsonResponse<INewestPageLoader>> => {
   const { req } = args;
 
   const session = await getSession(req.headers.cookie);
-  const userId = session.data[SessionCookieProperties.USER_ID];
+  const loggedInUserId = session.data[SessionCookieProperties.USER_ID];
 
   const searchParams = getUrlSearchParamsFromReq(req);
   const pageNumber: number = getPageNumberFromSearchParams(searchParams);
@@ -37,10 +41,10 @@ export const loader: MeactLoader<INewestPageLoader> = async (args) => {
     FeedType.NEW,
     first,
     skip,
-    userId
+    loggedInUserId
   );
 
-  return {
+  return makeDataResponse({
     stories,
-  };
+  });
 };

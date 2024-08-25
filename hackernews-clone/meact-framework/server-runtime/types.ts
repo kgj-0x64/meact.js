@@ -22,14 +22,14 @@ interface MetaTagObject {
   meta?: MetaTagAttributes;
 }
 
-type IMeactMetaArgs =
+type IMeactMetaArgs<T> =
   | undefined
   | {
       req?: Request;
-      data?: object;
+      pageLoaderData?: MeactJsonResponse<T>;
     };
 
-export type MeactMeta = (args: IMeactMetaArgs) => MetaTagObject[];
+export type MeactMeta<T> = (args: IMeactMetaArgs<T>) => MetaTagObject[];
 
 interface IMeactLoaderArgs {
   req: Request;
@@ -37,12 +37,12 @@ interface IMeactLoaderArgs {
 
 export type MeactLoader<T> = (
   args: IMeactLoaderArgs
-) => Promise<T | MeactJsonResponse>;
+) => Promise<MeactJsonResponse<T>>;
 
 interface IMeactActionArgs {
   req: Request;
 }
 
-export type MeactAction = (
+export type MeactAction<T> = (
   args: IMeactActionArgs
-) => Promise<MeactJsonResponse>;
+) => Promise<MeactJsonResponse<T>>;

@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { prepareHtmlOnPageRequest } from "./preparePageOnRequest";
+import { preparePageContentOnRequest } from "./handleRouteLoaderRequest";
 import { handleRouteActionRequest } from "./handleRouteActionRequest";
 
 export async function preparePageContentMiddleware(
@@ -15,10 +15,11 @@ export async function preparePageContentMiddleware(
     );
 
     // Inject the correct JS and CSS files into the index.html content
-    const preparedHtmlContent = await prepareHtmlOnPageRequest(req);
+    const preparedPageContent = await preparePageContentOnRequest(req);
 
     // Attach the generated content to the `req` object
-    req._preparedHtmlContent = preparedHtmlContent || "";
+    req._preparedPageHtmlContent = preparedPageContent.html || "";
+    req._preparedRouteResponseContent = preparedPageContent.routeLoaderData;
 
     console.log(
       `LOG: Prepared HTML content for ${req.method} ${
@@ -47,11 +48,11 @@ export async function handleRouteActionMiddleware(
     );
 
     // Get response data from route's action handler
-    const preparedJsonResponseContent = await handleRouteActionRequest(req);
+    const preparedRouteResponseContent = await handleRouteActionRequest(req);
 
     // Attach the generated content to the `req` object
-    req._preparedJsonResponseContent =
-      preparedJsonResponseContent.routeActionData;
+    req._preparedRouteResponseContent =
+      preparedRouteResponseContent.routeActionData;
 
     console.log(
       `LOG: Prepared JSON content for ${req.method} ${

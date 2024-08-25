@@ -5,14 +5,16 @@ import {
   SessionCookieProperties,
   getSession,
   commitSession,
-  makeJsonResponse,
+  makeDataResponse,
   makeRedirectResponse,
+  MeactJsonResponse,
+  makeErrorResponse,
 } from "@meact-framework/server-runtime";
 import { userService } from "server/bootstrap.server";
 
 export const componentName = "LoginPage";
 
-export const meta: MeactMeta = () => [
+export const meta: MeactMeta<any> = () => [
   {
     title: {
       text: "Login | Hacker News Clone",
@@ -20,7 +22,9 @@ export const meta: MeactMeta = () => [
   },
 ];
 
-export const loader: MeactLoader<Response> = async (args) => {
+export const loader: MeactLoader<any> = async (
+  args
+): Promise<MeactJsonResponse<any>> => {
   const { req } = args;
 
   const session = await getSession(req.headers.cookie);
@@ -35,18 +39,18 @@ export const loader: MeactLoader<Response> = async (args) => {
   // we should store an error message in the session
   // so that it can be retrieved on the next request
   // (e.g., when the user is redirected back to the login page)
-  const data = { error: session.data.error || null };
+  const data = { lastLoginError: session.data.error || null };
 
   // Once the error is retrieved (e.g., when displaying the login page again),
   // it should be cleared from the session so that it doesn’t persist unnecessarily.
   session.data.error = undefined;
 
-  return makeJsonResponse(data, {
+  return makeDataResponse(data, {
     "Set-Cookie": await commitSession(session),
   });
 };
 
-export const action: MeactAction = async (args) => {
+export const action: MeactAction<null> = async (args) => {
   const { req } = args;
 
   const session = await getSession(req.headers.cookie);
@@ -63,18 +67,55 @@ export const action: MeactAction = async (args) => {
   if (Object.keys(errors).length > 0) {
     session.data.error = "Missing credentials";
 
-    return makeJsonResponse(errors, {
+    return makeErrorResponse("Missing credentials", 400, {
       "Set-Cookie": await commitSession(session),
     });
   }
 
   const user = await userService.getUser(id);
-  if (!user || !(await userService.validatePassword(id, password))) {
-    session.data.error = "Invalid credentials";
+  if (!user) {
+    const errorMessage = "Unknown User ID";
+    session.data.error = errorMessage;
 
-    return makeRedirectResponse("/login?how=unsuccessful", {
-      "Set-Cookie": await commitSession(session),
-    });
+    return makeRedirectResponse(
+      "/login?how=unsuccessful",
+      {
+        "Set-Cookie": await commitSession(session),
+      },
+      303,
+      errorMessage
+    );
+  }
+
+  if (!(user.passwordSalt && user.hashedPassword)) {
+    const errorMessage =
+      "You must register for HackerNews clone separately for login to work";
+    session.data.error = errorMessage;
+
+    return makeRedirectResponse(
+      "/login?how=unsuccessful",
+      {
+        "Set-Cookie": await commitSession(session),
+      },
+      303,
+      errorMessage
+    );
+  }
+
+  const isPasswordValid = await userService.validatePassword(id, password);
+
+  if (!user || !isPasswordValid) {
+    const errorMessage = "Password is incorrect";
+    session.data.error = errorMessage;
+
+    return makeRedirectResponse(
+      "/login?how=unsuccessful",
+      {
+        "Set-Cookie": await commitSession(session),
+      },
+      303,
+      errorMessage
+    );
   }
 
   // Successful login, clear any previous error

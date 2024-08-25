@@ -4,6 +4,7 @@ import { JSX } from "@meact/jsx-runtime";
 import { MainLayout } from "../layouts/main-layout.js";
 import { ICurrentLoggedInUser, MeContext } from "../utils/context.js";
 import { convertNumberToTimeAgo } from "../utils/convert-number-to-time-ago.js";
+import { Form } from "app/components/Form.jsx";
 
 export interface IUserPageLoader {
   user: {
@@ -39,12 +40,12 @@ function UserPage(): JSX.Element {
       <MainLayout isFooterVisible={false}>
         <tr>
           <td>
-            <form className="profileform" method="post" action="/xuser">
-              <input type="hidden" name="id" value={user.id} />
+            <Form className="profileform" method="POST" action="/xuser">
+              <input type="hidden" name="id" prop:value={user.id} />
               <input
                 type="hidden"
                 name="hmac"
-                value="71104445c3c41b4167c38db67a656e610d5fbad9"
+                prop:value="71104445c3c41b4167c38db67a656e610d5fbad9"
               />
               <table style={{ border: "0px" }}>
                 <tbody>
@@ -72,13 +73,14 @@ function UserPage(): JSX.Element {
                     <td style={{ verticalAlign: "top" }}>about:</td>
                     <td>
                       <textarea
-                        cols={60}
-                        defaultValue={about}
                         name="about"
-                        onChange={onAboutChange}
+                        cols={60}
                         rows={5}
                         style={{ fontSize: "-2" }}
                         wrap="virtual"
+                        defaultValue={about}
+                        prop:value={about}
+                        prop:onChange={onAboutChange}
                       />
                       <a
                         href="/formatdoc"
@@ -95,9 +97,10 @@ function UserPage(): JSX.Element {
                       <input
                         type="text"
                         name="uemail"
-                        defaultValue={email}
-                        onChange={onEmailChange}
                         size={60}
+                        defaultValue={email}
+                        value={email}
+                        prop:onChange={onEmailChange}
                       />
                     </td>
                   </tr>
@@ -105,8 +108,8 @@ function UserPage(): JSX.Element {
                     <td style={{ verticalAlign: "top" }}>showdead:</td>
                     <td>
                       <select defaultValue="no" name="showd">
-                        <option value="yes">yes</option>
-                        <option value="no">no</option>
+                        <option prop:value="yes">yes</option>
+                        <option prop:value="no">no</option>
                       </select>
                     </td>
                   </tr>
@@ -114,8 +117,8 @@ function UserPage(): JSX.Element {
                     <td style={{ verticalAlign: "top" }}>noprocrast:</td>
                     <td>
                       <select defaultValue="no" name="nopro">
-                        <option value="yes">yes</option>
-                        <option value="no">no</option>
+                        <option prop:value="yes">yes</option>
+                        <option prop:value="no">no</option>
                       </select>
                     </td>
                   </tr>
@@ -215,8 +218,8 @@ function UserPage(): JSX.Element {
                 </tbody>
               </table>
               <br />
-              <input type="submit" value="update" />
-            </form>
+              <input type="submit" prop:value="update" />
+            </Form>
             <br />
             <br />
           </td>
