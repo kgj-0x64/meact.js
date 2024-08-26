@@ -1,6 +1,6 @@
+.env
+.vscode
 node_modules
 dist
 build
-.env
-.vscode
-meact-framework*/build.js
+meact-framework/server-runtime/build.js
