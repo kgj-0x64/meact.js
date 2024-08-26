@@ -1,7 +1,6 @@
 import { build } from "esbuild";
 import { existsSync, rmSync } from "fs";
 import path from "path";
-import mdx from "@mdx-js/esbuild";
 import {
   DIST_OUTPUT_DIRECTORY,
   APP_DIRECTORY,
@@ -33,8 +32,8 @@ const commonClientFacingBuildOptions = {
   treeShaking: true,
   // https://github.com/evanw/esbuild/blob/main/docs/architecture.md#code-splitting
   splitting: true, // Splitting currently only works with the "esm" format
-  sourcemap: !process.env.NODE_ENV === "prod",
-  minify: process.env.NODE_ENV === "prod",
+  sourcemap: process.env.NODE_ENV !== "production",
+  minify: process.env.NODE_ENV === "production",
   inject: [], // Avoid injecting anything extra
 };
 
@@ -85,17 +84,7 @@ async function buildScriptBundles() {
     alias: meactLibAlias,
     ...staticContentLoaders,
     logLevel: "info", // Optional: Shows build logs
-    plugins: [
-      mdx({
-        /* MDX compile options */
-        jsx: false, // produce code which uses jsx-runtime instead of JSX syntax
-        jsxImportSource: "@meact", // Use '@meact/jsx-runtime' for JSX processing
-        jsxRuntime: "automatic",
-        outputFormat: "program",
-        elementAttributeNameCase: "html",
-        stylePropertyNameCase: "css",
-      }),
-    ],
+    plugins: [],
   });
 }
 

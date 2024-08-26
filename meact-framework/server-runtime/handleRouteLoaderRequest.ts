@@ -85,6 +85,15 @@ export async function preparePageContentOnRequest(req: Request): Promise<{
       );
     }
 
+    // remove "debugger.css" in production so as to remove its visible area due to bg-color and padding
+    // while "render tree" is set to be plotted in a non-localhost window as well
+    if (req.hostname !== "localhost") {
+      indexHtmlContent = indexHtmlContent.replace(
+        `<link rel="stylesheet" href="styles/debugger.css" />`,
+        ``
+      );
+    }
+
     return {
       html: indexHtmlContent,
       routeLoaderData: pageServerData.pageLoaderData,
