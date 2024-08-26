@@ -3,3 +3,4 @@ dist
 build
 .env
 .vscode
+meact-framework*/build.js
