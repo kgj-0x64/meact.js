@@ -15,7 +15,7 @@
   "scripts": {
     "build-client": "tsx --env-file=.env meact-framework/server-runtime/esbuild.config.js",
     "build-server": "tsx --env-file=.env meact-framework/server-runtime/framework.build.ts",
-    "build": "npm run build-server && npm run build-client",
+    "build": "npm install && npm run build-server && npm run build-client",
     "start": "tsx --env-file=.env meact-framework/server-runtime/server.ts",
     "serve": "npm run build && npm run start",
     "ts:check": "tsc --noEmit",

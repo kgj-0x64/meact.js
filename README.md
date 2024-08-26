@@ -4,7 +4,7 @@ Meact.js = My (implementation of) React.js
 
 ["Multi-Page Application" framework built on top of meact.js](./meact-framework/README.md)
 
-- See [HackerNews Clone app built using this framework](../hackernews-clone/README.md)
+- See [HackerNews Clone app built using this framework](./hackernews-clone/README.md)
 
 ## The Framework
 
