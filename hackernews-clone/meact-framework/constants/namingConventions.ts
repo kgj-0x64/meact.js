@@ -1,8 +1,8 @@
-import { join } from "path";
-import { __dirname } from "../config";
+import { join, resolve } from "path";
+import { __dirname } from "./pathConfig";
 
-const MEACT_FRAMEWORK_DIRECTORY = join(__dirname);
-const ROOT_DIRECTORY = MEACT_FRAMEWORK_DIRECTORY.replace("meact-framework", "");
+const MEACT_FRAMEWORK_DIRECTORY = resolve(__dirname, "..");
+const ROOT_DIRECTORY = resolve(MEACT_FRAMEWORK_DIRECTORY, "..");
 
 /// ---------- MEACT LAND ---------- ///
 

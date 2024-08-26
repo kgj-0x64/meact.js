@@ -1,37 +1,59 @@
-import { glob } from "glob";
-import path from "path";
-import { writeFileSync } from "fs";
+import { promises as fs, writeFileSync } from "fs";
+import * as path from "path";
 import {
-  SERVER_API_DIRECTORY,
   MEACT_FRAMEWORK_SERVER_DIRECTORY,
-} from "../constants/namingConventions.ts";
+  SERVER_API_DIRECTORY,
+} from "meact-framework/constants/namingConventions";
 
-export async function buildMeactFrameworkServerSideHandlersMap() {
-  console.log("Meact app's server side handlers have to be registered...");
+async function getFiles(dir: string): Promise<string[]> {
+  const entries = await fs.readdir(dir, { withFileTypes: true });
 
-  const routeFiles = glob.sync(`${SERVER_API_DIRECTORY}/*.{js,ts}`);
+  const files = await Promise.all(
+    entries.map((entry) => {
+      const res = path.resolve(dir, entry.name);
+      return entry.isDirectory() ? getFiles(res) : res;
+    })
+  );
 
+  // flatten the array
+  return files.flat();
+}
+
+async function handleRouterScriptFiles(scriptFiles: string[]) {
   const imports = [];
   const mapEntries = [];
 
-  for (const file of routeFiles) {
-    const fileName = file.endsWith(".js")
-      ? path.basename(file, ".js")
-      : path.basename(file, ".ts");
+  const outputFile = path.resolve(MEACT_FRAMEWORK_SERVER_DIRECTORY, "build.js");
+  console.log("outputFile", outputFile);
 
-    const importPath = path.join("../..", file).replace(/\\/g, "/"); // Make the path relative and compatible with all OS
+  for (const scriptFile of scriptFiles) {
+    // get the relative path from one absolute path to the other absolute path
+    const relativePath = path.relative(path.dirname(outputFile), scriptFile);
+    console.log("relativePath", relativePath);
+
+    // `relativePath` uses backslashes (\\), which are specific to Windows.
+    // Forward slashes work on all platforms, including Windows, Linux, and macOS.
+    const importPath = relativePath.replace(/\\/g, "/");
+    console.log("importPath", importPath);
+
+    const fileName = scriptFile.endsWith(".js")
+      ? path.basename(scriptFile, ".js")
+      : path.basename(scriptFile, ".ts");
+
     const importStatementForThisFile = `import * as ${fileName} from "${importPath}";`;
     imports.push(importStatementForThisFile);
+    console.log("importStatementForThisFile", importStatementForThisFile);
 
     // Dynamically import the module
     const fileModule = await import(importPath); // relative path
+    console.log("successfully imported fileModule");
 
     let isThisPageRoute = false;
 
     // sanity check
     if (!("componentName" in fileModule)) {
       throw new Error(
-        `server/api/${file} is missing export of "componentName" value`
+        `server/api/${fileName} is missing export of "componentName" value`
       );
     } else {
       isThisPageRoute =
@@ -42,9 +64,6 @@ export async function buildMeactFrameworkServerSideHandlersMap() {
     const mapKey = fileName.startsWith("_")
       ? `${fileName}.componentName`
       : `"${fileName}"`;
-
-    const isThisRouteForAPage =
-      "componentName" in fileModule && fileModule["componentName"];
 
     const fileModuleExports = ["componentName", "meta", "loader", "action"]
       .filter((name) => name in fileModule)
@@ -80,6 +99,20 @@ export async function buildMeactFrameworkServerSideHandlersMap() {
     path.join(MEACT_FRAMEWORK_SERVER_DIRECTORY, "build.js"),
     outputContent.trim()
   );
+}
+
+async function buildMeactFrameworkServerSideHandlersMap() {
+  console.log("Meact app's server side handlers have to be registered...");
+
+  const apiDir = SERVER_API_DIRECTORY;
+
+  const files = await getFiles(apiDir);
+
+  const scriptFiles = files.filter(
+    (file) => file.endsWith(".ts") || file.endsWith(".js")
+  );
+
+  await handleRouterScriptFiles(scriptFiles);
 
   console.log(
     "Meact app's server side handlers have been registered successfully."

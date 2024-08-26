@@ -32,8 +32,8 @@ const commonClientFacingBuildOptions = {
   treeShaking: true,
   // https://github.com/evanw/esbuild/blob/main/docs/architecture.md#code-splitting
   splitting: true, // Splitting currently only works with the "esm" format
-  sourcemap: !process.env.NODE_ENV === "prod",
-  minify: process.env.NODE_ENV === "prod",
+  sourcemap: process.env.NODE_ENV !== "production",
+  minify: process.env.NODE_ENV === "production",
   inject: [], // Avoid injecting anything extra
 };
 

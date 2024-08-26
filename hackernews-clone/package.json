@@ -14,8 +14,8 @@
   "main": "index.js",
   "scripts": {
     "build-client": "tsx meact-framework/server-runtime/esbuild.config.js",
-    "build-server": "tsx meact-framework/server-runtime/framework.build.ts",
-    "build": "npm install && npm run build-client",
+    "build-server": "tsx meact-framework/server-runtime/router.config.ts",
+    "build": "npm install && npm run build-client && npm run build-server",
     "start": "tsx meact-framework/server-runtime/server.ts",
     "serve": "npm run build && npm run start",
     "ts:check": "tsc --noEmit",
@@ -30,7 +30,6 @@
     "cookie": "^0.6.0",
     "debug": "^4.3.6",
     "express": "^4.19.2",
-    "glob": "^11.0.0",
     "hackernews-clone": "file:",
     "lru-cache": "^11.0.0",
     "tsx": "^4.18.0"

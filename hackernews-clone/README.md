@@ -6,6 +6,8 @@
 
 My code is just a copy of ["hackernews-remix-react" repository](https://github.com/clintonwoo/hackernews-remix-react) which has been adapted to work with my UI library "Meact.js". I owe much gratitude to its author.
 
+- ! Do note that its auth works with a local LRU cache and is not synchronized with HackerNews API/DB. Also, it doesn't implement all of the app e.g. item's comment (i.e. subitem) on its own page (which I have implemented), and so on.
+
 ## Framework User Land
 
 ### File Name Conventions
