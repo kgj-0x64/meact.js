@@ -24,7 +24,6 @@ async function handleRouterScriptFiles(scriptFiles: string[]) {
   const mapEntries = [];
 
   const outputFile = path.resolve(MEACT_FRAMEWORK_SERVER_DIRECTORY, "build.js");
-  console.log("outputFile", outputFile);
 
   for (const scriptFile of scriptFiles) {
     // get the relative path from one absolute path to the other absolute path

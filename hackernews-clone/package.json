@@ -12,6 +12,9 @@
   ],
   "type": "module",
   "main": "index.js",
+  "engines": {
+    "node": "20.16.0"
+  },
   "scripts": {
     "build-client": "tsx meact-framework/server-runtime/esbuild.config.js",
     "build-server": "tsx meact-framework/server-runtime/router.config.ts",
