@@ -1,7 +1,6 @@
 import { build } from "esbuild";
 import { existsSync, rmSync } from "fs";
 import path from "path";
-import mdx from "@mdx-js/esbuild";
 import {
   DIST_OUTPUT_DIRECTORY,
   APP_DIRECTORY,
@@ -85,17 +84,7 @@ async function buildScriptBundles() {
     alias: meactLibAlias,
     ...staticContentLoaders,
     logLevel: "info", // Optional: Shows build logs
-    plugins: [
-      mdx({
-        /* MDX compile options */
-        jsx: false, // produce code which uses jsx-runtime instead of JSX syntax
-        jsxImportSource: "@meact", // Use '@meact/jsx-runtime' for JSX processing
-        jsxRuntime: "automatic",
-        outputFormat: "program",
-        elementAttributeNameCase: "html",
-        stylePropertyNameCase: "css",
-      }),
-    ],
+    plugins: [],
   });
 }
 
