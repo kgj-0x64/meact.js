@@ -9,9 +9,8 @@ import {
 export async function buildMeactFrameworkServerSideHandlersMap() {
   console.log("Meact app's server side handlers have to be registered...");
 
-  console.log("SERVER_API_DIRECTORY", SERVER_API_DIRECTORY);
   const routeFiles = glob.sync(`${SERVER_API_DIRECTORY}/*.{js,ts}`);
-  console.log("routeFiles", routeFiles);
+
   const imports = [];
   const mapEntries = [];
 
@@ -21,7 +20,6 @@ export async function buildMeactFrameworkServerSideHandlersMap() {
       : path.basename(file, ".ts");
 
     const importPath = path.join("../..", file).replace(/\\/g, "/"); // Make the path relative and compatible with all OS
-    console.log("importPath", importPath);
     const importStatementForThisFile = `import * as ${fileName} from "${importPath}";`;
     imports.push(importStatementForThisFile);
 
