@@ -89,15 +89,16 @@ export function NewsFeed(props: INewsFeedProps): JSX.Element {
                   />,
                   <ItemDetail
                     key={`${newsItem.id}detail`}
-                    commentCount={newsItem.commentCount}
+                    id={newsItem.id}
+                    submitterId={newsItem.submitterId}
                     creationTime={newsItem.creationTime}
                     hidden={newsItem.hidden}
-                    id={newsItem.id}
                     isFavoriteVisible={false}
                     isJobListing={isJobListing}
                     isPostScrutinyVisible={isPostScrutinyVisible}
-                    submitterId={newsItem.submitterId}
+                    commentCount={newsItem.commentCount}
                     upvoteCount={newsItem.upvoteCount}
+                    title={newsItem.title}
                   />,
                   <tr
                     key={`${newsItem.id}spacer`}

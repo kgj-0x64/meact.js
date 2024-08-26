@@ -34,7 +34,6 @@ function LoginPage(): JSX.Element {
   const validateLogin = (e: any): void => {
     try {
       validateNewUser({ id: loginId, password: loginPassword });
-      console.log("VALIDATED validateLogin");
     } catch (err: any) {
       e.preventDefault();
       setValidationMessage(err.message);
@@ -52,8 +51,12 @@ function LoginPage(): JSX.Element {
 
   return (
     <BlankLayout>
-      {message ? <p>{message}</p> : <null />}
-      {validationMessage ? <p>{validationMessage}</p> : <null />}
+      {message ? <p>{`Request failure reason: ${message}`}</p> : <null />}
+      {validationMessage ? (
+        <p>{`Invalid data: ${validationMessage}`}</p>
+      ) : (
+        <null />
+      )}
       <b>Login</b>
       <br />
       <br />
@@ -63,7 +66,7 @@ function LoginPage(): JSX.Element {
         onSubmit={(e): void => validateLogin(e)}
         style={{ marginBottom: "1em" }}
       >
-        <input name="goto" type="hidden" prop:value={goto || "news"} />
+        <input name="goto" type="hidden" prop:value={goto || "/"} />
         <table style={{ border: "0px" }}>
           <tbody>
             <tr>
@@ -73,6 +76,7 @@ function LoginPage(): JSX.Element {
                   name="id"
                   type="text"
                   size={20}
+                  autoComplete="on"
                   autoCapitalize="off"
                   spellCheck={false}
                   minLength={USERID_MIN_LENGTH}
@@ -89,6 +93,7 @@ function LoginPage(): JSX.Element {
                   name="password"
                   type="password"
                   size={20}
+                  autoComplete="on"
                   minLength={PASSWORD_MIN_LENGTH}
                   maxLength={PASSWORD_MAX_LENGTH}
                   prop:value={loginPassword}
@@ -103,7 +108,6 @@ function LoginPage(): JSX.Element {
         <br />
         <input type="submit" prop:value="login" />
       </Form>
-      <a href="/forgot">Forgot your password?</a>
       <br />
       <br />
       <b>Create Account</b>
@@ -111,7 +115,7 @@ function LoginPage(): JSX.Element {
       <br />
       <Form
         method="POST"
-        action="/register"
+        action={`/register?goto=${goto}`}
         onSubmit={(e): void => validateRegister(e)}
         style={{ marginBottom: "1em" }}
       >
@@ -144,6 +148,7 @@ function LoginPage(): JSX.Element {
                   type="password"
                   size={20}
                   autoComplete="off"
+                  autoCapitalize="off"
                   minLength={PASSWORD_MIN_LENGTH}
                   maxLength={PASSWORD_MAX_LENGTH}
                   prop:value={registerPassword}

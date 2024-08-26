@@ -4,6 +4,7 @@ import { ICurrentLoggedInUser, MeContext } from "../utils/context.js";
 import { getCurrentPathname } from "../utils/window.js";
 import { HeaderLinks } from "./header-links.js";
 import y18Gif from "../../public/static/y18.gif";
+import { Form } from "./Form.js";
 
 export interface IHeaderProps {
   isNavVisible: boolean;
@@ -15,7 +16,6 @@ export function Header(props: IHeaderProps): JSX.Element {
 
   const currentUrl = getCurrentPathname();
   const me = useContext<ICurrentLoggedInUser | undefined>(MeContext);
-  console.log("USE CONTEXT HEADER ME", me);
 
   return (
     <tr>
@@ -66,11 +66,18 @@ export function Header(props: IHeaderProps): JSX.Element {
                   <span className="pagetop">
                     <a href={`/user?id=${me.id}`}>{me.id}</a>
                     {` (${me.karma}) | `}
-                    <a
-                      href={`/logout?auth=d78ccc2c6120ffe08f32451519c2ff46d34c51ab&amp;goto=${currentUrl}`}
-                    >
-                      logout
-                    </a>
+                    <Form action="/logout" method="POST">
+                      <button
+                        type="submit"
+                        style={{
+                          background: "none",
+                          border: "none",
+                          cursor: "pointer",
+                        }}
+                      >
+                        logout
+                      </button>
+                    </Form>
                   </span>
                 ) : (
                   <span className="pagetop">

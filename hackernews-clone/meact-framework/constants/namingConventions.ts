@@ -1,16 +1,10 @@
 import { join } from "path";
-import { __dirname } from "../../config.js";
+import { __dirname } from "../config";
 
-const ROOT_DIRECTORY = __dirname;
+const MEACT_FRAMEWORK_DIRECTORY = join(__dirname);
+const ROOT_DIRECTORY = MEACT_FRAMEWORK_DIRECTORY.replace("meact-framework", "");
 
 /// ---------- MEACT LAND ---------- ///
-
-// absolute path of framework's directory
-const MEACT_FRAMEWORK_DIRECTORY_NAME = "meact-framework";
-const MEACT_FRAMEWORK_DIRECTORY = join(
-  ROOT_DIRECTORY,
-  MEACT_FRAMEWORK_DIRECTORY_NAME
-);
 
 // absolute path of meact library's directory
 const MEACT_LIB_DIRECTORY_NAME = "meact";

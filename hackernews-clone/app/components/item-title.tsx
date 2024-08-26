@@ -1,5 +1,6 @@
 import type { JSX } from "@meact/jsx-runtime";
 import { useLocation } from "../custom-hooks/useLocation.js";
+import { Form } from "./Form.js";
 
 export interface IItemTitleProps {
   key: string;
@@ -7,7 +8,8 @@ export interface IItemTitleProps {
   isRankVisible?: boolean;
   isUpvoteVisible?: boolean;
   rank?: number;
-  title: string;
+  title?: string;
+  text?: string | null;
   url: string | undefined;
   upvoted: boolean;
 }
@@ -38,13 +40,22 @@ export function ItemTitle(props: IItemTitleProps): JSX.Element {
       <td style={{ verticalAlign: "top" }} className="votelinks">
         <div style={{ textAlign: "center" }}>
           {isUpvoteVisible ? (
-            <a
-              href={`/vote?id=${id}&how=up&goto=${loc.pathname + loc.search}`}
-              className={upvoted ? "nosee" : " "}
-              style={{ cursor: "pointer" }}
+            <Form
+              action={`/vote?id=${id}&how=up&goto=${loc.pathname + loc.search}`}
+              method="POST"
             >
-              <div className="votearrow" title="upvote" />
-            </a>
+              <button
+                type="submit"
+                style={{
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                }}
+                className={upvoted ? "nosee" : " "}
+              >
+                <div className="votearrow" title="upvote" />
+              </button>
+            </Form>
           ) : (
             <null />
           )}

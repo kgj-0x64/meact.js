@@ -15,7 +15,8 @@ export function setAttributesAndProperties(meactElement, htmlElement) {
         /// Follow this style https://jakearchibald.com/2024/attributes-vs-properties/#lit-html
         // Our library puts the onus of defining HTML element properties differently from atrributes on the library user
         const propKey = key.replace(domNodePropertySymbol, "");
-        htmlElement[propKey] = value;
+        const attrKey = transformNodePropertyKey(propKey, value);
+        htmlElement[attrKey] = value;
       }
       // assign a ref created using useRef to this DOM element
       else if (key === "refKey") {
@@ -24,7 +25,7 @@ export function setAttributesAndProperties(meactElement, htmlElement) {
       }
       // SET DOM element's Attribute
       else {
-        const attrKey = transformHtmlAttributeKey(key);
+        const attrKey = transformNodeAttributeKey(key);
         let attrValue = value;
         if (key === "style") {
           attrValue = inlineStyleObjectToStyleAttrValue(value);
@@ -45,11 +46,28 @@ function isDomNodeProperty(propName) {
 }
 
 /**
+ * call this to transform a DOM node's property key
+ * to handle event handlers naming convention
+ * @param {string} propName
+ * @param {any} propValue
+ * @returns {string}
+ */
+function transformNodePropertyKey(propName, propValue) {
+  if (propName.startsWith("on") && typeof propValue === "function") {
+    return propName.toLowerCase();
+  }
+
+  return propName;
+}
+
+/**
  * call this to convert inline style object into appropriate HTML style attribute value
  * @param {object} styleObj
  * @returns {string}
  */
 function inlineStyleObjectToStyleAttrValue(styleObj) {
+  if (styleObj === undefined) return "";
+
   return Object.entries(styleObj)
     .map(([key, value]) => {
       const kebabKey = camelCaseToKebabCase(key);
@@ -68,12 +86,12 @@ function camelCaseToKebabCase(attrKey) {
 }
 
 /**
- * call this to transform a HTML attribute key because kebab-case transformation alone is not always correct
+ * call this to transform a DOM node's attribute key because kebab-case transformation alone is not always correct
  * e.g. "colSpan" gives "col-span" when it should be "colspan" only
  * @param {string} attrKey
  * @returns {string}
  */
-function transformHtmlAttributeKey(attrKey) {
+function transformNodeAttributeKey(attrKey) {
   // Dictionary for special cases where React property doesn't map directly to kebab-case
   const specialCases = {
     className: "class",

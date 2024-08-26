@@ -19,11 +19,7 @@ export class StoryService {
   }
 
   async getStory(id: number): Promise<StoryModel | void> {
-    return (
-      this.cache.getStory(id) ||
-      this.db.getNewsItem(id) ||
-      this.db.fetchStory(id)
-    );
+    return this.cache.getStory(id) || (await this.db.fetchStory(id));
   }
 
   async getStories(ids: number[]): Promise<Array<StoryModel | void> | void> {

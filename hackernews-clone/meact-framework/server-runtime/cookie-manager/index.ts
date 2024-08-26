@@ -100,7 +100,7 @@ export async function commitSession(session: Session): Promise<string> {
 
 // Function to destroy the session by clearing the cookie
 export async function destroySession(): Promise<string> {
-  const serializedCookie = cookie.serialize(cookieName, "", {
+  const serializedCookie = cookie.serialize(cookieName, encodeSession({}), {
     httpOnly: true, // Secure cookie (accessible only by the web server)
     secure: process.env.NODE_ENV === "production", // Send only over HTTPS
     maxAge: 0, // lifetime in milliseconds

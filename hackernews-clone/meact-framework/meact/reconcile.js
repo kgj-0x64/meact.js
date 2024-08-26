@@ -267,16 +267,14 @@ function updateSubtreeOfChildrenElementsHelper(
 function createElementDuringRerender(
   subtreeRootNode,
   childPosition,
-  { name, props, children }
+  { type, name, props, children }
 ) {
-  const thisFunctionRef = globalMeactComponentRegistry.get(name);
+  // ! FIXME: Handle "MemoizedFunction" here
+  const elementType =
+    type === "MeactComponent" ? globalMeactComponentRegistry.get(name) : name;
 
   // create a fresh new MeactElement object/subtree
-  const mountNewChildSubtree = createElement(
-    thisFunctionRef,
-    props,
-    ...children
-  );
+  const mountNewChildSubtree = createElement(elementType, props, ...children);
 
   // update the render tree
   subtreeRootNode.children[childPosition] = mountNewChildSubtree;

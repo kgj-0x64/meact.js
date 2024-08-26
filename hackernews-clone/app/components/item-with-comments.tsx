@@ -4,6 +4,8 @@ import { Comments } from "./comments.js";
 import { ItemDetail } from "./item-detail.js";
 import { ItemTitle } from "./item-title.js";
 import { StoryModel } from "../../server/models/index.js";
+import { SubItemDetail } from "./subitem-detail.jsx";
+import { SubItemTitle } from "./subitem-title.jsx";
 
 export interface INewsItemWithCommentsProps {
   loading?: boolean;
@@ -16,13 +18,15 @@ export function ItemWithComments(
 ): JSX.Element {
   const {
     newsItem: {
+      id,
+      submitterId,
+      creationTime,
+      title,
+      text,
+      parent,
       commentCount,
       comments,
-      creationTime,
-      id,
       rank,
-      submitterId,
-      title,
       upvoteCount,
       url,
     },
@@ -41,30 +45,46 @@ export function ItemWithComments(
           className="itemlist"
         >
           <tbody>
-            <ItemTitle
-              key={id.toString()}
-              id={id}
-              rank={rank}
-              title={title}
-              url={url}
-              isRankVisible={false}
-              upvoted={false}
-            />
-            <ItemDetail
-              key={id.toString()}
-              id={id}
-              isPostScrutinyVisible
-              commentCount={commentCount}
-              submitterId={submitterId}
-              upvoteCount={upvoteCount}
-              creationTime={creationTime}
-            />
+            {!parent ? (
+              <ItemTitle
+                key={id.toString()}
+                id={id}
+                rank={rank}
+                title={!parent ? title : text!}
+                url={url}
+                isRankVisible={false}
+                upvoted={false}
+              />
+            ) : (
+              <SubItemTitle
+                id={id}
+                parent={parent}
+                submitterId={submitterId}
+                creationTime={creationTime}
+                upvoteCount={upvoteCount}
+                upvoted={false}
+              />
+            )}
+            {!parent ? (
+              <ItemDetail
+                key={id.toString()}
+                id={id}
+                submitterId={submitterId}
+                creationTime={creationTime}
+                isPostScrutinyVisible
+                commentCount={commentCount}
+                upvoteCount={upvoteCount}
+                title={title}
+              />
+            ) : (
+              <SubItemDetail text={text!} />
+            )}
             <tr
               key="morespace"
               className="morespace"
               style={{ height: "10px" }}
             />
-            <CommentBox parentId={id} />
+            <CommentBox parentId={id} isParentRootItem={!parent} />
           </tbody>
         </table>
         <br />

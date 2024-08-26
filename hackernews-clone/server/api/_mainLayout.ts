@@ -16,9 +16,10 @@ export const loader: MeactLoader<IMainLoader> = async (
   const { req } = args;
 
   const session = await getSession(req.headers.cookie);
+
   const loggedInUserId = session.data[SessionCookieProperties.USER_ID];
   const loggedInUser = loggedInUserId
-    ? await userService.getUser(loggedInUserId)
+    ? await userService.getRegisteredUser(loggedInUserId)
     : undefined;
 
   const me =

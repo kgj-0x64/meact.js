@@ -5,6 +5,8 @@
       *  
     */
     import * as _mainLayout from "../../server/api/_mainLayout.ts";
+import * as xuser from "../../server/api/xuser.ts";
+import * as vote from "../../server/api/vote.ts";
 import * as user from "../../server/api/user.ts";
 import * as upvoted from "../../server/api/upvoted.ts";
 import * as threads from "../../server/api/threads.ts";
@@ -28,7 +30,6 @@ import * as hidden from "../../server/api/hidden.ts";
 import * as front from "../../server/api/front.ts";
 import * as from from "../../server/api/from.ts";
 import * as formatdoc from "../../server/api/formatdoc.ts";
-import * as forgot from "../../server/api/forgot.ts";
 import * as favorites from "../../server/api/favorites.ts";
 import * as dmca from "../../server/api/dmca.ts";
 import * as changepw from "../../server/api/changepw.ts";
@@ -45,6 +46,22 @@ import * as active from "../../server/api/active.ts";
         isPage: false,
         componentName: _mainLayout.componentName,
 loader: _mainLayout.loader,
+      },
+    ],
+[
+      "xuser",
+      {
+        isPage: null,
+        componentName: xuser.componentName,
+action: xuser.action,
+      },
+    ],
+[
+      "vote",
+      {
+        isPage: null,
+        componentName: vote.componentName,
+action: vote.action,
       },
     ],
 [
@@ -239,14 +256,6 @@ meta: from.meta,
         isPage: true,
         componentName: formatdoc.componentName,
 meta: formatdoc.meta,
-      },
-    ],
-[
-      "forgot",
-      {
-        isPage: true,
-        componentName: forgot.componentName,
-meta: forgot.meta,
       },
     ],
 [

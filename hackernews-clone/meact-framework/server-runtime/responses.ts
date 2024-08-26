@@ -15,20 +15,12 @@ export class MeactJsonResponse<T> {
       setInHeaders: Record<string, any>;
       status: number;
       redirectToUrl?: string;
-    },
+    } | null,
     error: MeactErrorResponse | null
   ) {
     this.data = data;
     this.meta = meta;
     this.error = error;
-  }
-
-  isRedirectResponse(): boolean {
-    return (
-      this.meta !== null &&
-      this.meta.redirectToUrl !== undefined &&
-      redirectStatusCodes.has(this.meta.status)
-    );
   }
 }
 
@@ -75,8 +67,7 @@ export function makeDataResponse<T>(
 export function makeRedirectResponse(
   url: string,
   updateInHeaders?: Record<string, any>,
-  status: number = 302,
-  errorMessage?: string
+  status: number = 302
 ): MeactJsonResponse<null> {
   const setInHeaders = updateInHeaders === undefined ? {} : updateInHeaders;
 
@@ -87,7 +78,7 @@ export function makeRedirectResponse(
       status,
       redirectToUrl: url,
     },
-    errorMessage === undefined ? null : new MeactErrorResponse(errorMessage)
+    null
   );
 }
 

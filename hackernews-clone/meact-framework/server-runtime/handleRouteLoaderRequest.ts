@@ -7,7 +7,7 @@ import {
   DIST_OUTPUT_DIRECTORY,
   APP_DIRECTORY_NAME,
   PAGES_DIRECTORY_NAME,
-} from "../constants/fileAndDirectoryNameAndPaths.ts";
+} from "../constants/namingConventions.ts";
 // @ts-ignore
 import { mapOfComponentNameToServerSideHandlers } from "./build.js";
 import { runExtraLoadersFromComponentsForThisPage } from "../../app/_app.js";
@@ -28,20 +28,6 @@ export async function preparePageContentOnRequest(req: Request): Promise<{
     // Get the page name (path)
     const pathName = req.path === "/" ? "/index" : req.path; // starts with "/"
     const pageName = pathName.substring(1);
-
-    // Check if this route is a valid page component
-    if (
-      !mapOfComponentNameToServerSideHandlers.has(pageName) ||
-      !mapOfComponentNameToServerSideHandlers.get(pageName).isPage
-    ) {
-      return {
-        html: null,
-        routeLoaderData: makeErrorResponse(
-          "Page does not exist at this route",
-          404
-        ),
-      };
-    }
 
     let indexHtmlContent = readFileSync(
       // relative path "./index.html" is not working
@@ -82,6 +68,7 @@ export async function preparePageContentOnRequest(req: Request): Promise<{
 
     // Run MeactMeta and Loader functions for the requested page and related components with their own Loader functions (if any)
     const pageServerData = await getPageServerData(req);
+
     if (pageServerData) {
       if (pageServerData.metaTagsForThisPage) {
         indexHtmlContent = indexHtmlContent.replace(
@@ -162,7 +149,13 @@ async function getPageServerData(req: Request): Promise<{
         });
 
       if (mapKey === pageName) {
-        pageLoaderData = loaderData;
+        // ! make a copy object
+        // else, modifying `loaderData` below will change the value for `pageLoaderData` object reference as well
+        pageLoaderData = new MeactJsonResponse(
+          loaderData.data,
+          loaderData.meta,
+          loaderData.error
+        );
       }
 
       // reset meta values so that they are not visible in the browser under that script tag

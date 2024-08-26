@@ -27,7 +27,9 @@ export function createElement(element, props, ...children) {
     )
   ) {
     throw new Error(
-      "Invalid argument of createElement: element must be one of null, string, function, or memoized function"
+      `Invalid argument of createElement: element ${JSON.stringify(
+        element
+      )} must be one of null, string, function, or memoized function`
     );
   }
 

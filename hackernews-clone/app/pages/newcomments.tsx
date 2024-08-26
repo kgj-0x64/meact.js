@@ -12,11 +12,13 @@ export function NewCommentsPage(): JSX.Element {
   const loaderData = useLoaderData<INewCommentsPageLoader>();
   const comments = loaderData?.comments;
 
-  if (comments === undefined) return <null />;
-
   return (
     <MainLayout>
-      <Comments comments={comments} shouldIndent={false} />
+      {comments ? (
+        <Comments comments={comments} shouldIndent={false} />
+      ) : (
+        <null />
+      )}
     </MainLayout>
   );
 }

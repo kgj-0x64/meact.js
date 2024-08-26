@@ -20,7 +20,8 @@ export function createBrowserDomForMeactElement(
     const htmlText = meactElement.props.dangerouslySetInnerHTML.__html;
 
     // let's add it to the browser DOM
-    const dangerouslySetElement = document.createElement(meactElement.type);
+    // ! assuming valid HTML element name
+    const dangerouslySetElement = document.createElement(meactElement.name);
     dangerouslySetElement.setAttribute(elementRenderId, meactElement.id);
 
     // set its inner HTML content directly

@@ -9,7 +9,7 @@ export async function preparePageContentMiddleware(
 ) {
   try {
     console.log(
-      `LOG: Preparing HTML content for ${req.method} ${
+      `LOG: Preparing page's content against ${req.method} ${
         req.path
       } request at ${Date.now()}`
     );
@@ -22,7 +22,7 @@ export async function preparePageContentMiddleware(
     req._preparedRouteResponseContent = preparedPageContent.routeLoaderData;
 
     console.log(
-      `LOG: Prepared HTML content for ${req.method} ${
+      `LOG: Prepared page's content against ${req.method} ${
         req.path
       } request at ${Date.now()}`
     );
@@ -42,7 +42,7 @@ export async function handleRouteActionMiddleware(
 ) {
   try {
     console.log(
-      `LOG: Preparing JSON content for ${req.method} ${
+      `LOG: Preparing JSON content against ${req.method} ${
         req.path
       } request at ${Date.now()}`
     );
@@ -55,7 +55,7 @@ export async function handleRouteActionMiddleware(
       preparedRouteResponseContent.routeActionData;
 
     console.log(
-      `LOG: Prepared JSON content for ${req.method} ${
+      `LOG: Prepared JSON content against ${req.method} ${
         req.path
       } request at ${Date.now()}`
     );

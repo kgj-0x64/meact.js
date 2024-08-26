@@ -10,6 +10,8 @@ My code is just a copy of ["hackernews-remix-react" repository](https://github.c
 
 ### File Name Conventions
 
+See [Naming Conventions](./meact-framework/constants/namingConventions.ts)
+
 - `./app` directory
   - `./app/index.tsx`: entrypoint to pages (thus, to the app) with fixed content
   - `./app/pages/*.tsx` directory: contains pages as compoenents identified by their file names

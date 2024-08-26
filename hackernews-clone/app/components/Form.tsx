@@ -33,14 +33,13 @@ export function Form<T>(props: JSX.PropsWithChildren<FormProps<T>>) {
       onSubmit(e);
     }
 
-    e.preventDefault();
+    // e.preventDefault();
 
-    // Create an object to gather data from each child
-    // since each child is meant to maintain its own state with onChange handlers, if any
-    const formDataObjectRef: Record<string, any> = {};
-    buildFormData(children, formDataObjectRef);
-    console.log("formDataObjectRef", formDataObjectRef);
-    mutate(formDataObjectRef);
+    // // Create an object to gather data from each child
+    // // since each child is meant to maintain its own state with onChange handlers, if any
+    // const formDataObjectRef: Record<string, any> = {};
+    // buildFormData(children, formDataObjectRef);
+    // mutate(formDataObjectRef);
   };
 
   return (

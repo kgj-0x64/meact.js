@@ -8,7 +8,7 @@ import {
 } from "@meact-framework/server-runtime";
 import { POSTS_PER_PAGE } from "../../app/config";
 import { IJobsPageLoader } from "../../app/pages/jobs";
-import { getUrlSearchParamsFromReq } from "app/utils/http-handlers";
+import { getUrlSearchParamsFromReq } from "../../app/utils/http-handlers";
 import { getPageNumberFromSearchParams } from "../../app/utils/news-page-number";
 import { feedService } from "../bootstrap.server";
 import { FeedType } from "../models";

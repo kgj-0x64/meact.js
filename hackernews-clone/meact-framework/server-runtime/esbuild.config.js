@@ -11,7 +11,7 @@ import {
   MEACT_FRAMEWORK_CLIENT_DIRECTORY,
   DIST_OUTPUT_DIRECTORY_NAME,
   STYLES_DIRECTORY_NAME,
-} from "../constants/fileAndDirectoryNameAndPaths.js";
+} from "../constants/namingConventions.js";
 
 const meactLibAlias = {
   // Alias to ensure the path is correctly resolved

@@ -1,9 +1,9 @@
 import type { JSX } from "@meact/jsx-runtime";
 import { convertNumberToTimeAgo } from "../utils/convert-number-to-time-ago.js";
+import { generateHnUrl } from "../utils/generateThirdPartyUrl.js";
 
 export interface IItemDetailProps {
   key: string;
-  commentCount: number;
   creationTime: number;
   hidden?: boolean;
   id: number;
@@ -11,22 +11,24 @@ export interface IItemDetailProps {
   isJobListing?: boolean;
   isPostScrutinyVisible?: boolean;
   submitterId: string;
-  upvoteCount: number;
+  commentCount?: number;
+  upvoteCount?: number | null;
+  title: string;
 }
 
 const HIDE_BUTTON_STYLE = { cursor: "pointer" };
 
 export function ItemDetail(props: IItemDetailProps): JSX.Element {
   const {
-    commentCount,
-    creationTime,
-    hidden,
     id,
+    submitterId,
+    creationTime,
     isFavoriteVisible = true,
     isJobListing = false,
     isPostScrutinyVisible = false,
-    submitterId,
+    commentCount,
     upvoteCount,
+    title,
   } = props;
 
   return isJobListing ? (
@@ -42,7 +44,7 @@ export function ItemDetail(props: IItemDetailProps): JSX.Element {
     <tr>
       <td colSpan={2} />
       <td className="subtext">
-        <span className="score">{upvoteCount} points</span>
+        <span className="score">{upvoteCount ? upvoteCount : 0} points</span>
         {" by "}
         <a href={`/user?id=${submitterId}`} className="hnuser">
           {submitterId}
@@ -72,13 +74,7 @@ export function ItemDetail(props: IItemDetailProps): JSX.Element {
         {isPostScrutinyVisible ? (
           <span>
             {" | "}
-            <a href="https://hn.algolia.com/?query=Sublime%20Text%203.0&sort=byDate&dateRange=all&type=story&storyText=false&prefix&page=0">
-              past
-            </a>
-            {" | "}
-            <a href="https://www.google.com/search?q=Sublime%20Text%203.0">
-              web
-            </a>
+            <a href={generateHnUrl(title)}>past</a>
           </span>
         ) : (
           <null />
@@ -86,7 +82,7 @@ export function ItemDetail(props: IItemDetailProps): JSX.Element {
         <span>
           {" | "}
           <a href={`/item?id=${id}`}>
-            {commentCount === 0
+            {!commentCount || commentCount === 0
               ? "discuss"
               : commentCount === 1
               ? "1 comment"

@@ -12,14 +12,12 @@ export function ItemPage(): JSX.Element {
   const loaderData = useLoaderData<IItemPageLoader>();
   const newsItem = loaderData?.newsItem;
 
-  if (newsItem === undefined) return <null />;
-
   return (
     <MainLayout>
-      {newsItem === undefined ? (
-        <null />
-      ) : (
+      {newsItem ? (
         <ItemWithComments newsItem={newsItem} />
+      ) : (
+        <h3>Item not found</h3>
       )}
     </MainLayout>
   );

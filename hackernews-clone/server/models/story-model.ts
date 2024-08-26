@@ -42,6 +42,8 @@ export class StoryModel {
 
   public readonly type: string;
 
+  public readonly parent?: number;
+
   constructor(fields: any) {
     if (!fields.id) {
       throw new Error(
@@ -50,10 +52,6 @@ export class StoryModel {
     } else if (!fields.submitterId) {
       throw new Error(
         `Error instantiating News Item, submitterId is required: ${fields.id}`
-      );
-    } else if (!fields.title) {
-      throw new Error(
-        `Error instantiating News Item, title is required: ${fields.id}`
       );
     } else if (fields.url && !isValidStoryUrl(fields.url)) {
       throw new Error(
@@ -74,5 +72,6 @@ export class StoryModel {
     this.upvoteCount = fields.upvoteCount || 1;
     this.upvotes = fields.upvotes || new Set([fields.submitterId]);
     this.url = fields.url;
+    this.parent = fields.parent;
   }
 }

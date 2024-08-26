@@ -29,7 +29,7 @@ export class HnDatabase {
       .then((itemSnapshot) => {
         const item = itemSnapshot.val();
 
-        if (item !== null) {
+        if (item) {
           const newsItem = new StoryModel({
             id: item.id,
             commentCount: item.descendants,
@@ -37,8 +37,10 @@ export class HnDatabase {
             creationTime: item.time * 1000,
             submitterId: item.by,
             title: item.title,
+            text: item.text,
             upvoteCount: item.score,
             url: item.url,
+            parent: item.parent,
           });
 
           this.cache.setStory(newsItem.id, newsItem);
@@ -49,7 +51,9 @@ export class HnDatabase {
 
         throw item;
       })
-      .catch((reason) => logger("Fetching post failed:", reason));
+      .catch((reason) => {
+        logger("Fetching post failed:", reason);
+      });
   }
 
   async fetchComment(id: number): Promise<CommentModel | void> {

@@ -3,6 +3,7 @@ import { convertNumberToTimeAgo } from "../utils/convert-number-to-time-ago.js";
 import sGif from "../../public/static/s.gif";
 import { JSX } from "@meact/jsx-runtime";
 import { useMemo } from "@meact";
+import { Form } from "./Form.js";
 
 export interface ICommentProps {
   key: string;
@@ -53,12 +54,21 @@ export function Comment(props: ICommentProps): JSX.Element {
               </td>
               <td style={{ verticalAlign: "top" }} className="votelinks">
                 <div style={{ textAlign: "center" }}>
-                  <a
-                    id={`up_${id}`}
-                    href={`vote?id=${id}&how=up&auth=4eb97bf0d2568aa743691210b904f0c5182bb0fc&goto=item?id=${id}`}
+                  <Form
+                    action={`vote?id=${id}&how=up&goto=item?id=${id}`}
+                    method="POST"
                   >
-                    <div className="votearrow" title="upvote" />
-                  </a>
+                    <button
+                      type="submit"
+                      style={{
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                      }}
+                    >
+                      <div className="votearrow" title="upvote" />
+                    </button>
+                  </Form>
                 </div>
               </td>
               <td className="default">
@@ -75,22 +85,33 @@ export function Comment(props: ICommentProps): JSX.Element {
                     </span>{" "}
                     <span id="unv_15238246" />
                     <span className="par" />{" "}
-                    <span className="togg" id="24" onClick={collapseComment}>
-                      {isCollapsed
-                        ? `[${
-                            collapsedChildrenCommentsCount
-                              ? `${collapsedChildrenCommentsCount + 1} more`
-                              : "+"
-                          }] `
-                        : "[-]"}
-                    </span>
+                    {/** ! TODO collapseComment -- useMemo is perfect -- recursive function `renderCommentTreeAsFlatArray` might be buggy 
+                      <button
+                        type="button"
+                        style={{
+                          background: "none",
+                          border: "none",
+                          cursor: "pointer",
+                        }}
+                        className="togg"
+                        prop:onClick={() => {}}
+                      >
+                        {isCollapsed
+                          ? `[${
+                              collapsedChildrenCommentsCount
+                                ? `${collapsedChildrenCommentsCount + 1} more`
+                                : "+"
+                            }] `
+                          : "[-]"}
+                      </button>
+                      */}
                     <span className="storyon" />
                   </span>
                 </div>
                 <br />
                 <div key="help" className="comment">
                   <span className="c00">
-                    {!isCollapsed && (
+                    {!isCollapsed ? (
                       <>
                         <div dangerouslySetInnerHTML={{ __html: text }} />
                         <div className="reply">
@@ -101,6 +122,8 @@ export function Comment(props: ICommentProps): JSX.Element {
                           </p>
                         </div>
                       </>
+                    ) : (
+                      <null />
                     )}
                   </span>
                 </div>

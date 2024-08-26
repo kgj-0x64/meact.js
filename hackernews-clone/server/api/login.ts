@@ -8,9 +8,16 @@ import {
   makeDataResponse,
   makeRedirectResponse,
   MeactJsonResponse,
-  makeErrorResponse,
 } from "@meact-framework/server-runtime";
-import { userService } from "server/bootstrap.server";
+import {
+  getErrorMessageForLoginErrorCode,
+  UserLoginErrorCode,
+} from "../../app/utils/user-login-error-code";
+import { userService } from "../bootstrap.server";
+import {
+  getUrlSearchParamsFromReq,
+  URLSearchParamFields,
+} from "../../app/utils/http-handlers";
 
 export const componentName = "LoginPage";
 
@@ -29,23 +36,31 @@ export const loader: MeactLoader<any> = async (
 
   const session = await getSession(req.headers.cookie);
 
+  const loggedInUserId = session.data[SessionCookieProperties.USER_ID];
+  const loggedInUser = loggedInUserId
+    ? await userService.getRegisteredUser(loggedInUserId)
+    : undefined;
+
   // Check if the user is already logged in
-  if (session.data[SessionCookieProperties.USER_ID]) {
+  if (loggedInUser) {
     // If logged in, redirect to the home page
     return makeRedirectResponse("/");
   }
+
+  // ! Reset dangling "userId", if any, in this cookie session's data object to make sure `commitSession(...)` gets correct argument
+  session.data[SessionCookieProperties.USER_ID] = undefined;
 
   // During a login attempt, if the login fails (e.g., invalid credentials),
   // we should store an error message in the session
   // so that it can be retrieved on the next request
   // (e.g., when the user is redirected back to the login page)
-  const data = { lastLoginError: session.data.error || null };
+  const responseData = { lastLoginError: session.data.error || null };
 
   // Once the error is retrieved (e.g., when displaying the login page again),
   // it should be cleared from the session so that it doesn’t persist unnecessarily.
   session.data.error = undefined;
 
-  return makeDataResponse(data, {
+  return makeDataResponse(responseData, {
     "Set-Cookie": await commitSession(session),
   });
 };
@@ -53,76 +68,54 @@ export const loader: MeactLoader<any> = async (
 export const action: MeactAction<null> = async (args) => {
   const { req } = args;
 
+  const searchParams = getUrlSearchParamsFromReq(req);
+  const gotoQueryParam = searchParams.get(URLSearchParamFields.GOTO) || "/";
+
   const session = await getSession(req.headers.cookie);
 
-  const { id, password, goto } = req.body as {
+  const { id, password } = req.body as {
     id: string;
     password: string;
-    goto?: string;
   };
 
   const errors: Record<string, boolean> = {};
   if (!id) errors.id = true;
   if (!password) errors.password = true;
   if (Object.keys(errors).length > 0) {
-    session.data.error = "Missing credentials";
+    const errorCode = UserLoginErrorCode.MISSING_CREDENTIALS;
+    session.data.error = getErrorMessageForLoginErrorCode(errorCode);
 
-    return makeErrorResponse("Missing credentials", 400, {
+    return makeRedirectResponse(`/login?how=${errorCode}`, {
       "Set-Cookie": await commitSession(session),
     });
   }
 
-  const user = await userService.getUser(id);
+  const user = await userService.getRegisteredUser(id);
+
   if (!user) {
-    const errorMessage = "Unknown User ID";
-    session.data.error = errorMessage;
+    const errorCode = UserLoginErrorCode.REGISTRATION_PENDING;
+    session.data.error = getErrorMessageForLoginErrorCode(errorCode);
 
-    return makeRedirectResponse(
-      "/login?how=unsuccessful",
-      {
-        "Set-Cookie": await commitSession(session),
-      },
-      303,
-      errorMessage
-    );
-  }
-
-  if (!(user.passwordSalt && user.hashedPassword)) {
-    const errorMessage =
-      "You must register for HackerNews clone separately for login to work";
-    session.data.error = errorMessage;
-
-    return makeRedirectResponse(
-      "/login?how=unsuccessful",
-      {
-        "Set-Cookie": await commitSession(session),
-      },
-      303,
-      errorMessage
-    );
+    return makeRedirectResponse(`/login?how=${errorCode}`, {
+      "Set-Cookie": await commitSession(session),
+    });
   }
 
   const isPasswordValid = await userService.validatePassword(id, password);
-
   if (!user || !isPasswordValid) {
-    const errorMessage = "Password is incorrect";
-    session.data.error = errorMessage;
+    const errorCode = UserLoginErrorCode.INCORRECT_PASSWORD;
+    session.data.error = getErrorMessageForLoginErrorCode(errorCode);
 
-    return makeRedirectResponse(
-      "/login?how=unsuccessful",
-      {
-        "Set-Cookie": await commitSession(session),
-      },
-      303,
-      errorMessage
-    );
+    return makeRedirectResponse(`/login?how=${errorCode}`, {
+      "Set-Cookie": await commitSession(session),
+    });
   }
 
   // Successful login, clear any previous error
   session.data.error = undefined;
   session.data[SessionCookieProperties.USER_ID] = user.id;
 
-  return makeRedirectResponse(goto || "/", {
+  return makeRedirectResponse(gotoQueryParam, {
     "Set-Cookie": await commitSession(session),
   });
 };

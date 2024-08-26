@@ -36,6 +36,10 @@ export class UserService {
     return false;
   }
 
+  async getRegisteredUser(id: string): Promise<UserModel | undefined> {
+    return this.cache.getUser(id);
+  }
+
   async registerUser(user: {
     id: string;
     password: string;
@@ -45,7 +49,7 @@ export class UserService {
 
     // Check if user already exists
     if (this.cache.getUser(user.id)) {
-      throw new Error("Username is taken.");
+      throw new Error(`Username ${user.id} is taken.`);
     }
 
     // Go ahead and create the new user
@@ -68,17 +72,13 @@ export class UserService {
     return newUser;
   }
 
-  async updateUser(user: {
-    id: string;
-    about: string;
-    email: string;
-  }): Promise<UserModel> {
+  async updateUser(user: { id: string; about: string }): Promise<UserModel> {
     const foundUser = this.cache.getUser(user.id);
     if (!foundUser) {
       throw new Error("User not found.");
     }
 
-    if (user.email) foundUser.email = user.email;
+    // if (user.email) foundUser.email = user.email;
     if (user.about) foundUser.about = user.about;
 
     this.cache.setUser(user.id, foundUser);

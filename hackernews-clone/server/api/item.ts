@@ -25,10 +25,14 @@ export const meta: MeactMeta<IItemPageLoader | null> = (args) => {
     args.pageLoaderData.data &&
     args.pageLoaderData.data.newsItem
   ) {
+    const pageTitle = args.pageLoaderData.data.newsItem.title
+      ? args.pageLoaderData.data.newsItem.title
+      : args.pageLoaderData.data.newsItem.text;
+
     return [
       {
         title: {
-          text: `${args.pageLoaderData.data.newsItem.title} | Hacker News Clone`,
+          text: `${pageTitle} | Hacker News Clone`,
         },
       },
     ];
@@ -49,6 +53,7 @@ export const loader: MeactLoader<IItemPageLoader | null> = async (
   }
 
   const newsItem = await newsItemService.getStory(+newsItemId);
+
   if (!newsItem) {
     return makeErrorResponse("News Item not found");
   }
