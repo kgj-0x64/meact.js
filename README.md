@@ -2,6 +2,14 @@
 
 Meact.js = My (implementation of) React.js
 
+["Multi-Page Application" framework built on top of meact.js](./meact-framework/README.md)
+
+- See [HackerNews Clone app built using this framework](../hackernews-clone/README.md)
+
+## The Framework
+
+This "Multi-Page Application" framework takes that Meact.js library (that is, "meact" and "meact-dom" implementations) and serves pages using Express.js server with "pages" directory as router like Next.js. Pages are generated on demand using tree-shaken and code-split JavaScript bundles (and chunks) which were generated at build time for each page.
+
 ## Implementation
 
 - [x] Functional Components (i.e. reusable UI elements) built with "Template Literals" and global State & Event Handler Managers
@@ -44,6 +52,7 @@ Meact.js = My (implementation of) React.js
 
 - [x] Meta Tags (Server-side Hydration)
 - [x] Server-side Loader Pattern (Remix.js-like)
+- [x] Server-side Action Pattern (Remix.js-like)
 - [x] Framework's Abstraction
 
 ### Constraints

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HackerNews x Meact.js</title>
+    <!-- Link and Script tags will be injected by the server -->
+    <link rel="shortcut icon" href="/static/favicon.ico" />
+    <link rel="stylesheet" href="styles/debugger.css" />
+    <link rel="stylesheet" href="$stylesheetBundlePath" />
+    <script type="module" src="$pageScriptBundlePath" defer></script>
+    <script
+      type="module"
+      src="meact-framework/client-runtime/client.js"
+      defer
+    ></script>
+    <!-- https://stackoverflow.com/a/7956249/3083243 -->
+    <!-- The type="application/json" is needed to prevent browser from parsing it while loading. -->
+    <script id="page-loader-data" type="application/json"></script>
+  </head>
+  <body>
+    <div id="root">
+      <!-- Your content here -->
+    </div>
+    <div id="meact-element-tree"></div>
+
+    <!-- Inline script that calls runApp from "csr.js" -->
+    <script type="module">
+      // set these values dynamically while handling GET request for a page
+      window.currentPageScriptBundlePath = "$pageScriptBundlePath";
+
+      // https://developer.mozilla.org/en-US/docs/Web/API/Document/DOMContentLoaded_event#checking_whether_loading_is_already_complete
+      // DOMContentLoaded may fire before your script has a chance to run, so it is wise to check before adding a listener.
+      if (document.readyState === "loading") {
+        // Loading hasn't finished yet
+        document.addEventListener("DOMContentLoaded", hydrate);
+      } else {
+        // `DOMContentLoaded` has already fired
+        hydrate();
+      }
+
+      async function hydrate() {
+        const currentPageModule = await import(
+          `./${window.currentPageScriptBundlePath}`
+        );
+        window.currentPageModule = currentPageModule;
+
+        const meactFrameworkClientModule = await import(
+          "./meact-framework/client-runtime/client.js"
+        );
+        meactFrameworkClientModule.hydrate();
+      }
+    </script>
+  </body>
+</html>
