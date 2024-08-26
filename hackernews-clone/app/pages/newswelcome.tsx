@@ -72,12 +72,10 @@ export function NewsWelcomePage(): JSX.Element {
         <br />
         <br />
         <br />
-        <table
-          style={{ padding: "0px", backgroundColor: "#ff6600", width: "100%" }}
-        >
+        <table style={tableStyle}>
           <tbody>
-            <tr style={{ height: "0px" }}>
-              <td style={{ padding: "0px" }} />
+            <tr style={tableRowStyle}>
+              <td style={tableColumnStyle} />
             </tr>
           </tbody>
         </table>
@@ -91,5 +89,13 @@ export function NewsWelcomePage(): JSX.Element {
     </NoticeLayout>
   );
 }
+
+const tableStyle = {
+  padding: "0px",
+  backgroundColor: "#ff6600",
+  width: "100%",
+};
+const tableRowStyle = { height: "0px" };
+const tableColumnStyle = { padding: "0px" };
 
 export default NewsWelcomePage;

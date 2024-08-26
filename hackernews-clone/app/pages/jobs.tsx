@@ -27,7 +27,7 @@ export default function JobsPage(): JSX.Element {
         postsPerPage={POSTS_PER_PAGE}
         notice={
           <>
-            <tr key="noticetopspacer" style={{ height: "20px" }} />
+            <tr key="noticetopspacer" style={topSpacerStyle} />
             <tr key="notice">
               <td />
               <td>
@@ -42,10 +42,13 @@ export default function JobsPage(): JSX.Element {
                 .
               </td>
             </tr>
-            <tr key="noticebottomspacer" style={{ height: "20px" }} />
+            <tr key="noticebottomspacer" style={bottomSpacerStyle} />
           </>
         }
       />
     </MainLayout>
   );
 }
+
+const topSpacerStyle = { height: "20px" };
+const bottomSpacerStyle = { height: "20px" };

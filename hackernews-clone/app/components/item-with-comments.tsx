@@ -34,16 +34,8 @@ export function ItemWithComments(
 
   return (
     <tr>
-      <td style={{ padding: "0px" }}>
-        <table
-          style={{
-            border: "0px",
-            padding: "0px",
-            borderCollapse: "collapse",
-            borderSpacing: "0px",
-          }}
-          className="itemlist"
-        >
+      <td style={containerStyle}>
+        <table style={itemContainerStyle} className="itemlist">
           <tbody>
             {!parent ? (
               <ItemTitle
@@ -82,7 +74,7 @@ export function ItemWithComments(
             <tr
               key="morespace"
               className="morespace"
-              style={{ height: "10px" }}
+              style={spaceHolderStyle}
             />
             <CommentBox parentId={id} isParentRootItem={!parent} />
           </tbody>
@@ -96,3 +88,12 @@ export function ItemWithComments(
     </tr>
   );
 }
+
+const containerStyle = { padding: "0px" };
+const itemContainerStyle = {
+  border: "0px",
+  padding: "0px",
+  borderCollapse: "collapse",
+  borderSpacing: "0px",
+};
+const spaceHolderStyle = { height: "10px" };

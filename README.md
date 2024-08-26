@@ -51,8 +51,9 @@ This "Multi-Page Application" framework takes that Meact.js library (that is, "m
 - [x] [Code splitting](https://github.com/evanw/esbuild/blob/main/docs/architecture.md#code-splitting) (chunks shared between routes)
 
 - [x] Meta Tags (Server-side Hydration)
-- [x] Server-side Loader Pattern (Remix.js-like)
-- [x] Server-side Action Pattern (Remix.js-like)
+- [x] Server-side Loader and `useLoaderData` Hook Pattern (like Remix.js) which prepares data needed by page (and its components) at request time and sends it alongside HTML content thus saving a round-trip
+- [x] Server-side Action and `useActionData` Hook Pattern (like Remix.js) using custom `FormAction` component and `useMutation` hook [see "Submit Page" implementation](./hackernews-clone//app//pages//submit.tsx)
+
 - [x] Framework's Abstraction
 
 ### Constraints
@@ -83,11 +84,15 @@ This "Multi-Page Application" framework takes that Meact.js library (that is, "m
 
 ### Interesting Takeaways
 
-- **In-browser debugging** is just so beautiful, nothing short of IntelliJ!
+- **In-browser debugging** is very robust, got to play with "Sources" tab a lot while debugging recursive library functions & APIs.
 
 - [JSX Spec - "Why not Template Literals?"](https://facebook.github.io/jsx/#sec-why-not-template-literals)
 
 - **React uses the order of hooks inside a component's function definition to manage state and side effects.**
+
+- I have actually understood the importance of immutability in object references and its impact on work done during re-rendering given how React.js uses shallow comparison to strike a balance between performance and correctness.
+
+  - If a property itself is an object (or array), a shallow comparison will only check if the references (or addresses) of these objects are the same, without recursively comparing nested objects or arrays. For insatnce, defining objects in inline `style` attribute will create a new object reference on every render and thus resulting in re-rendering of that element in the browser DOM - so, either define them outside the component or use `useMemo`.
 
 - [How different frameworks handle the difference between DOM properties and attributes](https://jakearchibald.com/2024/attributes-vs-properties/#how-frameworks-handle-the-difference)
 

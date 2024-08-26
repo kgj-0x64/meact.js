@@ -58,16 +58,8 @@ export function NewsFeed(props: INewsFeedProps): JSX.Element {
 
   return (
     <tr>
-      <td style={{ padding: "0px" }}>
-        <table
-          style={{
-            border: "0px",
-            padding: "0px",
-            borderCollapse: "collapse",
-            borderSpacing: "0px",
-          }}
-          className="itemlist"
-        >
+      <td style={pageStyle}>
+        <table style={tableStyle} className="itemlist">
           <tbody>
             {notice ? notice : <null />}
             <>
@@ -102,13 +94,13 @@ export function NewsFeed(props: INewsFeedProps): JSX.Element {
                   />,
                   <tr
                     key={`${newsItem.id}spacer`}
-                    style={{ height: 5 }}
+                    style={spacerStyle}
                     className="spacer"
                   />,
                 ])}
               <tr
                 key="morespace"
-                style={{ height: "10px" }}
+                style={moreSpacerStyle}
                 className="morespace"
               />
               <tr key="morelinktr">
@@ -131,3 +123,13 @@ export function NewsFeed(props: INewsFeedProps): JSX.Element {
     </tr>
   );
 }
+
+const pageStyle = { padding: "0px" };
+const tableStyle = {
+  border: "0px",
+  padding: "0px",
+  borderCollapse: "collapse",
+  borderSpacing: "0px",
+};
+const spacerStyle = { height: 5 };
+const moreSpacerStyle = { height: "10px" };

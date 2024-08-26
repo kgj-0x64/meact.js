@@ -1,4 +1,5 @@
 import { JSX } from "@meact/jsx-runtime";
+import { Form } from "./Form.js";
 
 export interface ICommentBoxProps {
   parentId: number;
@@ -12,7 +13,7 @@ export function CommentBox(props: ICommentBoxProps): JSX.Element {
     <tr>
       <td colSpan={2} />
       <td>
-        <form method="post" action="comment">
+        <Form method="POST" action="comment">
           <input type="hidden" name="parent" prop:value={parentId} />
           <input type="hidden" name="goto" prop:value={`item?id=${parentId}`} />
           <textarea name="text" rows={6} cols={60} />
@@ -22,7 +23,7 @@ export function CommentBox(props: ICommentBoxProps): JSX.Element {
             type="submit"
             prop:value={isParentRootItem ? "add comment" : "reply"}
           />
-        </form>
+        </Form>
       </td>
     </tr>
   );

@@ -9,24 +9,12 @@ export function NoticeLayout(props: JSX.PropsWithChildren<{}>): JSX.Element {
     <div>
       <br />
       <br />
-      <table
-        style={{
-          marginLeft: "auto",
-          marginRight: "auto",
-          padding: "0px",
-          width: "500px",
-        }}
-      >
+      <table style={tableStyle}>
         <tbody>
           <tr>
-            <td style={{ backgroundColor: "#fafaf0" }}>
+            <td style={logoContainerStyle}>
               <a href="http://www.ycombinator.com">
-                <img
-                  alt=""
-                  src={yc500Gif}
-                  style={{ border: "0px" }}
-                  width="500"
-                />
+                <img alt="" src={yc500Gif} style={logoImageStyle} width="500" />
               </a>
               <br />
               <br />
@@ -38,3 +26,12 @@ export function NoticeLayout(props: JSX.PropsWithChildren<{}>): JSX.Element {
     </div>
   );
 }
+
+const tableStyle = {
+  marginLeft: "auto",
+  marginRight: "auto",
+  padding: "0px",
+  width: "500px",
+};
+const logoContainerStyle = { backgroundColor: "#fafaf0" };
+const logoImageStyle = { border: "0px" };

@@ -39,7 +39,7 @@ export function Comment(props: ICommentProps): JSX.Element {
   return (
     <tr className="athing comtr" key={id.toString()} id={id.toString()}>
       <td>
-        <table style={{ border: "0" }}>
+        <table style={tableStyle}>
           <tbody>
             <tr>
               <td className="ind">
@@ -52,27 +52,20 @@ export function Comment(props: ICommentProps): JSX.Element {
                   } /* Width varies depending on comment level */
                 />
               </td>
-              <td style={{ verticalAlign: "top" }} className="votelinks">
-                <div style={{ textAlign: "center" }}>
+              <td style={voteButtonColumnStyle} className="votelinks">
+                <div style={voteButtonContainerStyle}>
                   <Form
                     action={`vote?id=${id}&how=up&goto=item?id=${id}`}
                     method="POST"
                   >
-                    <button
-                      type="submit"
-                      style={{
-                        background: "none",
-                        border: "none",
-                        cursor: "pointer",
-                      }}
-                    >
+                    <button type="submit" style={textButtonStyle}>
                       <div className="votearrow" title="upvote" />
                     </button>
                   </Form>
                 </div>
               </td>
               <td className="default">
-                <div style={{ marginTop: "2px", marginBottom: "-10px" }}>
+                <div style={metaInfoContainerStyle}>
                   <span className="comhead">
                     <a href={`/user?id=${submitterId}`} className="hnuser">
                       {submitterId}
@@ -88,11 +81,7 @@ export function Comment(props: ICommentProps): JSX.Element {
                     {/** ! TODO collapseComment -- useMemo is perfect -- recursive function `renderCommentTreeAsFlatArray` might be buggy 
                       <button
                         type="button"
-                        style={{
-                          background: "none",
-                          border: "none",
-                          cursor: "pointer",
-                        }}
+                        style={textButtonStyle}
                         className="togg"
                         prop:onClick={() => {}}
                       >
@@ -115,7 +104,7 @@ export function Comment(props: ICommentProps): JSX.Element {
                       <>
                         <div dangerouslySetInnerHTML={{ __html: text }} />
                         <div className="reply">
-                          <p style={{ fontSize: "1" }}>
+                          <p style={replyTextButtonStyle}>
                             <a href={`/reply?id=${id}&goto=item?id=${id}`}>
                               reply
                             </a>
@@ -135,3 +124,14 @@ export function Comment(props: ICommentProps): JSX.Element {
     </tr>
   );
 }
+
+const tableStyle = { border: "0" };
+const voteButtonColumnStyle = { verticalAlign: "top" };
+const voteButtonContainerStyle = { textAlign: "center" };
+const textButtonStyle = {
+  background: "none",
+  border: "none",
+  cursor: "pointer",
+};
+const metaInfoContainerStyle = { marginTop: "2px", marginBottom: "-10px" };
+const replyTextButtonStyle = { fontSize: "1" };

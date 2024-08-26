@@ -11,8 +11,8 @@ export function FormatDocPage(): JSX.Element {
       <tr>
         <td>
           <span className="admin">
-            <div style={{ textAlign: "center" }}>
-              <table style={{ width: "500px" }}>
+            <div style={tableContainerStyle}>
+              <table style={tableStyle}>
                 <tbody>
                   <tr>
                     <td>
@@ -45,5 +45,8 @@ export function FormatDocPage(): JSX.Element {
     </MainLayout>
   );
 }
+
+const tableContainerStyle = { textAlign: "center" };
+const tableStyle = { width: "500px" };
 
 export default FormatDocPage;

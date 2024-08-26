@@ -31,14 +31,11 @@ export function ItemTitle(props: IItemTitleProps): JSX.Element {
 
   return (
     <tr className="athing">
-      <td
-        style={{ textAlign: "right", verticalAlign: "top" }}
-        className="title"
-      >
+      <td style={rankContainerStyle} className="title">
         <span className="rank">{isRankVisible ? `${rank}.` : <null />}</span>
       </td>
-      <td style={{ verticalAlign: "top" }} className="votelinks">
-        <div style={{ textAlign: "center" }}>
+      <td style={voteButtonColumnStyle} className="votelinks">
+        <div style={voteButtonContainerStyle}>
           {isUpvoteVisible ? (
             <Form
               action={`/vote?id=${id}&how=up&goto=${loc.pathname + loc.search}`}
@@ -46,11 +43,7 @@ export function ItemTitle(props: IItemTitleProps): JSX.Element {
             >
               <button
                 type="submit"
-                style={{
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                }}
+                style={buttonStyle}
                 className={upvoted ? "nosee" : " "}
               >
                 <div className="votearrow" title="upvote" />
@@ -85,3 +78,12 @@ export function ItemTitle(props: IItemTitleProps): JSX.Element {
     </tr>
   );
 }
+
+const rankContainerStyle = { textAlign: "right", verticalAlign: "top" };
+const voteButtonColumnStyle = { verticalAlign: "top" };
+const voteButtonContainerStyle = { textAlign: "center" };
+const buttonStyle = {
+  background: "none",
+  border: "none",
+  cursor: "pointer",
+};

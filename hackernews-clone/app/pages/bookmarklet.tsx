@@ -16,9 +16,9 @@ export function BookmarkletPage(): JSX.Element {
           <br />
           <br />
         </p>
-        <div style={{ textAlign: "center" }}>
+        <div style={textCenteringStyle}>
           <a
-            style={{ color: "#777", fontSize: "2em" }}
+            style={linkStyle}
             href="javascript:window.location=%22http://news.ycombinator.com/submitlink?u=%22+encodeURIComponent(document.location)+%22&amp;t=%22+encodeURIComponent(document.title)"
           >
             post to HN
@@ -26,16 +26,14 @@ export function BookmarkletPage(): JSX.Element {
         </div>
         <br />
         <br />
-        <table
-          style={{ padding: "0px", backgroundColor: "#ff6600", width: "100%" }}
-        >
+        <table style={tableStyle}>
           <tbody>
-            <tr style={{ height: "0px" }}>
-              <td style={{ padding: "0px" }} />
+            <tr style={tableRowStyle}>
+              <td style={tableColumnStyle} />
             </tr>
           </tbody>
         </table>
-        <p style={{ textAlign: "center" }}>
+        <p style={textCenteringStyle}>
           <span className="foot">
             <br />
             <br />
@@ -45,5 +43,15 @@ export function BookmarkletPage(): JSX.Element {
     </NoticeLayout>
   );
 }
+
+const textCenteringStyle = { textAlign: "center" };
+const linkStyle = { color: "#777", fontSize: "2em" };
+const tableStyle = {
+  padding: "0px",
+  backgroundColor: "#ff6600",
+  width: "100%",
+};
+const tableRowStyle = { height: "0px" };
+const tableColumnStyle = { padding: "0px" };
 
 export default BookmarkletPage;

@@ -31,8 +31,8 @@ export function SubItemTitle(props: ISubItemTitleProps): JSX.Element {
   return (
     <tr>
       <td colSpan={1} />
-      <td style={{ verticalAlign: "top" }} className="votelinks">
-        <div style={{ textAlign: "center" }}>
+      <td style={voteButtonColumnStyle} className="votelinks">
+        <div style={voteButtonContainerStyle}>
           {isUpvoteVisible ? (
             <Form
               action={`/vote?id=${id}&how=up&goto=${loc.pathname + loc.search}`}
@@ -40,11 +40,7 @@ export function SubItemTitle(props: ISubItemTitleProps): JSX.Element {
             >
               <button
                 type="submit"
-                style={{
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                }}
+                style={buttonStyle}
                 className={upvoted ? "nosee" : " "}
               >
                 <div className="votearrow" title="upvote" />
@@ -72,3 +68,11 @@ export function SubItemTitle(props: ISubItemTitleProps): JSX.Element {
     </tr>
   );
 }
+
+const voteButtonColumnStyle = { verticalAlign: "top" };
+const voteButtonContainerStyle = { textAlign: "center" };
+const buttonStyle = {
+  background: "none",
+  border: "none",
+  cursor: "pointer",
+};

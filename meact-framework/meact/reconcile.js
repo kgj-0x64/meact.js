@@ -61,7 +61,7 @@ export function updateSubtreeForExistingNode(
     !upcomingChildNodeAtThisPosition &&
     existingSubtreeRootNode.type === "MeactComponent"
   ) {
-    // pass a new copy object, else the original object reference will be modified in place
+    // ! pass a new copy object, else the original object reference will be modified in place
     const copyOfExistingSubtreeRootNode = new MeactElement(
       existingSubtreeRootNode.type,
       existingSubtreeRootNode.name,

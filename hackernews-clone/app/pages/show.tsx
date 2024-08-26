@@ -24,7 +24,7 @@ export function ShowHNPage(): JSX.Element {
         postsPerPage={POSTS_PER_PAGE}
         notice={
           <>
-            <tr key="noticetopspacer" style={{ height: "5px" }} />
+            <tr key="noticetopspacer" style={topSpacerStyle} />
             <tr key="notice">
               <td colSpan={2} />
               <td>
@@ -39,12 +39,15 @@ export function ShowHNPage(): JSX.Element {
                 Show HNs.
               </td>
             </tr>
-            <tr key="noticebottomspacer" style={{ height: "10px" }} />
+            <tr key="noticebottomspacer" style={bottomSpacerStyle} />
           </>
         }
       />
     </MainLayout>
   );
 }
+
+const topSpacerStyle = { height: "5px" };
+const bottomSpacerStyle = { height: "10px" };
 
 export default ShowHNPage;

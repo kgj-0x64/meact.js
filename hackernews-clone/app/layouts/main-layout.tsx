@@ -32,22 +32,10 @@ export function MainLayout(
   return (
     <MeContext.Provider value={me}>
       <div>
-        <table
-          id="hnmain"
-          style={{
-            backgroundColor: "#f6f6ef",
-            border: "0px",
-            borderCollapse: "collapse",
-            borderSpacing: "0px",
-            marginLeft: "auto",
-            marginRight: "auto",
-            padding: "0px",
-            width: "85%",
-          }}
-        >
+        <table id="hnmain" style={tableStyle}>
           <tbody>
             <Header isNavVisible={!!isNavVisible} title={title!} />
-            <tr id="pagespace" style={{ height: "10px" }} />
+            <tr id="pagespace" style={spacerStyle} />
             {children}
             {isFooterVisible ? <Footer /> : <null />}
           </tbody>
@@ -56,3 +44,15 @@ export function MainLayout(
     </MeContext.Provider>
   );
 }
+
+const tableStyle = {
+  backgroundColor: "#f6f6ef",
+  border: "0px",
+  borderCollapse: "collapse",
+  borderSpacing: "0px",
+  marginLeft: "auto",
+  marginRight: "auto",
+  padding: "0px",
+  width: "85%",
+};
+const spacerStyle = { height: "10px" };

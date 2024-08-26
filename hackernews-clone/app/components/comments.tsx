@@ -29,7 +29,7 @@ export function Comments(props: ICommentsProps): JSX.Element {
   );
 
   return (
-    <table className="comment-tree" style={{ border: "0" }}>
+    <table className="comment-tree" style={commentsTableStyle}>
       <tbody>
         {renderCommentTreeAsFlatArray(
           [],
@@ -101,3 +101,5 @@ function countChildrenComments(comments: IComment[]): number {
     }, 0)
   );
 }
+
+const commentsTableStyle = { border: "0" };

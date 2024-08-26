@@ -4,17 +4,17 @@ import sGif from "../../public/static/s.gif";
 export function Footer(): JSX.Element {
   return (
     <tr>
-      <td style={{ padding: "0px" }}>
+      <td style={footerColumnStyle}>
         <img alt="" src={sGif} height="10" width="0" />
-        <table style={{ height: "2px", width: "100%", borderSpacing: "0px" }}>
+        <table style={tableStyle}>
           <tbody>
             <tr>
-              <td style={{ backgroundColor: "#ff6600" }} />
+              <td style={ycColorStyle} />
             </tr>
           </tbody>
         </table>
         <br />
-        <div style={{ textAlign: "center" }}>
+        <div style={linksContainerStyle}>
           <span className="yclinks">
             <a href="/newsguidelines">Guidelines</a>
             &nbsp;| <a href="/newsfaq">FAQ</a>
@@ -29,11 +29,7 @@ export function Footer(): JSX.Element {
           </span>
           <br />
           <br />
-          <form
-            method="get"
-            action="//hn.algolia.com/"
-            style={{ marginBottom: "1em" }}
-          >
+          <form method="get" action="//hn.algolia.com/" style={searchFormStyle}>
             Search:
             <input
               type="text"
@@ -50,3 +46,9 @@ export function Footer(): JSX.Element {
     </tr>
   );
 }
+
+const footerColumnStyle = { padding: "0px" };
+const tableStyle = { height: "2px", width: "100%", borderSpacing: "0px" };
+const ycColorStyle = { backgroundColor: "#ff6600" };
+const linksContainerStyle = { textAlign: "center" };
+const searchFormStyle = { marginBottom: "1em" };

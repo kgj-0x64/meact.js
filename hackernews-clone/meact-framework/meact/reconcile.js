@@ -55,8 +55,9 @@ export function updateSubtreeForExistingNode(
 
   // handle function invocation if this subtree root node is of type MeactComponent
 
-  // if upcomingChildNodeAtThisPosition is not null,
-  // it means "Fragment" | "MeactContextProvider" functions were already called and their children are being handled now
+  // Proceed if upcomingChildNodeAtThisPosition is not null,
+  // so it handles all component type elements including "Fragment" and "MeactContextProvider"
+  // but it's not called when children of "Fragment" and "MeactContextProvider" are being handled
   if (
     !upcomingChildNodeAtThisPosition &&
     existingSubtreeRootNode.type === "MeactComponent"
@@ -96,6 +97,13 @@ export function updateSubtreeForExistingNode(
     // else, set first and only child returned from running this component's function as reconciliation target
     freshChildOfSubtreeRootAtThisPosition =
       copyOfExistingSubtreeRootNode.children[0];
+
+    if (existingSubtreeRootNode.name === "FormAction") {
+      console.log(
+        "freshChildOfSubtreeRootAtThisPosition",
+        freshChildOfSubtreeRootAtThisPosition
+      );
+    }
   }
 
   /// reconcile this child position of this existing (persisted) node...

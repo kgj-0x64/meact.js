@@ -64,10 +64,10 @@ function LoginPage(): JSX.Element {
         method="POST"
         action="/login"
         onSubmit={(e): void => validateLogin(e)}
-        style={{ marginBottom: "1em" }}
+        style={formStyle}
       >
         <input name="goto" type="hidden" prop:value={goto || "/"} />
-        <table style={{ border: "0px" }}>
+        <table style={formTableStyle}>
           <tbody>
             <tr>
               <td>username:</td>
@@ -117,9 +117,9 @@ function LoginPage(): JSX.Element {
         method="POST"
         action={`/register?goto=${goto}`}
         onSubmit={(e): void => validateRegister(e)}
-        style={{ marginBottom: "1em" }}
+        style={formStyle}
       >
-        <table style={{ border: "0px" }}>
+        <table style={formTableStyle}>
           <tbody>
             <tr>
               <td>username:</td>
@@ -166,5 +166,8 @@ function LoginPage(): JSX.Element {
     </BlankLayout>
   );
 }
+
+const formStyle = { marginBottom: "1em" };
+const formTableStyle = { border: "0px" };
 
 export default LoginPage;

@@ -2,55 +2,17 @@ import type { JSX } from "@meact/jsx-runtime";
 import { BlankLayout } from "../layouts/blank-layout.js";
 import "../styles/dmca.css";
 
-const spanStyle = {
-  fontSize: "11.5pt",
-  fontFamily: "Helvetica",
-  color: "#444444",
-};
-const paragraphStyle = {
-  marginBottom: "7.5pt",
-  lineHeight: "normal",
-  background: "white",
-};
-const liStyle = {
-  color: "#444444",
-  marginBottom: "15.0pt",
-  lineHeight: "normal",
-  background: "white",
-};
-const liSpanStyle = { fontSize: "10.5pt", fontFamily: "Helvetica" };
-const paragraphStyle2 = {
-  marginTop: "7.5pt",
-  marginRight: "0in",
-  marginBottom: "15.0pt",
-  marginLeft: "0in",
-  lineHeight: "normal",
-  background: "white",
-};
-const bSpanStyle = {
-  fontSize: "13.5pt",
-  fontFamily: "Helvetica",
-  color: "#444444",
-};
-
 export default function DmcaPage(): JSX.Element {
   return (
     <BlankLayout>
-      <p
-        className="MsoNormal"
-        style={{
-          marginBottom: "15.0pt",
-          lineHeight: "normal",
-          background: "white",
-        }}
-      >
+      <p className="MsoNormal" style={pageStyle}>
         <span style={spanStyle}>
           Y Combinator has adopted the following policy toward copyright
           infringement on the Services in accordance with the Digital Millennium
           Copyright Act (a copy of which is located at{" "}
         </span>
         <a href="http://www.loc.gov/copyright/legislation/dmca.pdf">
-          <span style={{ fontSize: "11.5pt", fontFamily: "Helvetica" }}>
+          <span style={pdfLinkStyle}>
             http://www.loc.gov/copyright/legislation/dmca.pdf
           </span>
         </a>
@@ -82,7 +44,7 @@ export default function DmcaPage(): JSX.Element {
           (including section numbers) when you send written notice to us:{" "}
         </span>
       </p>
-      <ol style={{ marginTop: "0in" }} start={1} type="1">
+      <ol style={orderedListContainerStyle} start={1} type="1">
         <li className="MsoNormal" style={liStyle}>
           <span style={liSpanStyle}>
             Identification of the work or material being infringed.{" "}
@@ -150,7 +112,7 @@ export default function DmcaPage(): JSX.Element {
           following information to the Designated Agent at the address below:
         </span>
       </p>
-      <ul style={{ listStyleType: "disc", marginTop: "0in" }}>
+      <ul style={unorderedListContainerStyle}>
         <li className="MsoNormal" style={liStyle}>
           <span style={liSpanStyle}>
             The specific URLs of material that Y Combinator has removed or to
@@ -216,3 +178,42 @@ export default function DmcaPage(): JSX.Element {
     </BlankLayout>
   );
 }
+
+const pageStyle = {
+  marginBottom: "15.0pt",
+  lineHeight: "normal",
+  background: "white",
+};
+const spanStyle = {
+  fontSize: "11.5pt",
+  fontFamily: "Helvetica",
+  color: "#444444",
+};
+const paragraphStyle = {
+  marginBottom: "7.5pt",
+  lineHeight: "normal",
+  background: "white",
+};
+const liStyle = {
+  color: "#444444",
+  marginBottom: "15.0pt",
+  lineHeight: "normal",
+  background: "white",
+};
+const liSpanStyle = { fontSize: "10.5pt", fontFamily: "Helvetica" };
+const paragraphStyle2 = {
+  marginTop: "7.5pt",
+  marginRight: "0in",
+  marginBottom: "15.0pt",
+  marginLeft: "0in",
+  lineHeight: "normal",
+  background: "white",
+};
+const bSpanStyle = {
+  fontSize: "13.5pt",
+  fontFamily: "Helvetica",
+  color: "#444444",
+};
+const pdfLinkStyle = { fontSize: "11.5pt", fontFamily: "Helvetica" };
+const orderedListContainerStyle = { marginTop: "0in" };
+const unorderedListContainerStyle = { listStyleType: "disc", marginTop: "0in" };

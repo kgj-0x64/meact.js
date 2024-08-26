@@ -6,7 +6,7 @@ export function ListsPage(): JSX.Element {
     <MainLayout>
       <tr>
         <td>
-          <table style={{ borderSpacing: "7px 0px" }}>
+          <table style={tableStyle}>
             <tbody>
               <tr>
                 <td>
@@ -61,5 +61,7 @@ export function ListsPage(): JSX.Element {
     </MainLayout>
   );
 }
+
+const tableStyle = { borderSpacing: "7px 0px" };
 
 export default ListsPage;
