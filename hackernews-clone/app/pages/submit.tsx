@@ -39,30 +39,28 @@ function SubmitPage(): JSX.Element {
 
   return (
     <MainLayout title="Submit" isNavVisible={false} isFooterVisible={false}>
-      {actionData?.title ? (
-        <div style={errorTextStyle}>A title is required.</div>
-      ) : (
-        <null />
-      )}
-      {actionData?.textOrUrl ? (
-        <div style={errorTextStyle}>URL or Text is required.</div>
-      ) : (
-        <null />
-      )}
-      {actionData?.url ? (
-        <div style={errorTextStyle}>URL is not correctly formatted.</div>
-      ) : (
-        <null />
-      )}
       <tr>
         <td>
-          <div style={{ color: "blue" }}>{JSON.stringify(actionData)}</div>
           <FormAction
             method="POST"
             action="/submit"
             onSuccess={memoizedOnSuccess}
           >
-            <div style={{ color: "blue" }}>{JSON.stringify(actionData)}</div>
+            {actionData?.title ? (
+              <div style={errorTextStyle}>A title is required.</div>
+            ) : (
+              <null />
+            )}
+            {actionData?.textOrUrl ? (
+              <div style={errorTextStyle}>URL or Text is required.</div>
+            ) : (
+              <null />
+            )}
+            {actionData?.url ? (
+              <div style={errorTextStyle}>URL is not correctly formatted.</div>
+            ) : (
+              <null />
+            )}
             <table style={tableStyle}>
               <tbody>
                 <tr>

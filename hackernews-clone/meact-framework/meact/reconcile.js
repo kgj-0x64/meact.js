@@ -97,13 +97,6 @@ export function updateSubtreeForExistingNode(
     // else, set first and only child returned from running this component's function as reconciliation target
     freshChildOfSubtreeRootAtThisPosition =
       copyOfExistingSubtreeRootNode.children[0];
-
-    if (existingSubtreeRootNode.name === "FormAction") {
-      console.log(
-        "freshChildOfSubtreeRootAtThisPosition",
-        freshChildOfSubtreeRootAtThisPosition
-      );
-    }
   }
 
   /// reconcile this child position of this existing (persisted) node...

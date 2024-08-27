@@ -71,5 +71,9 @@ export const action: MeactAction<any> = async (args) => {
     url,
   });
 
-  return makeRedirectResponse(`/item?id=${newsItem.id}`);
+  // not doing `makeRedirectResponse` here since that sends an Express.js redirect instruction to the browser/client
+  // while "subbmit" action/mutation handler would find JSON data in response as consisteent
+  return makeDataResponse({
+    redirectToUrl: `/item?id=${newsItem.id}`,
+  });
 };

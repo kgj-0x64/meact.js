@@ -1,6 +1,7 @@
-import { MeactJsonResponse } from "@meact-framework/server-runtime";
 import { JSX } from "@meact/jsx-runtime";
-import { useMutation } from "app/custom-hooks/useMutation.js";
+import { useEffect } from "@meact";
+import { MeactJsonResponse } from "@meact-framework/server-runtime";
+import { useMutation } from "../custom-hooks/useMutation.js";
 
 interface FormActionProps<T> {
   method: "POST" | "PUT" | "DELETE";
@@ -37,11 +38,31 @@ export function FormAction<T>(
     mutate(formDataObjectRef);
   };
 
-  if (data && onSuccess) {
-    onSuccess(data.data);
-  }
+  useEffect(() => {
+    const handleDataFromResponse = () => {
+      // is this a redirect response
+      // @ts-ignore
+      if (data && data.data && data.data.redirectToUrl) {
+        // similar behavior as clicking on a link
+        // @ts-ignore
+        window.location.href = data.data.redirectToUrl;
+      }
+      // is this a response containing JSON data
+      else if (data && onSuccess) {
+        /**
+         * ! parent's state must be updated from within `useEffect`
+         * else, parent's reconciliation will start while
+         * this component's function is blocked at this statement
+         * and thus its return block will run again with older props and children argument
+         * after parent's reconciliation is done
+         * hence leaving this component with potentially stale data
+         */
+        onSuccess(data.data);
+      }
+    };
 
-  console.log("HTML form children", children);
+    handleDataFromResponse();
+  }, [data]);
 
   return (
     <form

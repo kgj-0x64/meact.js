@@ -55,13 +55,14 @@ export function updateSubtreeForExistingNode(
 
   // handle function invocation if this subtree root node is of type MeactComponent
 
-  // if upcomingChildNodeAtThisPosition is not null,
-  // it means "Fragment" | "MeactContextProvider" functions were already called and their children are being handled now
+  // Proceed if upcomingChildNodeAtThisPosition is not null,
+  // so it handles all component type elements including "Fragment" and "MeactContextProvider"
+  // but it's not called when children of "Fragment" and "MeactContextProvider" are being handled
   if (
     !upcomingChildNodeAtThisPosition &&
     existingSubtreeRootNode.type === "MeactComponent"
   ) {
-    // ! pass a new copy object, else the original object reference will be modified in place
+    // pass a new copy object, else the original object reference will be modified in place
     const copyOfExistingSubtreeRootNode = new MeactElement(
       existingSubtreeRootNode.type,
       existingSubtreeRootNode.name,

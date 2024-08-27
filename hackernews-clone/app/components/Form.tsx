@@ -11,8 +11,8 @@ interface FormProps<T> {
 export function Form<T>(props: JSX.PropsWithChildren<FormProps<T>>) {
   const { action, onSubmit, className, style, children } = props;
 
-  // HTMl `form` element's default behavior is enough here
   const handleSubmit = (/** e: React.FormEvent<HTMLFormElement> */ e: any) => {
+    // HTML `form` element's default behavior is enough here
     if (onSubmit !== undefined) {
       onSubmit(e);
     }

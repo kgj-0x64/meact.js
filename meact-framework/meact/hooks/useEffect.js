@@ -44,7 +44,10 @@ export default function useEffect(setup, dependencies) {
     values[thisHookCallCount].setupFunc = setup;
 
     const hasDepsChanged =
-      dependencies.length === 0 || !areArraysEqual(previousDeps, dependencies);
+      dependencies.length === 0
+        ? false
+        : !areArraysEqual(previousDeps, dependencies);
+
     if (hasDepsChanged) {
       shouldQueue = true;
     }

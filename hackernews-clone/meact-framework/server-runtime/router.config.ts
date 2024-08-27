@@ -20,8 +20,8 @@ async function getFiles(dir: string): Promise<string[]> {
 }
 
 async function handleRouterScriptFiles(scriptFiles: string[]) {
-  const imports = [];
-  const mapEntries = [];
+  const imports: string[] = [];
+  const mapEntries: string[] = [];
 
   const outputFile = path.resolve(MEACT_FRAMEWORK_SERVER_DIRECTORY, "build.js");
 

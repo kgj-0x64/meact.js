@@ -42,7 +42,9 @@ export default function useMemo(calculateValueFn, dependencies) {
     values[thisHookCallCount].depsArray = dependencies;
 
     const hasDepsChanged =
-      dependencies.length === 0 || !areArraysEqual(previousDeps, dependencies);
+      dependencies.length === 0
+        ? false
+        : !areArraysEqual(previousDeps, dependencies);
 
     if (hasDepsChanged) {
       cachedValue = calculateValueFn();
