@@ -1,14 +1,12 @@
-# Meact.js Design
+# Meact.js
 
-Meact.js = My (implementation of) React.js
+Meact.js - My [Custom Implementation of] React.js
 
-["Multi-Page Application" framework built on top of meact.js](./meact-framework/README.md)
+I developed Meact.js as a highly stimulating and educational project, where I built a core "Render Tree" and a DIFF reconciliation algorithm inspired by React with APIs for most commonly used hooks. This includes a client-side renderer similar to "react-dom."
 
-- See [HackerNews Clone app built using this framework](./hackernews-clone/README.md)
+Additionally, I have created a ["Multi-Page Application" (MPA) framework]((./meact-framework/README.md) atop the "meact" and "meact-dom" libraries. This framework uses server-side routing, with a page-based routing pattern inspired by Next.js and a server-side loader/action pattern borrowed from Remix.js. The setup leverages Esbuild for preparing tree-shaken and code-split JS/CSS bundles at build time, while Express.js dynamically serves these pages by injecting the appropriate bundles into "index.html" and running loaders through middleware.
 
-## The Framework
-
-This "Multi-Page Application" framework takes that Meact.js library (that is, "meact" and "meact-dom" implementations) and serves pages using Express.js server with "pages" directory as router like Next.js. Pages are generated on demand using tree-shaken and code-split JavaScript bundles (and chunks) which were generated at build time for each page.
+See [the HackerNews Clone app built using this framework to test and prove its production readiness](./hackernews-clone/README.md)
 
 ## Implementation
 
