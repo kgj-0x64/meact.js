@@ -64,7 +64,9 @@ Uncaught TypeError: Cannot read properties of undefined (reading 'values')
 
 ### Traditional Functions
 
-Traditional functions have their own `this` context, which is determined by how the function is called. In my case, the object calling `updateValue` is the `stateManager` object.
+Traditional functions have their own `this` context, which is determined by how the function is called. 
+
+In my case, the object calling `updateValue` is the `stateManager` object.
 Therefore, `this` inside `updateValue` refers to the `stateManager` object, not the `MeactElement` instance.
 
 ```js
@@ -101,7 +103,7 @@ const obj = {
 obj.method(); // 'this' does NOT refer to obj, but to `Window` object in browser's console
 ```
 
-## Complex Example
+### Complex Example
 
 In the `traditionalMethod`, the inner function creates a new `this` context. In the `arrowMethod`, the arrow function captures the `this` value from its surrounding scope.
 
@@ -110,16 +112,16 @@ This behavior of arrow functions can be particularly useful in callback scenario
 ```js
 const obj = {
   traditionalMethod: function () {
-    console.log(this); // refers to obj
+    console.log("TM THIS", this); // refers to obj
     setTimeout(function () {
-      console.log(this); // refers to global object or undefined in strict mode
+      console.log("TM CB", this); // refers to global object or undefined in strict mode
     }, 100);
   },
 
-  arrowMethod: function () {
-    console.log(this); // refers to obj
+  arrowMethod: () => {
+    console.log("AM THIS", this); // refers to global object or undefined in strict mode
     setTimeout(() => {
-      console.log(this); // still refers to obj
+      console.log("AM CB", this); // still refers to global object or undefined in strict mode
     }, 100);
   },
 };
@@ -127,3 +129,40 @@ const obj = {
 obj.traditionalMethod();
 obj.arrowMethod();
 ```
+
+```
+TM THIS {traditionalMethod: ƒ, arrowMethod: ƒ}
+AM THIS Window {0: Window, 1: global, 2: Window, window: Window, self: Window, document: document, name: '', location: Location, …}
+TM CB Window {0: Window, 1: global, 2: Window, window: Window, self: Window, document: document, name: '', location: Location, …}
+AM CB Window {0: Window, 1: global, 2: Window, window: Window, self: Window, document: document, name: '', location: Location, …}
+```
+
+## `bind`
+
+Functions provide a built-in method `bind` that allows to fix this.
+
+Method `func.bind(context, ...args)` returns a "bound variant" of function `func` that fixes the context `this` and first arguments if given. Usually we apply `bind` to fix `this` for an object method, so that we can pass it somewhere, e.g. to `setTimeout`.
+
+```js
+const module = {
+  x: 42,
+  getX: function () {
+    return this.x;
+  },
+};
+
+const unboundGetX = module.getX;
+console.log(unboundGetX()); // The function gets invoked at the global scope
+// Expected output: undefined
+
+const boundGetX = unboundGetX.bind(module);
+console.log(boundGetX());
+// Expected output: 42
+```
+
+When you call `module.getX()`, the value of `this` inside `getX` refers to the `module` object because it's being called as a method of `module`. So when you call `module.getX()`, `this.x` is `42`.
+
+When you are assigning the `getX` function to the variable `unboundGetX`, you've **disconnected** the function from the `module` object. So when you later call `unboundGetX()`, it's no longer called as a method of `module`. Instead, it's invoked in the **global scope**, and `this` now refers to the **global object** (in non-strict mode) or is `undefined` (in strict mode).
+
+When you use `.bind(module)`, you're explicitly setting the value of `this` inside `unboundGetX` to the `module` object. Now, when `boundGetX` is called, `this` is locked to `module`, and `this.x` correctly refers to `module.x`, which is `42`.
+
